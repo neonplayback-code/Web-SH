@@ -53,7 +53,7 @@ export function Header() {
           <Link className="launcher-pill header-login" to="/entrar">Entrar</Link>
         )}
         {isOwner && pathname !== '/nuevo' && (
-          <Link className="launcher-pill header-login" to="/nuevo" aria-label="Publicar" title="Nueva publicación">
+          <Link className="add-button" to="/nuevo" aria-label="Publicar" title="Nueva publicación">
             <Icon name="plus" /><span>Publicar</span>
           </Link>
         )}
