@@ -1,0 +1,415 @@
+/* ========================================
+   REDISEÑO ESPECTACULAR - BARRA DE BÚSQUEDA
+   ======================================== */
+
+/* Contenedor principal de filtros */
+.tab-filters {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0;
+  padding: 20px;
+  border-radius: 20px;
+  background:
+    linear-gradient(135deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    );
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 0 40px rgba(var(--cyan-rgb, 0, 200, 255), 0.1);
+  animation: filtersFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tab-filters::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 20px;
+  background: linear-gradient(
+    135deg,
+    transparent,
+    color-mix(in srgb, var(--cyan) 20%, transparent),
+    transparent
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: -1;
+}
+
+.tab-filters:hover::before {
+  opacity: 1;
+  animation: borderGlow 3s ease-in-out infinite;
+}
+
+@keyframes filtersFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes borderGlow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+
+/* Caja de búsqueda con efectos glassmorphism */
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  height: 56px;
+  isolation: isolate;
+}
+
+/* Icono de búsqueda con efectos mágicos */
+.search-icon {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--cyan);
+  pointer-events: none;
+  z-index: 1;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--cyan) 40%, transparent));
+  animation: iconPulse 3s ease-in-out infinite;
+}
+
+.search-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.search-input:focus ~ .search-icon {
+  transform: translateY(-50%) scale(1.15) rotate(-5deg);
+  filter: drop-shadow(0 0 16px var(--cyan));
+  animation: iconSpin 1s ease-out;
+}
+
+@keyframes iconPulse {
+  0%, 100% {
+    opacity: 0.8;
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--cyan) 40%, transparent));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 16px color-mix(in srgb, var(--cyan) 60%, transparent));
+  }
+}
+
+@keyframes iconSpin {
+  0% { transform: translateY(-50%) scale(1) rotate(0deg); }
+  50% { transform: translateY(-50%) scale(1.2) rotate(-10deg); }
+  100% { transform: translateY(-50%) scale(1.15) rotate(-5deg); }
+}
+
+/* Input de búsqueda ESPECTACULAR */
+.search-input {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 0 60px 0 70px;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  background:
+    linear-gradient(135deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.04) 100%
+    );
+  color: var(--text);
+  font: 600 16px/1.4 var(--body);
+  letter-spacing: 0.02em;
+  outline: none;
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.2),
+    0 4px 16px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  backdrop-filter: blur(10px);
+}
+
+.search-input::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 16px;
+  background: linear-gradient(
+    135deg,
+    var(--cyan),
+    var(--purple),
+    var(--cyan)
+  );
+  background-size: 200% 200%;
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.4s ease;
+  animation: gradientShift 4s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.search-input::placeholder {
+  color: var(--dim);
+  opacity: 0.6;
+  font-weight: 500;
+  transition: opacity 0.3s ease;
+}
+
+.search-input:hover {
+  background:
+    linear-gradient(135deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.06) 100%
+    );
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.2),
+    0 6px 24px rgba(0, 0, 0, 0.15),
+    0 0 40px color-mix(in srgb, var(--cyan) 15%, transparent);
+  transform: translateY(-2px);
+}
+
+.search-input:hover::placeholder {
+  opacity: 0.8;
+}
+
+.search-input:focus {
+  border-color: var(--cyan);
+  background:
+    linear-gradient(135deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.08) 100%
+    );
+  box-shadow:
+    inset 0 2px 12px rgba(0, 0, 0, 0.25),
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    0 0 0 4px color-mix(in srgb, var(--cyan) 25%, transparent),
+    0 0 60px color-mix(in srgb, var(--cyan) 40%, transparent),
+    0 0 100px color-mix(in srgb, var(--cyan) 20%, transparent);
+  transform: translateY(-3px) scale(1.01);
+  animation: inputGlow 2s ease-in-out infinite;
+}
+
+@keyframes inputGlow {
+  0%, 100% {
+    box-shadow:
+      inset 0 2px 12px rgba(0, 0, 0, 0.25),
+      0 8px 32px rgba(0, 0, 0, 0.2),
+      0 0 0 4px color-mix(in srgb, var(--cyan) 25%, transparent),
+      0 0 60px color-mix(in srgb, var(--cyan) 40%, transparent),
+      0 0 100px color-mix(in srgb, var(--cyan) 20%, transparent);
+  }
+  50% {
+    box-shadow:
+      inset 0 2px 12px rgba(0, 0, 0, 0.25),
+      0 8px 32px rgba(0, 0, 0, 0.2),
+      0 0 0 4px color-mix(in srgb, var(--cyan) 35%, transparent),
+      0 0 80px color-mix(in srgb, var(--cyan) 50%, transparent),
+      0 0 120px color-mix(in srgb, var(--cyan) 30%, transparent);
+  }
+}
+
+/* Botón de limpiar búsqueda - EFECTO MÁGICO */
+.search-clear {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg,
+      rgba(255, 255, 255, 0.1),
+      rgba(255, 255, 255, 0.05)
+    );
+  color: var(--muted);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 2;
+  opacity: 0;
+  animation: clearFadeIn 0.3s ease forwards;
+}
+
+@keyframes clearFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.8) rotate(-90deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) scale(1) rotate(0deg);
+  }
+}
+
+.search-clear svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.8;
+  transition: all 0.3s ease;
+}
+
+.search-clear:hover {
+  background:
+    linear-gradient(135deg,
+      rgba(255, 100, 100, 0.3),
+      rgba(255, 50, 50, 0.2)
+    );
+  border-color: rgba(255, 100, 100, 0.5);
+  color: #ff6666;
+  transform: translateY(-50%) scale(1.1) rotate(90deg);
+  box-shadow:
+    0 4px 16px rgba(255, 50, 50, 0.3),
+    0 0 30px rgba(255, 50, 50, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+.search-clear:hover svg {
+  transform: rotate(180deg);
+  filter: drop-shadow(0 0 8px rgba(255, 100, 100, 0.6));
+}
+
+.search-clear:active {
+  transform: translateY(-50%) scale(0.9) rotate(90deg);
+  box-shadow:
+    0 2px 8px rgba(255, 50, 50, 0.4),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Grupo de botones de ordenamiento */
+.tab-sort {
+  display: flex;
+  flex: none;
+  gap: 8px;
+  padding: 4px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--edge);
+}
+
+/* Botones de ordenamiento */
+.sort-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font: 600 14px/1.2 var(--body);
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+.sort-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+  fill: none;
+  stroke: currentColor;
+  transition: all 0.25s ease;
+}
+
+.sort-btn .sort-icon {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  transition: transform 0.25s ease;
+}
+
+.sort-btn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: color-mix(in srgb, var(--cyan) 30%, transparent);
+}
+
+.sort-btn:hover svg,
+.sort-btn:hover .sort-icon {
+  transform: scale(1.1);
+}
+
+/* Botón activo */
+.sort-btn.is-active {
+  color: var(--cyan);
+  background: color-mix(in srgb, var(--cyan) 12%, transparent);
+  border-color: color-mix(in srgb, var(--cyan) 50%, transparent);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--cyan) 15%, transparent);
+}
+
+.sort-btn.is-active svg {
+  stroke: var(--cyan);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--cyan) 40%, transparent));
+}
+
+.sort-btn.is-active .sort-icon {
+  color: var(--cyan);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--cyan) 50%, transparent);
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .tab-filters {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .tab-sort {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .sort-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 12px 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sort-btn span:not(.sort-icon):not(.heart-icon) {
+    display: none;
+  }
+
+  .sort-btn {
+    gap: 0;
+    padding: 12px;
+  }
+
+  .sort-btn svg,
+  .sort-btn .sort-icon {
+    margin: 0 auto;
+  }
+}

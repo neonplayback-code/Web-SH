@@ -1,0 +1,37 @@
+/* StarryNight Base: black sky, blue horizon, white stars, warm moonlight.
+   Reference: https://github.com/spicetify/spicetify-themes/tree/master/StarryNight
+   Locally authored adaptation for ASTRA; all selectors are scoped to that mode. */
+html[data-mode=astra] {
+  --bg: #000000;
+  --text: #ffffff;
+  --muted: #adb5bd;
+  --dim: #94a4b7;
+  --glass-fill: linear-gradient(155deg, rgba(21,34,56,.42), rgba(9,18,30,.26));
+  --glass-edge: rgba(173,181,189,.18);
+  --glass-blur: 8px;
+}
+html[data-mode=astra] body {
+  background: linear-gradient(180deg, #000000 0%, #070f1b 48%, #142b44 100%);
+  background-attachment: fixed;
+}
+html[data-mode=astra] :is(.aurora, .grid-glow, .astra-deco, #od-cosmos) { display: none !important; }
+html[data-mode=astra] body::after { background: radial-gradient(ellipse at 50% 45%, transparent 45%, rgba(0,0,0,.25)); }
+html[data-mode=astra] :is(.hero-copy, .clock-panel, .search, .shortcut-card, .utility-card, .game-card, .plugin-widget) {
+  border-color: rgba(173,181,189,.18) !important;
+}
+html[data-mode=astra] :is(.shortcut-card, .game-card, .utility-card):hover { border-color: rgba(255,243,196,.45) !important; }
+html[data-mode=astra] .clock-panel time { text-shadow: 0 0 26px rgba(255,243,196,.22); }
+html[data-mode=astra] .moon-halo svg { filter: drop-shadow(0 0 28px rgba(255,243,196,.2)); }
+html[data-mode=astra] :is(.section-kicker, .moon-name, .date-button) { color: #fff3c4; }
+html[data-mode=astra] .hero-copy { background-image: none; }
+html[data-mode=astra] :is(.dialog, .search-suggest, .search-engine-menu, .calendar-pop) { background-color: rgba(9,18,30,.97) !important; }
+html[data-mode=astra] :focus-visible { outline-color: #fff3c4; }
+html.starry-paused[data-mode=astra] *, html.starry-paused[data-mode=astra] *::before, html.starry-paused[data-mode=astra] *::after { animation-play-state: paused !important; }
+@media (max-width: 600px) {
+  html[data-mode=astra] .topbar { flex-wrap: wrap; gap: 16px; }
+  html[data-mode=astra] .topbar-right { margin-left: auto; max-width: 100%; flex-wrap: wrap; }
+  html[data-mode=astra] .clock-panel { overflow: hidden; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-mode=astra] *, html[data-mode=astra] *::before, html[data-mode=astra] *::after { animation: none !important; }
+}

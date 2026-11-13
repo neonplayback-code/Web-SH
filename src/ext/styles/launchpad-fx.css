@@ -1,0 +1,34 @@
+/* Launchpad motion: drag lift, new-group birth and the collapsible side blocks. Loaded last. */
+
+/* Drag: the card lifts and tilts slightly, so it reads as held; the grid glides around it (FLIP in app.js). */
+.shortcut-card.is-dragging {
+  opacity: .6;
+  transform: translateY(-4px) scale(1.03) rotate(-1deg);
+  box-shadow: 0 26px 44px -20px #000, 0 0 0 1px color-mix(in srgb, var(--accent, var(--cyan)) 60%, transparent);
+  transition: transform .2s var(--ease, ease), opacity .2s, box-shadow .2s;
+  z-index: 2;
+}
+
+/* New group: a short bloom and a ring that settle into place. */
+@keyframes group-birth {
+  0% { transform: scale(.5); opacity: 0; box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent, var(--cyan)) 90%, transparent); }
+  55% { transform: scale(1.07); opacity: 1; box-shadow: 0 0 0 16px transparent, 0 0 46px color-mix(in srgb, var(--accent, var(--cyan)) 70%, transparent); }
+  100% { transform: none; opacity: 1; box-shadow: none; }
+}
+.shortcut-card.is-new-group { animation: group-birth .75s cubic-bezier(.2, .9, .3, 1.25) both; }
+html[data-mode=overdrive] .shortcut-card.is-new-group { animation-name: group-birth; }
+@media (prefers-reduced-motion: reduce) {
+  .shortcut-card.is-new-group, .shortcut-card.is-dragging { animation: none; transition: none; }
+}
+
+/* Collapsible side blocks: a toggle in each heading folds the block to that heading line. */
+.collapse-toggle {
+  flex: none; margin-left: auto; width: 22px; height: 22px; display: grid; place-items: center;
+  border: 1px solid var(--edge, rgba(255, 255, 255, .14)); border-radius: 7px;
+  background: rgba(255, 255, 255, .05); color: var(--muted, #aab4cc); font: 600 14px/1 var(--mono, monospace); cursor: pointer;
+  transition: color .2s, border-color .2s, background .2s;
+}
+.collapse-toggle:hover, .collapse-toggle:focus-visible { color: var(--text, #fff); border-color: var(--cyan, #53efff); outline: none; }
+.is-collapsed > :not(.collapse-head) { display: none !important; }
+html[data-mode=overdrive] .collapse-toggle { border-radius: 0; border-color: var(--hg-line2); background: var(--hg-bg2); color: var(--hg-text2); }
+html[data-mode=overdrive] .collapse-toggle:hover, html[data-mode=overdrive] .collapse-toggle:focus-visible { border-color: var(--hg-ac); color: var(--hg-ac); }

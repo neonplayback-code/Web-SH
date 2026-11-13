@@ -1,0 +1,538 @@
+/* ASTRA · acabado: encabezado de sección, buscador y orden, y el lienzo del cielo (shader WebGL).
+   Todo bajo html[data-mode=astra]: HANGAR no cambia. */
+
+/* ---------------------------------------------------------------- Cielo (AstraSky) */
+#astra-sky { position: fixed; inset: 0; z-index: 0; display: none; width: 100%; height: 100%; pointer-events: none; }
+html[data-mode=astra] #astra-sky { display: block; }
+html[data-mode=astra] #particles { display: none; }
+
+/* ---------------------------------------------------------- Encabezado de sección */
+@keyframes ap-title-flow { to { background-position: 200% 50%; } }
+html[data-mode=astra] .dashboard .tab-head { position: relative; align-items: flex-end; gap: 14px 40px; padding-bottom: 22px; }
+html[data-mode=astra] .tab-head .section-kicker {
+  display: inline-flex; align-items: center; gap: 9px; margin: 0 0 14px; padding: 6px 15px 6px 12px;
+  border: 1px solid color-mix(in srgb, var(--cyan) 34%, transparent); border-radius: 999px;
+  background: linear-gradient(100deg, color-mix(in srgb, var(--cyan) 14%, transparent), color-mix(in srgb, var(--purple) 8%, transparent));
+  backdrop-filter: blur(8px);
+  color: color-mix(in srgb, var(--cyan) 55%, #fff); text-shadow: none;
+  font: 700 11px/1 var(--body); letter-spacing: .24em; text-transform: uppercase; font-style: normal;
+}
+html[data-mode=astra] .tab-head .section-kicker::before {
+  margin: 0; font-size: 11px; color: var(--cyan); text-shadow: 0 0 10px var(--cyan);
+}
+html[data-mode=astra][data-font] .tab-head #tab-heading {
+  margin: 0; font: 600 clamp(30px, 4vw, 52px)/1.06 var(--display); letter-spacing: -.015em; text-transform: none;
+  background: linear-gradient(100deg, #fff 0%, var(--cyan) 22%, color-mix(in srgb, var(--purple) 82%, #fff) 48%, var(--pink) 72%, var(--cyan) 88%, #fff 100%) 0 50% / 200% 100% repeat-x;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+  text-shadow: none; filter: drop-shadow(0 0 22px color-mix(in srgb, var(--cyan) 42%, transparent));
+  animation: none;
+}
+html[data-mode=astra][data-titlefx=on] .tab-head #tab-heading { animation: ap-title-flow 10s linear infinite; }
+html[data-mode=astra] .tab-head .heading-period { -webkit-text-fill-color: var(--pink); color: var(--pink); text-shadow: 0 0 14px color-mix(in srgb, var(--pink) 60%, transparent); }
+/* Línea bajo el título: nace con el color del tema y se desvanece; un cometa la recorre sin mover la base. */
+@keyframes ap-comet-line {
+  0% { background-position: -160px 0, 0 0; }
+  70%, 100% { background-position: 360px 0, 0 0; }
+}
+html[data-mode=astra] .tab-head .section-title::after {
+  width: min(340px, 70%); height: 1px; margin-top: 16px;
+  background:
+    linear-gradient(90deg, transparent, rgba(255, 255, 255, .85) 60%, #fff 99%, transparent) -160px 0 / 160px 1px no-repeat,
+    linear-gradient(90deg, var(--cyan), color-mix(in srgb, var(--purple) 62%, transparent) 58%, transparent) 0 0 / 100% 1px no-repeat;
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--cyan) 70%, transparent));
+  animation: ap-comet-line 5.5s ease-in-out infinite;
+}
+html[data-mode=astra] .tab-blurb {
+  max-width: 38ch; padding: 7px 14px; border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, .08);
+  background: rgba(5, 8, 22, .45);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  color: rgba(232, 240, 255, .92); text-align: right; text-wrap: balance;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, .75);
+  font: 400 clamp(13.5px, 1.25vw, 15.5px)/1.5 var(--body);
+}
+
+/* --------------------------------------------------------------------- Buscador */
+.search-cosmos { display: none; }
+
+@keyframes ap-nebula-drift {
+  0% { transform: translate3d(-4%, -6%, 0) scale(1); opacity: .7; }
+  50% { transform: translate3d(4%, 4%, 0) scale(1.06); opacity: 1; }
+  100% { transform: translate3d(-2%, 6%, 0) scale(1.02); opacity: .8; }
+}
+@keyframes ap-star-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-120px, -24px, 0); }
+}
+@keyframes ap-star-twinkle {
+  0%, 100% { opacity: .55; }
+  50% { opacity: .95; }
+}
+@keyframes ap-beam-sweep {
+  0% { transform: translateX(-140%) skewX(-24deg); opacity: 0; }
+  20% { opacity: .75; }
+  80% { opacity: .55; }
+  100% { transform: translateX(260%) skewX(-24deg); opacity: 0; }
+}
+@keyframes ap-icon-orbit {
+  from { transform: rotate(0deg) translateX(21px); }
+  to { transform: rotate(360deg) translateX(21px); }
+}
+@keyframes ap-orb-pulse {
+  0%, 100% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--cyan) 28%, transparent), 0 0 14px -4px color-mix(in srgb, var(--cyan) 50%, transparent); }
+  50% { box-shadow: 0 0 0 1px color-mix(in srgb, var(--cyan) 50%, transparent), 0 0 22px -2px color-mix(in srgb, var(--cyan) 75%, transparent); }
+}
+
+/* Cápsula espacial de cristal esmerilado con nebulosa interior, estrellas y borde de cometa. */
+html[data-mode=astra] .tab-filters {
+  --ap-edge: color-mix(in srgb, var(--cyan) 26%, rgba(255, 255, 255, .1));
+  position: relative; flex-wrap: nowrap; gap: 10px; padding: 7px; overflow: visible; isolation: isolate;
+  border: 1px solid transparent !important; border-radius: 999px;
+  background: linear-gradient(155deg, rgba(16, 26, 58, .44), rgba(6, 10, 26, .62) 60%, rgba(12, 16, 40, .48)) !important;
+  backdrop-filter: blur(26px) saturate(175%) !important; -webkit-backdrop-filter: blur(26px) saturate(175%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .18),
+    inset 0 -1px 0 rgba(120, 185, 255, .09),
+    0 24px 60px -26px rgba(0, 0, 0, .85),
+    0 0 42px -18px color-mix(in srgb, var(--cyan) 42%, transparent) !important;
+  animation: none; transition: border-color .35s, box-shadow .4s var(--ease), transform .35s var(--ease);
+}
+html[data-mode=astra] .tab-filters:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .22),
+    inset 0 -1px 0 rgba(140, 200, 255, .14),
+    0 26px 64px -24px rgba(0, 0, 0, .88),
+    0 0 54px -16px color-mix(in srgb, var(--cyan) 56%, transparent) !important;
+}
+/* Efecto ASTRA: anillo de cometa orbitando el borde y resplandor detrás de la cápsula. */
+html[data-mode=astra] .tab-filters::before {
+  content: ""; display: block !important; position: absolute; inset: -1px; z-index: 3; width: auto; height: auto;
+  border-radius: inherit; padding: 1.5px; pointer-events: none; opacity: .92;
+  background: conic-gradient(from var(--ang), transparent 0 42%, var(--cyan) 56%, var(--purple) 72%, var(--pink) 86%, transparent 97%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: astra-orbit 8.5s linear infinite;
+}
+html[data-mode=astra] .tab-filters::after {
+  content: ""; display: block !important; position: absolute; inset: 1px; z-index: -1; width: auto; height: auto;
+  border-radius: inherit; pointer-events: none; opacity: .42; filter: blur(18px);
+  background: conic-gradient(from var(--ang), transparent 0 42%, var(--cyan) 56%, var(--purple) 72%, var(--pink) 86%, transparent 97%);
+  animation: astra-orbit 8.5s linear infinite;
+}
+html[data-mode=astra] .tab-filters:focus-within::before, html[data-mode=astra] .tab-filters:focus-within::after { animation-duration: 3s; }
+html[data-mode=astra] .tab-filters:focus-within::after { opacity: .68; filter: blur(22px); }
+html[data-mode=astra] .tab-filters:focus-within {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .24),
+    inset 0 -1px 0 color-mix(in srgb, var(--cyan) 22%, transparent),
+    0 0 0 4px color-mix(in srgb, var(--cyan) 15%, transparent),
+    0 24px 66px -22px color-mix(in srgb, var(--cyan) 78%, #000) !important;
+}
+
+/* Capa espacial interior: nebulosa flotante, micro-estrellas a la deriva y destello estelar. */
+html[data-mode=astra] .search-cosmos {
+  display: block; position: absolute; inset: 0; z-index: 0; border-radius: inherit; overflow: hidden; pointer-events: none;
+}
+html[data-mode=astra] .search-cosmos::before {
+  content: ""; position: absolute; inset: -35%;
+  background:
+    radial-gradient(45% 85% at 18% 45%, color-mix(in srgb, var(--cyan) 18%, transparent), transparent 65%),
+    radial-gradient(40% 80% at 55% 65%, color-mix(in srgb, var(--purple) 18%, transparent), transparent 68%),
+    radial-gradient(35% 75% at 85% 35%, color-mix(in srgb, var(--pink) 16%, transparent), transparent 65%);
+  filter: blur(14px);
+  animation: ap-nebula-drift 14s ease-in-out infinite alternate;
+}
+html[data-mode=astra] .search-stars {
+  position: absolute; inset: 0 -140px 0 0; opacity: .75;
+  background-image:
+    radial-gradient(1px 1px at 18px 16px, rgba(255, 255, 255, .9), transparent),
+    radial-gradient(1.5px 1.5px at 74px 42px, color-mix(in srgb, var(--cyan) 70%, #fff), transparent),
+    radial-gradient(1px 1px at 142px 22px, rgba(255, 255, 255, .75), transparent),
+    radial-gradient(1.2px 1.2px at 210px 48px, color-mix(in srgb, var(--pink) 65%, #fff), transparent),
+    radial-gradient(1px 1px at 275px 14px, rgba(255, 255, 255, .85), transparent),
+    radial-gradient(1.4px 1.4px at 340px 36px, rgba(220, 236, 255, .85), transparent);
+  background-size: 380px 64px;
+  animation: ap-star-drift 28s linear infinite, ap-star-twinkle 4.2s ease-in-out infinite alternate;
+}
+html[data-mode=astra] .search-beam {
+  position: absolute; top: 0; bottom: 0; left: 0; width: 34%; opacity: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .11) 48%, color-mix(in srgb, var(--cyan) 22%, rgba(255, 255, 255, .18)) 52%, transparent);
+}
+html[data-mode=astra] .tab-filters:hover .search-beam,
+html[data-mode=astra] .tab-filters:focus-within .search-beam {
+  animation: ap-beam-sweep 2.2s var(--ease) 1;
+}
+
+html[data-mode=astra] .tab-filters .search-box { position: relative; z-index: 1; flex: 1 1 auto; height: 52px; }
+html[data-mode=astra] .tab-filters .search-icon {
+  left: 8px; width: 38px; height: 38px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--cyan) 28%, rgba(255, 255, 255, .12)), color-mix(in srgb, var(--purple) 14%, rgba(6, 12, 28, .6)));
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  color: color-mix(in srgb, var(--cyan) 75%, #fff);
+  filter: none;
+  animation: ap-orb-pulse 4s ease-in-out infinite;
+  transition: background .3s, color .3s, transform .35s var(--ease), box-shadow .35s;
+}
+/* Satélite orbitando el icono de búsqueda */
+html[data-mode=astra] .tab-filters .search-icon::after {
+  content: ""; position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; margin: -2px; border-radius: 50%;
+  background: #fff; box-shadow: 0 0 8px 1px var(--cyan), 0 0 14px var(--pink);
+  opacity: .75; pointer-events: none;
+  animation: ap-icon-orbit 5.5s linear infinite;
+}
+html[data-mode=astra] .tab-filters .search-icon svg { width: 18px; height: 18px; }
+html[data-mode=astra] .tab-filters .search-box:focus-within .search-icon {
+  background: linear-gradient(135deg, var(--cyan), color-mix(in srgb, var(--purple) 65%, var(--cyan)));
+  color: #050d1c; filter: none; transform: translateY(-50%) scale(1.06);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--cyan) 70%, transparent);
+}
+html[data-mode=astra] .tab-filters .search-box:focus-within .search-icon::after {
+  opacity: 1; animation-duration: 2s;
+}
+html[data-mode=astra] .tab-filters .search-input {
+  padding: 0 54px 0 58px; border: 0; border-radius: 999px; background: transparent; box-shadow: none; backdrop-filter: none;
+  font: 500 17px/1.2 var(--body); letter-spacing: .005em; color: #f4f7ff;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, .45);
+}
+html[data-mode=astra] .tab-filters .search-input:hover, html[data-mode=astra] .tab-filters .search-input:focus {
+  background: transparent; box-shadow: none; border: 0; outline: none;
+}
+html[data-mode=astra] .tab-filters .search-input::placeholder { color: rgba(202, 214, 245, .68); font-style: italic; font-family: var(--display); font-size: 19px; opacity: 1; }
+html[data-mode=astra] .tab-filters .search-input::-webkit-search-cancel-button { display: none; }
+/* Atajo "/": tecla de cristal espacial que se oculta al escribir. */
+html[data-mode=astra] .tab-filters .search-box::after {
+  content: "/"; position: absolute; right: 12px; top: 50%; display: grid; place-items: center; width: 28px; height: 28px;
+  transform: translateY(-50%); border: 1px solid rgba(255, 255, 255, .18); border-bottom-width: 2px; border-radius: 9px;
+  background: rgba(255, 255, 255, .07); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  color: rgba(220, 232, 255, .86); font: 600 13px/1 var(--body);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15), 0 4px 12px rgba(0, 0, 0, .25);
+  pointer-events: none; transition: opacity .25s, transform .25s var(--ease);
+}
+html[data-mode=astra] .tab-filters .search-box:has(.search-input:focus)::after,
+html[data-mode=astra] .tab-filters .search-box:has(.search-input:not(:placeholder-shown))::after { opacity: 0; transform: translateY(-50%) scale(.85); }
+@media (hover: none) { html[data-mode=astra] .tab-filters .search-box::after { display: none; } }
+html[data-mode=astra] .tab-filters .search-clear {
+  right: 8px; width: 34px; height: 34px;
+}
+html[data-mode=astra] .tab-filters .search-clear:hover {
+  transform: translateY(-50%) rotate(90deg) scale(1.06);
+}
+
+/* Orden: cápsula interior translúcida; sus botones heredan el cielo estrellado y el cometa orbital de astra-fx.css. */
+html[data-mode=astra] .tab-filters .tab-sort {
+  position: relative; z-index: 1;
+  gap: 6px; padding: 4px; flex: 0 0 auto; flex-wrap: nowrap;
+  border: 1px solid rgba(255, 255, 255, .12); border-radius: 999px;
+  background: rgba(5, 9, 22, .46);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+html[data-mode=astra] .tab-filters .tab-sort .sort-btn {
+  min-height: 44px; padding: 0 20px; gap: 8px; border-radius: 999px;
+  font: 700 14px/1 var(--body); letter-spacing: .01em; white-space: nowrap;
+}
+html[data-mode=astra] .tab-filters .tab-sort .sort-btn svg, html[data-mode=astra] .tab-filters .tab-sort .sort-btn .sort-icon { stroke: currentColor; color: inherit; }
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-mode=astra] .tab-filters::before,
+  html[data-mode=astra] .tab-filters::after,
+  html[data-mode=astra] .search-cosmos::before,
+  html[data-mode=astra] .search-stars,
+  html[data-mode=astra] .search-beam,
+  html[data-mode=astra] .tab-filters .search-icon,
+  html[data-mode=astra] .tab-filters .search-icon::after,
+  html[data-mode=astra] .tab-filters .tab-sort .sort-btn.is-active { animation: none !important; }
+}
+html[data-motion=off][data-mode=astra] :is(.tab-filters::before, .tab-filters::after, .search-cosmos::before, .search-stars, .search-beam, .tab-filters .search-icon, .tab-filters .search-icon::after, .tab-filters .tab-sort .sort-btn.is-active) {
+  animation: none !important;
+}
+
+@media (max-width: 700px) {
+  html[data-mode=astra] .dashboard .tab-head { display: block; }
+  html[data-mode=astra] .tab-blurb { margin-top: 10px; text-align: left; }
+  html[data-mode=astra] .tab-filters { flex-wrap: wrap; border-radius: 28px; padding: 8px; }
+  html[data-mode=astra] .tab-filters .search-box { flex-basis: 100%; }
+  html[data-mode=astra] .tab-filters .tab-sort { flex: 1 1 100%; }
+  html[data-mode=astra] .tab-filters .tab-sort .sort-btn { flex: 1; justify-content: center; padding: 0 12px; }
+}
+@media (max-width: 480px) {
+  html[data-mode=astra] .tab-filters .tab-sort .sort-btn span:not(.sort-icon) { display: inline; }
+}
+
+/* ----------------------------------------------------- Tarjeta principal (Hero) */
+html[data-mode=astra] .hero-copy.home-hero {
+  display: flex; flex-direction: column;
+  padding: 28px 30px 24px;
+  border-color: rgba(255, 255, 255, .12);
+  background:
+    radial-gradient(90% 70% at 8% 0%, color-mix(in srgb, var(--cyan) 11%, transparent), transparent 62%),
+    radial-gradient(75% 65% at 95% 18%, color-mix(in srgb, var(--purple) 10%, transparent), transparent 65%),
+    linear-gradient(160deg, rgba(11, 17, 36, .76), rgba(6, 10, 24, .52) 68%, rgba(5, 8, 20, .38));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12), 0 28px 64px -28px rgba(0, 0, 0, .82);
+}
+
+/* Orden editorial: identidad arriba -> titular y mensaje -> galería "Lo más querido" al pie */
+html[data-mode=astra] .home-hero > .creator-head {
+  order: 1; gap: 18px; margin-bottom: 22px; padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, .08);
+}
+html[data-mode=astra] .home-hero > h1 { order: 2; margin-top: 0; }
+html[data-mode=astra] .home-hero > .hero-subtitle { order: 3; margin-top: 12px; font-size: 13.5px; line-height: 1.65; color: rgba(196, 210, 236, .76); }
+html[data-mode=astra] .home-hero > .hero-subtitle span { color: rgba(236, 243, 255, .92); }
+html[data-mode=astra] .home-hero > .creator-bio { order: 4; margin-top: 12px; }
+html[data-mode=astra] .home-hero > .creator-links { order: 5; margin-top: 16px; }
+html[data-mode=astra] .home-hero > .creator-featured {
+  order: 6; gap: 12px; margin: auto 0 0; padding-top: 22px;
+}
+
+/* Cabecera del creador */
+html[data-mode=astra] .home-hero .creator-logo { width: 86px; height: 86px; }
+html[data-mode=astra] .home-hero .creator-logo img {
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--cyan) 52%, rgba(255, 255, 255, .2)),
+    0 0 24px -4px color-mix(in srgb, var(--cyan) 42%, transparent),
+    0 14px 32px rgba(0, 0, 0, .55);
+}
+html[data-mode=astra] .home-hero .creator-name {
+  font: 700 clamp(20px, 2vw, 26px)/1.16 var(--display); letter-spacing: -.01em;
+}
+html[data-mode=astra] .home-hero .hero-greeting {
+  font: 500 12.5px/1.4 var(--body); letter-spacing: .12em; text-transform: uppercase; font-style: normal;
+  color: color-mix(in srgb, var(--cyan) 50%, #d6e2ff);
+}
+html[data-mode=astra] .home-hero .creator-chips { gap: 7px; margin-top: 8px; }
+html[data-mode=astra] .home-hero .creator-chip {
+  padding: 5px 12px; font: 500 11.5px/1.3 var(--body);
+  border-color: rgba(255, 255, 255, .13); background-color: rgba(8, 12, 30, .48);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+
+/* Titular principal */
+html[data-mode=astra] .home-hero #greeting {
+  font: 600 clamp(25px, 2.65vw, 37px)/1.18 var(--display); letter-spacing: -.015em;
+}
+html[data-mode=astra] .home-hero #greeting .hero-title-lead {
+  font-size: .78em; font-weight: 500; letter-spacing: -.015em; margin-bottom: 4px;
+}
+html[data-mode=astra] .home-hero #greeting .hero-title-dot {
+  color: var(--pink); -webkit-text-fill-color: var(--pink);
+  text-shadow: 0 0 14px color-mix(in srgb, var(--pink) 65%, transparent);
+}
+
+/* Organización tipográfica en Pulso, pestañas y tarjetas de ASTRA */
+html[data-mode=astra] .tabbar .tab { font: 600 13px/1 var(--body); letter-spacing: .02em; }
+html[data-mode=astra] .pulse-title { font: 700 11.5px/1 var(--body); letter-spacing: .16em; }
+html[data-mode=astra] .pulse-stat b { font: 600 clamp(22px, 2.2vw, 30px)/1.08 var(--display); }
+html[data-mode=astra] .pulse-stat span { font: 500 11px/1.2 var(--body); letter-spacing: .04em; }
+html[data-mode=astra] .pulse-bar { font: 500 12.5px/1.3 var(--body); }
+html[data-mode=astra] .pulse-last strong { font: 600 14.5px/1.3 var(--body); }
+html[data-mode=astra] .pulse-last small { font: 400 11.5px/1.3 var(--body); }
+
+/* Galería "Lo más querido ♥" */
+html[data-mode=astra] .creator-featured > .pulse-sub {
+  display: flex; align-items: center; gap: 12px;
+  color: rgba(215, 226, 250, .78); letter-spacing: .2em;
+}
+html[data-mode=astra] .creator-featured > .pulse-sub::after {
+  content: ""; flex: 1; height: 1px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, .14), transparent);
+}
+html[data-mode=astra] .featured-row { gap: 12px; }
+html[data-mode=astra] .featured-item {
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, .1);
+  background: linear-gradient(170deg, rgba(255, 255, 255, .06), rgba(8, 13, 28, .58));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 10px 26px -16px rgba(0, 0, 0, .7);
+  transition: transform .3s var(--ease), border-color .3s, box-shadow .3s;
+}
+html[data-mode=astra] .featured-item:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--cyan) 52%, rgba(255, 255, 255, .18));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14), 0 16px 34px -16px color-mix(in srgb, var(--cyan) 42%, #000);
+}
+html[data-mode=astra] .featured-cover {
+  aspect-ratio: 16 / 9;
+  background:
+    radial-gradient(110% 90% at 22% 14%, hsl(var(--cover-h, 220) 88% 60% / .42), transparent 62%),
+    radial-gradient(80% 70% at 88% 85%, hsl(calc(var(--cover-h, 220) + 45) 80% 52% / .22), transparent 65%),
+    linear-gradient(150deg, hsl(var(--cover-h, 220) 48% 18%), hsl(calc(var(--cover-h, 220) + 52) 55% 8%));
+}
+html[data-mode=astra] .featured-cover::before {
+  font-size: clamp(18px, 1.8vw, 24px); letter-spacing: .14em;
+  color: hsl(var(--cover-h, 220) 90% 90% / .65);
+}
+html[data-mode=astra] .featured-cover::after {
+  opacity: 1;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .12), transparent 36%),
+    linear-gradient(0deg, rgba(6, 10, 22, .65), transparent 55%);
+}
+html[data-mode=astra] .featured-cover img { transition: transform .5s var(--ease); }
+html[data-mode=astra] .featured-item:hover .featured-cover img { transform: scale(1.05); }
+
+.featured-rank, .featured-type {
+  position: absolute; top: 8px; z-index: 2; padding: 3px 7px; border-radius: 999px;
+  background: rgba(6, 10, 22, .58); border: 1px solid rgba(255, 255, 255, .14);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  font: 700 10px/1 var(--mono); letter-spacing: .08em; color: rgba(238, 244, 255, .9);
+}
+.featured-rank { left: 8px; }
+.featured-item:first-child .featured-rank {
+  border-color: color-mix(in srgb, var(--cyan) 50%, rgba(255, 255, 255, .2));
+  color: color-mix(in srgb, var(--cyan) 65%, #fff);
+}
+.featured-type { right: 8px; text-transform: uppercase; font-size: 9px; color: rgba(210, 222, 248, .78); }
+
+.featured-info {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 10px 11px;
+  border-top: 1px solid rgba(255, 255, 255, .07);
+}
+html[data-mode=astra] .featured-info b {
+  min-width: 0; padding: 0; font-size: 13px; font-weight: 600; color: #f2f6ff;
+}
+html[data-mode=astra] .featured-info small {
+  flex: none; padding: 3px 8px; border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--pink) 30%, transparent);
+  background: color-mix(in srgb, var(--pink) 13%, rgba(255, 255, 255, .04));
+  color: color-mix(in srgb, var(--pink) 72%, #fff);
+  font-size: 11px; font-weight: 700; line-height: 1.2;
+}
+
+@media (max-width: 560px) {
+  html[data-mode=astra] .hero-copy.home-hero { padding: 22px 18px 20px; }
+  html[data-mode=astra] .home-hero .creator-logo { width: 72px; height: 72px; }
+}
+
+/* Ventana de personalización en ASTRA: cristal espacial, bloques limpios y cápsula segmentada */
+html[data-mode=astra] .dialog.modal {
+  border-color: rgba(185, 218, 255, .20);
+  box-shadow: 0 28px 80px -20px rgba(0, 0, 0, .9), 0 0 40px -18px color-mix(in srgb, var(--cyan) 35%, transparent);
+}
+html[data-mode=astra] .cz-block {
+  border-color: rgba(185, 218, 255, .12);
+  background: linear-gradient(165deg, rgba(255, 255, 255, .04), rgba(6, 10, 26, .45));
+}
+html[data-mode=astra] .cz-seg {
+  gap: 5px; padding: 4px;
+  border-color: rgba(185, 218, 255, .14);
+  background: rgba(5, 9, 22, .52);
+}
+
+/* ---------- Layouts de tarjetas en todas las pestañas bajo ASTRA ---------- */
+html[data-mode=astra] :is(a, article).item,
+html[data-mode=astra] .item-step-card {
+  transition: transform .3s var(--ease), border-color .28s, box-shadow .32s;
+}
+html[data-mode=astra] a.item:is(:hover, :focus-visible),
+html[data-mode=astra] .item-step-card:is(:hover, :focus-visible) {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--cyan) 52%, rgba(255, 255, 255, .2));
+  box-shadow: 0 20px 44px -20px color-mix(in srgb, var(--cyan) 38%, #000), inset 0 1px 0 rgba(255, 255, 255, .14);
+}
+html[data-mode=astra] .item-cover {
+  border-radius: 12px;
+  border-color: rgba(185, 218, 255, .14);
+}
+html[data-mode=astra] .item-cover img { transition: transform .55s var(--ease); }
+html[data-mode=astra] .item:hover .item-cover img { transform: scale(1.04); }
+html[data-mode=astra] .item-more { padding-inline: 20px; }
+html[data-mode=astra] .item-tags { gap: 6px; }
+html[data-mode=astra] .item-tags i {
+  padding: 3px 9px; border: 1px solid rgba(185, 218, 255, .16); border-radius: 999px;
+  background: rgba(255, 255, 255, .04); color: color-mix(in srgb, var(--cyan) 68%, #fff); font: 500 10.5px/1.4 var(--mono);
+}
+html[data-mode=astra] .item-badge {
+  align-self: flex-start; padding: 4px 11px; border-radius: 999px;
+  border-color: color-mix(in srgb, var(--cyan) 50%, transparent);
+  background: color-mix(in srgb, var(--cyan) 12%, transparent);
+  font: 700 10px/1.3 var(--mono); letter-spacing: .14em;
+}
+
+/* Proyectos, Videos, Betas, Demos: altura flexible uniforme sin huecos ni botones desalineados */
+html[data-mode=astra] :is(.item-tall, .item-video, .item-beta, .item-demo) {
+  display: flex; flex-direction: column; min-height: 0; gap: 12px;
+}
+html[data-mode=astra] :is(.item-tall, .item-video) > .item-more,
+html[data-mode=astra] :is(.item-beta, .item-demo) > .item-actions { margin-top: auto; padding-top: 4px; }
+
+/* Videos: atenuar iniciales para no chocar con el botón Play */
+html[data-mode=astra] .item-video .item-cover::before { opacity: .16; font-size: 40px; }
+html[data-mode=astra] .item-stage { overflow: hidden; border-radius: 12px; }
+html[data-mode=astra] .item-play {
+  width: 56px; height: 56px; padding-left: 3px; border: 1px solid color-mix(in srgb, var(--cyan) 75%, #fff);
+  background: rgba(6, 10, 26, .82); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  color: #fff; font-size: 16px;
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--cyan) 12%, transparent), 0 0 24px -4px var(--cyan);
+  transition: transform .25s var(--ease), background-color .25s, color .25s;
+}
+html[data-mode=astra] .item-stage:is(:hover, :focus-visible) .item-play {
+  transform: translate(-50%, -50%) scale(1.1); background: var(--cyan); color: #050816;
+}
+
+/* Anuncios */
+html[data-mode=astra] .item-banner { gap: 18px; border-radius: 18px; }
+html[data-mode=astra] .item-date {
+  align-self: stretch; align-content: center; gap: 4px; padding: 10px;
+  border-radius: 12px; border-color: color-mix(in srgb, var(--cyan) 28%, rgba(255, 255, 255, .12));
+  background: rgba(255, 255, 255, .04);
+}
+html[data-mode=astra] .item-date b { font: 700 26px/1 var(--display); color: #f4f7ff; }
+html[data-mode=astra] .item-date i { font: 700 10px/1 var(--mono); letter-spacing: .16em; }
+
+/* Posts: ancho completo con borde aurora y lectura cómoda */
+html[data-mode=astra] .item-article {
+  max-width: none; gap: 8px; padding: 20px 24px; border-radius: 18px;
+  border-left: 3px solid color-mix(in srgb, var(--cyan) 78%, var(--pink));
+}
+html[data-mode=astra] .item-article .item-sum { max-width: 82ch; }
+
+/* Avances: línea luminosa y nodos esféricos centrados */
+html[data-mode=astra] .tab-grid[data-layout=timeline] { padding-left: 32px; }
+html[data-mode=astra] .tab-grid[data-layout=timeline]::before {
+  left: 8px; width: 1.5px; opacity: .75;
+  background: linear-gradient(180deg, var(--cyan), var(--pink) 68%, transparent);
+}
+html[data-mode=astra] .item-step { padding: 0 0 16px; }
+html[data-mode=astra] .item-step-card { gap: 6px; padding: 18px 22px; border-radius: 16px; }
+html[data-mode=astra] .item-node {
+  left: -30px; top: 22px; width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid var(--cyan); background: #060918;
+  box-shadow: 0 0 0 4px rgba(6, 9, 24, .85), 0 0 14px var(--cyan);
+  transition: background-color .25s, box-shadow .25s;
+}
+html[data-mode=astra] .item-step:is(:hover, :focus-within) .item-node {
+  background: var(--cyan); box-shadow: 0 0 0 4px rgba(6, 9, 24, .85), 0 0 20px var(--cyan);
+}
+
+/* Links: título y dominio siempre en dos líneas limpias + insignia redondeada */
+html[data-mode=astra] .tab-grid[data-layout=links] {
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+html[data-mode=astra] .item-link {
+  grid-template-columns: 44px minmax(0, 1fr) auto; gap: 14px; padding: 14px 16px; border-radius: 16px;
+}
+html[data-mode=astra] .item-link .item-text { display: grid; gap: 3px; min-width: 0; }
+html[data-mode=astra] .item-link .item-title {
+  margin: 0; font-size: 14.5px; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+html[data-mode=astra] .item-link .item-meta { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html[data-mode=astra] .item-fav {
+  width: 44px; height: 44px; border-radius: 12px;
+  border-color: color-mix(in srgb, var(--cyan) 32%, rgba(255, 255, 255, .14));
+  background: rgba(255, 255, 255, .04);
+}
+html[data-mode=astra] .item-out { transition: transform .25s var(--ease), color .25s; }
+html[data-mode=astra] .item-link:is(:hover, :focus-visible) .item-out { color: #fff; transform: translate(2px, -2px); }
+
+/* Shorts: proporción amplia, sin esquinas duras internas y velo inferior legible */
+html[data-mode=astra] .tab-grid[data-layout=short] {
+  grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+}
+html[data-mode=astra] .item-short { border-radius: 16px; }
+html[data-mode=astra] .item-short .item-cover { border: 0; border-radius: 0; }
+html[data-mode=astra] .item-over {
+  padding: 48px 14px 14px;
+  background: linear-gradient(transparent, rgba(4, 7, 18, .92) 72%);
+}
+html[data-mode=astra] .item-over .item-title { font-size: 14px; line-height: 1.3; }

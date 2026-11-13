@@ -1,0 +1,213 @@
+/* HANGAR: fondo (el shader Matrix va en HangarMatrix.tsx y hangar-neo.css), barra, paneles y portada del creador. */
+html[data-mode=overdrive] {
+  --hg-soft: color-mix(in srgb, var(--hg-ac) 10%, transparent);
+  --hg-aline: color-mix(in srgb, var(--hg-ac) 50%, transparent);
+  --hg-grad: linear-gradient(115deg, var(--hg-ac), var(--hangar-secondary));
+  --hg-grid: color-mix(in srgb, var(--hg-ac) 9%, transparent);
+}
+html[data-mode=overdrive] body { background: #060b13; }
+.hg-environment { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; color: var(--hg-ac); background: #04070c; }
+/* Lluvia 2D de reserva, solo si el navegador no tiene WebGL. */
+.hg-code-rain { position: absolute; inset: 0; width: 100%; height: 100%; opacity: calc(.9 * var(--hangar-energy, .65)); }
+
+html[data-mode=overdrive] .topbar { position: relative; z-index: 2; border-bottom: 1px solid var(--hg-aline); background: linear-gradient(90deg, #0c1823ed, #0b111ce6); box-shadow: 0 12px 60px #0005; }
+html[data-mode=overdrive] .brand-name { letter-spacing: .08em; text-shadow: 0 0 calc(20px * var(--glow)) var(--hg-aline); }
+html[data-mode=overdrive] .brand-box { border-radius: 2px; border-color: var(--hangar-secondary); color: var(--hangar-secondary); -webkit-text-fill-color: currentColor; }
+html[data-mode=overdrive] .mode-selector { border-radius: 6px; border-color: var(--hg-aline); box-shadow: 0 0 calc(24px * var(--glow)) #57dcff12; }
+html[data-mode=overdrive] .mode-thumb { border-radius: 3px; background: var(--hg-grad); }
+html[data-mode=overdrive] :is(.hero-copy, .clock-panel, .utility-card, .game-card) {
+  position: relative; border-radius: var(--radius, 14px); border: 1px solid var(--hg-aline) !important;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--hg-ac) 7%, #0b1421) 0, #0d1523f5 50%, color-mix(in srgb, var(--hangar-secondary) 5%, #0b1421));
+  box-shadow: inset 0 1px #b9e9ff12, 0 12px 36px #0005, 0 0 calc(20px * var(--glow)) color-mix(in srgb, var(--hg-ac) 6%, transparent);
+}
+html[data-mode=overdrive] .home-hero { padding-top: 66px; padding-bottom: 90px; isolation: isolate; }
+html[data-mode=overdrive] .home-hero > :not(.hg-console-art) { position: relative; z-index: 1; }
+.hg-console-art { position: absolute; inset: 0; pointer-events: none; overflow: hidden; border-radius: inherit; }
+.hg-bay-label { display: flex; justify-content: space-between; gap: 8px; padding: 14px 26px; color: var(--hg-ac); font: 10px/1.4 var(--hg-font-mono); letter-spacing: .18em; border-bottom: 1px solid var(--hg-line); background: linear-gradient(90deg, var(--hg-soft), transparent); }
+.hg-bay-label span:last-child { color: var(--hg-text3); }
+
+.hg-terminal { position: absolute; bottom: 0; left: 0; right: 0; padding: 14px 26px; display: grid; gap: 7px; border-top: 1px solid var(--hg-line); background: #020912aa; color: #91a9c2; font: 11px/1.5 var(--hg-font-mono); }
+.hg-terminal b { color: var(--hg-ac); font-weight: 500; }.hg-code-line { color: var(--hangar-secondary); }
+.hg-code-line i { display: inline-block; width: 6px; height: 12px; margin-left: 9px; background: var(--hg-ac); vertical-align: middle; animation: hg-caret 1.2s steps(2) infinite; }
+
+@keyframes hg-caret { 50% { opacity: .2; } }
+html[data-mode=overdrive] .pulse-head { border-bottom-color: var(--hg-aline); }
+html[data-mode=overdrive] .pulse-stat { border-radius: 4px; background: #040c16; border-color: var(--hg-line2); box-shadow: inset 0 2px var(--hg-soft); }
+html[data-mode=overdrive] .pulse-stat b { color: var(--hg-ac); text-shadow: 0 0 calc(15px * var(--glow)) var(--hg-aline); }
+html[data-mode=overdrive] .section-kicker { letter-spacing: .16em; }
+html[data-mode=overdrive] .search { background: #080f1bef; border-color: var(--hg-aline); border-radius: 6px; }
+html[data-mode=overdrive] .search:focus-within { box-shadow: 0 0 calc(24px * var(--glow)) var(--hg-soft); border-color: var(--hg-ac); }
+html[data-mode=overdrive] .item { transition: transform .25s, box-shadow .25s, border-color .25s; }
+html[data-mode=overdrive] .item:hover { transform: translateY(-4px); border-color: var(--hg-ac) !important; box-shadow: 0 12px 32px #0008, 0 0 calc(25px * var(--glow)) var(--hg-soft); }
+html[data-mode=overdrive] .item-cover { border-radius: 6px !important; border-bottom: 1px solid var(--hg-aline); }
+html[data-mode=overdrive] .item-cover::after { opacity: .5; background: repeating-linear-gradient(0deg, transparent 0 5px, #040b1530 5px 6px); }
+
+/* GX: luminous rails, a travelling highlight and a crisp pressed state. */
+html[data-mode=overdrive] :is(button, a):active { transform: translateY(1px); }
+html[data-mode=overdrive] .hangar-settings { border-color: var(--hg-aline); }
+.hangar-settings-hint { color: var(--muted); font-size: 13px; line-height: 1.6; }
+.hangar-presets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 18px; }
+.hangar-presets button { min-height: 64px; border: 1px solid var(--hg-aline); border-radius: 8px; background: linear-gradient(130deg, var(--hg-soft), #0a1020); color: var(--hg-text); font: 600 13px var(--hg-font-ui); cursor: pointer; }
+.hangar-presets button:hover { border-color: var(--hg-ac); box-shadow: 0 0 18px var(--hg-soft); }
+/* Honor the shared layout controls even though the old extension has stronger selectors. */
+html[data-mode=overdrive][data-density=compact] .tab-grid { gap: 12px; }
+html[data-mode=overdrive][data-density=roomy] .tab-grid { gap: 30px; }
+html[data-mode=overdrive] .tab-grid[data-layout=tile] { grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(225px * var(--card-scale))), 1fr)); }
+html[data-mode=overdrive][data-motion=off] .hg-console-art * { animation: none !important; }
+html[data-mode=overdrive][data-fx=minimal] :is(.item, button, a) { box-shadow: none !important; }
+@media (max-width:760px) {
+
+  .hg-bay-label { padding-inline: 20px; font-size: 9px; letter-spacing: .1em; }
+  .hg-terminal { padding-inline: 20px; font-size: 10px; }
+  html[data-mode=overdrive] .home-hero { padding-top: 64px; padding-bottom: 90px; }
+  .hangar-presets { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hg-console-art * { animation: none !important; }
+  html[data-mode=overdrive] :is(.item,button,a), html[data-mode=overdrive] :is(button,a)::after { transition: none !important; }
+}
+
+html[data-mode=overdrive] .home-hero {
+  background:
+    linear-gradient(135deg, #0b1724f7 24%, #101f2ce8 62%, #080f19f5),
+    repeating-linear-gradient(135deg, #a5c5d51a 0 1px, transparent 1px 9px);
+  border-color: color-mix(in srgb, var(--hg-ac) 43%, #1b2938) !important;
+}
+html[data-mode=overdrive] .hg-bay-label {
+  min-height: 39px;
+  align-items: center;
+  padding-inline: clamp(18px, 3vw, 36px);
+  border-bottom-color: var(--hg-aline);
+  background: linear-gradient(90deg, var(--hg-soft), #090f1acc 72%);
+}
+html[data-mode=overdrive] .home-hero .creator-head {
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
+  gap: 18px;
+  padding: 15px 20px 15px 15px;
+  margin: 0 0 24px;
+  border: 1px solid var(--hg-line2);
+  border-left: 2px solid var(--hg-ac);
+  border-radius: 4px 12px 4px 4px;
+  background: linear-gradient(110deg, #0a121de8, #142639f5);
+  box-shadow: inset 0 1px #e8f9ff0a, 0 8px 24px #0004;
+}
+html[data-mode=overdrive] .home-hero .creator-logo {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  padding: 5px;
+  border: 1px solid var(--hg-aline);
+  border-radius: 9px 3px;
+  background: linear-gradient(135deg, var(--hg-soft), #080e18);
+  box-shadow: 0 0 14px var(--hg-soft);
+}
+html[data-mode=overdrive] .home-hero .creator-logo img {
+  border-radius: 5px 2px;
+  box-shadow: none;
+  object-fit: cover;
+}
+html[data-mode=overdrive] .home-hero .creator-id { min-width: 0; }
+html[data-mode=overdrive] .home-hero .creator-name {
+  font-size: clamp(21px, 2.4vw, 29px);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+html[data-mode=overdrive] .home-hero .creator-chip { max-width: 100%; overflow-wrap: anywhere; }
+html[data-mode=overdrive] .home-hero .hero-id {
+  color: var(--hg-ac);
+  font-weight: 600;
+}
+html[data-mode=overdrive] .home-hero .hero-greeting { color: var(--hg-text2); }
+
+html[data-mode=overdrive] .hg-terminal {
+  border-top-color: var(--hg-line2);
+  background: linear-gradient(90deg, #060c15, #101c2b 75%, #060c15);
+}
+html[data-mode=overdrive] .profile-card.utility-card {
+  gap: clamp(16px, 3vw, 34px);
+  padding: clamp(22px, 4vw, 52px);
+  border-left: 3px solid var(--hg-ac) !important;
+  background: radial-gradient(ellipse at 0 0, var(--hg-soft), transparent 58%), #0b1623;
+}
+html[data-mode=overdrive] .profile-card .profile-avatar {
+  background: linear-gradient(135deg, var(--hg-soft), #080f19);
+  border: 1px solid var(--hg-aline);
+  border-radius: 12px 3px;
+  color: var(--hg-ac);
+}
+html[data-mode=overdrive] .profile-card .profile-id { min-width: 0; }
+html[data-mode=overdrive] .profile-card h1 { overflow-wrap: anywhere; }
+html[data-mode=overdrive] .profile-card .profile-stats { gap: 8px; }
+html[data-mode=overdrive] .profile-card .profile-stats span {
+  padding: 6px 10px;
+  border: 1px solid var(--hg-line2);
+  border-radius: 4px;
+  background: #080f19;
+}
+@media (max-width: 760px) {
+  html[data-mode=overdrive] .home-hero .creator-head { gap: 12px; padding: 12px; }
+  html[data-mode=overdrive] .home-hero .creator-logo { width: 58px; height: 58px; }
+
+}
+
+html[data-mode=overdrive] :is(.home-hero, .home-stats.pulse) {
+  background: linear-gradient(135deg, #0a1421f7, #101e2ef5 66%, #090f1bf7);
+}
+@keyframes hg-gradient-button { from { background-position: 0 50%; } to { background-position: 100% 50%; } }
+
+/* Mask the center so the gradient stays on all four edges and follows the corners. */
+@property --hg-edge-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+html[data-mode=overdrive] {
+  --hg-edge-duration: var(--hangar-duration);
+  --hg-edge-animation: hg-edge-orbit;
+}
+html[data-mode=overdrive][data-motion=calm] { --hg-edge-duration: 40s; }
+html[data-mode=overdrive][data-motion=off] { --hg-edge-animation: none; }
+html[data-mode=overdrive] :is(.home-hero, .clock-panel, .utility-card, .game-card, .search, .mode-selector, .creator-head){
+  position: relative;
+}
+html[data-mode=overdrive][data-hangar-buttons] :is(.home-hero, .clock-panel, .utility-card, .game-card, .search, .mode-selector, .creator-head)::before{
+  content: '';
+  display: block !important;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  box-sizing: border-box;
+  width: auto;
+  height: auto;
+  border: 0;
+  border-radius: inherit;
+  padding: var(--hg-edge-width, 1px);
+  pointer-events: none;
+  background: conic-gradient(from var(--hg-edge-angle),
+    transparent 0 10%, var(--hangar-secondary) 24%,
+    color-mix(in srgb, var(--hangar-secondary) 38%, transparent) 35%, transparent 46%,
+    var(--hg-ac) 64%, color-mix(in srgb, var(--hg-ac) 25%, white) 71%,
+    var(--hg-ac) 76%, transparent 91%);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: var(--hg-edge-opacity, .62);
+  animation: var(--hg-edge-animation) var(--hg-edge-duration) linear infinite;
+  animation-delay: var(--hg-edge-delay, 0s);
+}
+html[data-mode=overdrive] :is(.home-hero, .home-stats.pulse, .profile-card) {
+  --hg-edge-width: 2px;
+  --hg-edge-opacity: .91;
+}
+html[data-mode=overdrive] .home-stats.pulse,
+html[data-mode=overdrive] :is(.item, .game-card):nth-child(even) { --hg-edge-delay: -5s; }
+html[data-mode=overdrive] :is(.item, .game-card):nth-child(3n) { --hg-edge-delay: -9s; }
+html[data-mode=overdrive] :is(.item, .game-card):is(:hover, :focus-within) {
+  --hg-edge-opacity: 1;
+}
+@keyframes hg-edge-orbit { to { --hg-edge-angle: 360deg; } }
+@media (prefers-reduced-motion: reduce) {
+  html[data-mode=overdrive] { --hg-edge-animation: none; }
+}

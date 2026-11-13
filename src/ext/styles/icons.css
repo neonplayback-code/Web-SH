@@ -1,0 +1,37 @@
+/* SVG geometry only: effects must not change a control's layout or positioning. */
+.od-icon{display:inline-block;width:18px;height:18px;flex:0 0 18px;vertical-align:middle;pointer-events:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) [data-icon]{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .icon-button .od-icon,:where(html.od-launchpad,html.od-popup,html.od-youtube) .shortcut-edit .od-icon{width:16px;height:16px;flex-basis:16px}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .shortcut-edit{display:grid;place-items:center;padding:0}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .brand-mark .od-icon{width:17px;height:17px}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .clock-cross{animation:none!important}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .clock-cross .od-icon{width:15px;height:15px}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .weather-icon .od-icon{width:22px;height:22px}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .add-symbol{display:inline-flex;line-height:1}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .add-symbol .od-icon{width:16px;height:16px}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .task-check,:where(html.od-launchpad,html.od-popup,html.od-youtube) .task-remove,:where(html.od-launchpad,html.od-popup,html.od-youtube) .calendar-nav{display:inline-grid;place-items:center}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .task-check .od-icon,:where(html.od-launchpad,html.od-popup,html.od-youtube) .task-remove .od-icon{width:14px;height:14px}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .save-button,:where(html.od-launchpad,html.od-popup,html.od-youtube) .ghost-button,:where(html.od-launchpad,html.od-popup,html.od-youtube) .game-play{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .save-button span{margin-left:0}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .save-button .od-icon,:where(html.od-launchpad,html.od-popup,html.od-youtube) .back-link .od-icon,:where(html.od-launchpad,html.od-popup,html.od-youtube) .delete-button .od-icon,:where(html.od-launchpad,html.od-popup,html.od-youtube) .ghost-button .od-icon,:where(html.od-launchpad,html.od-popup,html.od-youtube) .game-play .od-icon{width:15px;height:15px;flex-basis:15px}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .back-link,:where(html.od-launchpad,html.od-popup,html.od-youtube) .delete-button{gap:8px}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .calendar-nav .od-icon{width:17px;height:17px}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .shortcut-visits .od-icon{width:10px;height:10px;margin-right:3px}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .palette-input>[data-icon]{width:22px;color:var(--cyan)}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .palette-foot kbd .od-icon,:where(html.od-launchpad,html.od-popup,html.od-youtube) .search kbd .od-icon{width:12px;height:12px;flex-basis:12px}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .search kbd b [data-icon]{display:inline-flex}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .launcher-pill img,:where(html.od-launchpad,html.od-popup,html.od-youtube) .segmented img,:where(html.od-launchpad,html.od-popup,html.od-youtube) .game-platform-logo{width:16px;height:16px;object-fit:contain;vertical-align:middle;flex-shrink:0}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .launcher-pill img[src$="battlenet.svg"]{filter:none}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .segmented label>span{display:inline-flex;align-items:center;justify-content:center;gap:7px}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .segmented img[src$="steam.svg"],:where(html.od-launchpad,html.od-popup,html.od-youtube) .segmented img[src$="epicgames.svg"]{filter:brightness(0) invert(1)}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .game-info small{display:flex;align-items:center;gap:6px}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .search-engine-option.is-selected::after{content:"";width:14px;height:14px;background:var(--cyan);mask:url("../assets/ui/check.svg") center/contain no-repeat}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .popup-icon{display:inline-flex;align-items:center;gap:7px}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .popup-icon .od-icon{color:#79deef;width:15px;height:15px}
+
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .weather-text small .od-icon{width:11px;height:11px;flex-basis:11px}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .game-platform-logo[src$="steam.svg"],:where(html.od-launchpad,html.od-popup,html.od-youtube) .game-platform-logo[src$="epicgames.svg"]{filter:brightness(0) invert(1)}
+
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .brand-mark{display:inline-grid;place-items:center;width:42px;height:42px;overflow:hidden;vertical-align:middle;padding:0;border-radius:50%;border:1px solid #b196f34d;background:#0c0920;animation:none;box-shadow:0 0 18px #9274ff25}
+:where(html.od-launchpad,html.od-popup,html.od-youtube) .brand-mark img{display:block;width:100%;height:100%;object-fit:contain}
+:where(html.od-popup) .brand img{width:46px;height:46px;object-fit:contain;border-radius:50%;box-shadow:0 0 18px #9274ff25}

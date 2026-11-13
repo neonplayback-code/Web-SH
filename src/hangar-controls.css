@@ -1,0 +1,100 @@
+/* HANGAR · barra de búsqueda y filtros, como consola de mando: una sola fila con el campo de texto
+   (etiqueta "BUSCAR//" sobre el borde, tipografía monoespaciada, atajo "/" a la vista) y el orden a la derecha.
+   Va en su propio archivo y con html[data-mode=overdrive] .tab-filters, para no pisar hangar-web.css.
+   Los tokens --hgp-* (radio interior, superficie hundida, sombras) se definen en hangar-polish.css. */
+
+html[data-mode=overdrive] .tab-filters {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  padding: 10px; margin: 0; height: auto; min-height: 0; overflow: visible;
+  border: 1px solid var(--hg-line2); border-radius: var(--radius, 0);
+  animation: none;
+  transition: border-color .2s, box-shadow .28s;
+}
+/* Al escribir, el marco se enciende sin cambiar de grosor (las capas antiguas lo movían un píxel). */
+html[data-mode=overdrive] .tab-filters:focus-within {
+  border-width: 1px; border-color: var(--hg-aline);
+}
+
+/* Caja del texto: hueco oscuro con marco de un píxel */
+html[data-mode=overdrive] .tab-filters .search-box { flex: 1 1 320px; min-width: 0; height: 44px; isolation: isolate; }
+html[data-mode=overdrive] .tab-filters .search-box::before {
+  content: "BUSCAR//"; position: absolute; top: -6px; left: 10px; z-index: 2;
+  padding: 0 5px; background: var(--hgp-bar, #0b1420);
+  font: 700 9px/1 var(--hg-font-mono, var(--mono)); letter-spacing: .2em; color: var(--hg-ac);
+  pointer-events: none;
+}
+/* Atajo de teclado: "/" enfoca el buscador. Se oculta al escribir y en pantallas táctiles. */
+html[data-mode=overdrive] .tab-filters .search-box::after {
+  content: "/"; position: absolute; right: 10px; top: 50%; z-index: 2;
+  display: grid; place-items: center; width: 24px; height: 24px; transform: translateY(-50%);
+  border: 1px solid var(--hg-line2); border-bottom-width: 2px; background: var(--hg-panel);
+  color: var(--hg-text2); font: 600 12px/1 var(--hg-font-mono, var(--mono));
+  pointer-events: none; transition: opacity .16s;
+}
+html[data-mode=overdrive] .tab-filters .search-box:has(.search-input:focus)::after,
+html[data-mode=overdrive] .tab-filters .search-box:has(.search-input:not(:placeholder-shown))::after { opacity: 0; }
+@media (hover: none) { html[data-mode=overdrive] .tab-filters .search-box::after { display: none; } }
+
+html[data-mode=overdrive] .tab-filters .search-input {
+  width: 100%; height: 100%; padding: 0 46px 0 44px;
+  border: 1px solid var(--hg-line2); border-radius: var(--hgp-r, 0); background: var(--hgp-well, #050a12);
+  box-shadow: inset 0 1px 0 #000; transform: none; animation: none;
+  font: 500 14px/1 var(--hg-font-mono, var(--mono)); letter-spacing: .04em; text-transform: none;
+  color: var(--hg-text); caret-color: var(--hg-ac);
+  transition: border-color .18s, box-shadow .22s, background-color .18s;
+}
+/* El texto escrito se muestra tal cual; solo el indicador va en mayúsculas de consola. */
+html[data-mode=overdrive] .tab-filters .search-input::placeholder {
+  color: var(--hg-text3); opacity: .9; font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+}
+html[data-mode=overdrive] .tab-filters .search-input::-webkit-search-cancel-button { display: none; }
+html[data-mode=overdrive] .tab-filters .search-input:hover {
+  border-color: color-mix(in srgb, var(--hg-ac) 35%, var(--hg-line2));
+  background: var(--hgp-well, #050a12); box-shadow: inset 0 1px 0 #000; transform: none;
+}
+html[data-mode=overdrive] .tab-filters .search-input:focus {
+  border-color: var(--hg-ac); outline: none; animation: none; transform: none;
+  background: var(--hgp-well, #050a12);
+  /* El anillo de foco lo pone la capa "comfort" (outline de 2 px); aquí solo se enciende el interior. */
+  box-shadow: inset 0 0 18px color-mix(in srgb, var(--hg-ac) 12%, transparent);
+}
+
+html[data-mode=overdrive] .tab-filters .search-icon {
+  left: 8px; top: 50%; width: 30px; height: 30px; transform: translateY(-50%);
+  color: var(--hg-text3); filter: none; animation: none; transition: color .18s;
+}
+html[data-mode=overdrive] .tab-filters .search-input:focus ~ .search-icon { color: var(--hg-ac); transform: translateY(-50%); filter: none; animation: none; }
+html[data-mode=overdrive] .tab-filters .search-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+html[data-mode=overdrive] .tab-filters .search-clear {
+  right: 6px; top: 50%; width: 32px; height: 32px; transform: translateY(-50%);
+  border-radius: var(--hgp-r, 0); background: var(--hg-panel); border: 1px solid var(--hg-line2); color: var(--hg-text2);
+  box-shadow: none; backdrop-filter: none; animation: none; opacity: 1;
+  transition: color .16s, border-color .16s, background-color .16s;
+}
+html[data-mode=overdrive] .tab-filters .search-clear svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; transform: none; filter: none; }
+html[data-mode=overdrive] .tab-filters .search-clear:hover {
+  color: var(--hg-ac); border-color: var(--hg-ac); background: var(--hg-soft); box-shadow: none; transform: translateY(-50%);
+}
+html[data-mode=overdrive] .tab-filters .search-clear:active { transform: translateY(-50%) scale(.94); box-shadow: none; }
+
+/* Orden: bloques con esquina cortada a la derecha del campo; el activo se enciende */
+html[data-mode=overdrive] .tab-filters .tab-sort { flex: 0 0 auto; gap: 6px; padding: 0; border: 0; background: none; flex-wrap: nowrap; }
+html[data-mode=overdrive] .tab-sort .sort-btn { min-height: 44px; }
+html[data-mode=overdrive] .tab-sort .sort-btn svg { width: 15px; height: 15px; stroke-width: 2.2; transform: none; }
+html[data-mode=overdrive] .tab-sort .sort-btn .sort-icon { font-size: 14px; transform: none; }
+/* El icono del orden activo hereda el acento (antes se pintaba con el color del fondo y desaparecía). */
+html[data-mode=overdrive] .tab-sort .sort-btn.is-active svg { stroke: currentColor; filter: none; }
+html[data-mode=overdrive] .tab-sort .sort-btn.is-active .sort-icon { color: inherit; text-shadow: none; }
+
+@media (max-width: 700px) {
+  html[data-mode=overdrive] .tab-filters .search-box { flex-basis: 100%; }
+  html[data-mode=overdrive] .tab-filters .tab-sort { flex: 1 1 100%; }
+  html[data-mode=overdrive] .tab-sort .sort-btn { flex: 1; }
+}
+/* En móvil los dos botones ocupan media fila cada uno: caben con su texto, que es más claro que un icono solo. */
+@media (max-width: 480px) {
+  html[data-mode=overdrive] .tab-sort .sort-btn { gap: 6px; padding: 0 8px; font-size: 11px; letter-spacing: .06em; }
+  html[data-mode=overdrive] .tab-sort .sort-btn span:not(.sort-icon) { display: inline; }
+  html[data-mode=overdrive] .tab-sort .sort-btn :is(svg, .sort-icon) { margin: 0; }
+}

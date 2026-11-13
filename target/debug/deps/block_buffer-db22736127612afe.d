@@ -1,0 +1,6 @@
+/home/Alchemy/Proyectos/Web SH/target/debug/deps/block_buffer-db22736127612afe.d: /home/Alchemy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/block-buffer-0.10.4/src/lib.rs /home/Alchemy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/block-buffer-0.10.4/src/sealed.rs
+
+/home/Alchemy/Proyectos/Web SH/target/debug/deps/libblock_buffer-db22736127612afe.rmeta: /home/Alchemy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/block-buffer-0.10.4/src/lib.rs /home/Alchemy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/block-buffer-0.10.4/src/sealed.rs
+
+/home/Alchemy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/block-buffer-0.10.4/src/lib.rs:
+/home/Alchemy/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/block-buffer-0.10.4/src/sealed.rs:

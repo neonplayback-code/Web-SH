@@ -1,0 +1,72 @@
+/* Glass layer for the new tab, loaded after astra.css and hangar.css.
+   Panels show the backdrop behind them (default animated wallpaper or the user's image, GIF or video)
+   through a blurred, lightly tinted surface. Each mode keeps its own edge and accent. */
+
+html[data-mode=astra] {
+  --glass-fill: linear-gradient(155deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, 0) 60%), rgba(0, 0, 4, .35); /* black frosted glass */
+  --glass-edge: rgba(255, 255, 255, .14);
+  --glass-blur: 12px;
+}
+html[data-mode=overdrive] {
+  --glass-fill: color-mix(in srgb, var(--hg-panel) 46%, transparent);
+  --glass-blur: 20px;
+}
+
+/* Surfaces that take the glass. Dialogs keep a denser fill so text stays readable. */
+html[data-mode] :is(.hero-copy, .clock-panel, .search, .shortcut-card, .utility-card, .game-card, .plugin-widget, .plugin-row, .plugin-detail, .settings-block, .weather-chip, .folder-row, .catalog-card, .custom-preview) {
+  background: var(--glass-fill) !important;
+  backdrop-filter: blur(var(--glass-blur)) saturate(118%) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(118%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), 0 18px 40px -26px rgba(0, 0, 0, .7) !important;
+}
+html[data-mode=astra] :is(.hero-copy, .clock-panel, .search, .shortcut-card, .utility-card, .game-card, .plugin-widget, .plugin-row, .plugin-detail, .settings-block, .weather-chip, .folder-row, .catalog-card, .custom-preview) {
+  border-color: var(--glass-edge) !important;
+}
+/* The starfield layer inside Astra panels stays, but at the glass tint so it does not paint a black slab. */
+html[data-mode=astra] :is(.clock-panel, .utility-card, .plugin-widget)::before { opacity: .45 !important; }
+
+html[data-mode=overdrive] :is(.hero-copy, .clock-panel, .search, .shortcut-card, .utility-card, .game-card, .plugin-widget, .plugin-row, .plugin-detail, .settings-block, .weather-chip, .folder-row, .catalog-card, .custom-preview) {
+  border-color: var(--hg-line) !important;
+}
+
+/* Wallpaper: a bit less saturated and darker at the edges so panels and text read clearly. */
+.backdrop-media img, .backdrop-media video { filter: saturate(.72) brightness(.88); }
+.backdrop-media .bg-overdrive { display: none; }
+html[data-mode=overdrive] .backdrop-media .bg-astra { display: none; }
+html[data-mode=overdrive] .backdrop-media .bg-overdrive { display: block; }
+.backdrop-media img.bg-astra, .backdrop-media img.bg-overdrive { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.backdrop-preview .bg-overdrive { display: none; }
+html[data-mode=overdrive] .backdrop-preview .bg-astra { display: none; }
+html[data-mode=overdrive] .backdrop-preview .bg-overdrive { display: block; }
+
+/* Less clutter: telemetry duplicates the clock and the stage counter, and the footer caption repeats the tagline. */
+html[data-mode=overdrive] .tele-cell, html[data-mode=overdrive] .hero-index, html[data-mode=overdrive] .footer-caption { display: none !important; }
+html[data-mode=overdrive] body::before, html[data-mode=overdrive] .aurora { display: none; }
+html[data-mode=overdrive] .hero-copy, html[data-mode=overdrive] .rail-extra { background-color: transparent; }
+html[data-mode=overdrive] .col-rail { background: color-mix(in srgb, var(--hg-bg2) 62%, transparent); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+html[data-mode=overdrive] .col-stage { background: transparent; }
+
+/* Sidebar label stays on one line. */
+.hero-topline .hero-id { white-space: nowrap; }
+
+/* Cards that have been hovered get the "od-button" decoration, whose own !important rules (button-effects.css) used to give
+   them a different surface from untouched cards. Same glass in every state, only the edge reacts to the cursor. */
+html[data-mode].od-launchpad .shortcut-card.od-button[data-od-effect],
+html[data-mode].od-launchpad .shortcut-card.od-button[data-od-effect]:is(:hover, :focus-within) {
+  background: var(--glass-fill) !important;
+  backdrop-filter: blur(var(--glass-blur)) saturate(118%) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(118%) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), 0 18px 40px -26px rgba(0, 0, 0, .7) !important;
+  border-color: var(--glass-edge, var(--hg-line)) !important;
+}
+html[data-mode].od-launchpad .shortcut-card.od-button[data-od-effect]:is(:hover, :focus-within) { border-color: rgba(255, 255, 255, .34) !important; }
+html[data-mode=overdrive].od-launchpad .shortcut-card.od-button[data-od-effect]:is(:hover, :focus-within) { border-color: var(--hg-line2) !important; }
+/* Lite mode: no blur, a denser black so text stays readable. */
+html.perf-lite[data-mode=astra] { --glass-fill: rgba(0, 0, 2, .88); }
+html.perf-lite[data-mode] :is(.hero-copy, .clock-panel, .search, .shortcut-card, .utility-card, .game-card, .plugin-widget, .plugin-row, .plugin-detail, .settings-block, .weather-chip, .folder-row, .catalog-card, .custom-preview), html.perf-lite[data-mode].od-launchpad .shortcut-card.od-button[data-od-effect] { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+
+/* A folder card's inner button is only a layout wrapper: the card carries the surface. Without this, the generic button effect
+   (translucent fill + blur) painted a second, darker slab inside the card. */
+html[data-mode] .folder-card .shortcut-link, html[data-mode] .folder-card .shortcut-link.od-button {
+  background: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: none !important; border: 0 !important; border-radius: inherit;
+}

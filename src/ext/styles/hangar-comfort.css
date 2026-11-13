@@ -1,0 +1,40 @@
+/* HANGAR comfort layer (loaded last). Same look, easier to use: bigger text, stronger contrast, larger click targets,
+   clear keyboard focus and calmer tracking. It only changes sizes, colours of secondary text and focus; no layout moves. */
+
+/* ---- contrast: secondary and tertiary text were too dim on the dark panels ---- */
+html[data-mode=overdrive]:not(#od) { --hg-text2: #bdc9d8; --hg-text3: #93a1b3; --hg-line2: #3d4a5c; }
+
+/* ---- text size: nothing below 12px; wide letter-spacing (hard to read) is tightened ---- */
+html[data-mode=overdrive] :is(.tele-label, .clock-label, .clock-live, .hero-session, .hg-stats dt, .hg-meter-read, .sg-clear, .palette-title, .theme-row > span) { font-size: 12px !important; letter-spacing: .1em !important; }
+html[data-mode=overdrive] :is(.hero-topline, .hero-greeting, .palette-button kbd, .search kbd, .key-list kbd, .game-info small, .dialog-head .eyebrow, .dialog label, .field-hint, .shortcut-domain, .hg-status, .clock-bottom span:last-child, .date-button) { font-size: 12.5px !important; letter-spacing: .06em !important; }
+html[data-mode=overdrive] .field-hint { line-height: 1.55; color: var(--hg-text2); }
+html[data-mode=overdrive] .shortcut-name, html[data-mode=overdrive] .game-info strong { font-size: max(15px, 1em); }
+html[data-mode=overdrive] .dialog input:not([type=checkbox]):not([type=radio]):not([type=color]), html[data-mode=overdrive] .dialog select, html[data-mode=overdrive] .dialog textarea { min-height: 44px; font-size: 15px; }
+
+/* ---- click targets: at least 44px tall (40px for dense rows) ---- */
+html[data-mode=overdrive] :is(.ghost-button, .save-button, .add-button, .delete-button, .launcher-pill, .back-link, .mode-btn, .add-tab, .search-engine-option, .catalog-add) { min-height: 44px; }
+html[data-mode=overdrive] :is(.icon-button, .dialog-close, .calendar-nav, .search-engine-trigger, #search-clear) { min-width: 44px; min-height: 44px; }
+html[data-mode=overdrive] .check-row { min-height: 44px; padding: 6px 0; cursor: pointer; }
+html[data-mode=overdrive] .check-row input { width: 20px; height: 20px; }
+html[data-mode=overdrive] .theme-swatch, html[data-mode=overdrive] .theme-swatch.od-button { width: 28px; height: 28px; }
+html[data-mode=overdrive] .theme-row { gap: 10px; }
+html[data-mode=overdrive] .sg-item { min-height: 48px; font-size: 15px; }
+html[data-mode=overdrive] .sg-item .sg-tool { opacity: .75; width: 32px; height: 32px; }
+
+/* ---- feedback: every control says it is clickable and reacts at once ---- */
+html[data-mode=overdrive] :is(button, a, label.check-row, summary, [role=button], .shortcut-card) { cursor: pointer; }
+html[data-mode=overdrive] :is(button, [role=button]):disabled { cursor: not-allowed; opacity: .45; }
+html[data-mode=overdrive] :is(.ghost-button, .save-button, .add-button, .icon-button, .launcher-pill, .mode-btn, .check-row, .shortcut-card, .sg-item):active { transform: translateY(1px); }
+
+/* ---- keyboard focus: a clear 2px accent ring everywhere, never hidden ---- */
+html[data-mode=overdrive] :is(a, button, input, select, textarea, summary, [role=button], [tabindex]):focus-visible { outline: 2px solid var(--hg-ac) !important; outline-offset: 2px !important; box-shadow: 0 0 0 4px color-mix(in srgb, var(--hg-ac) 22%, transparent); }
+html[data-mode=overdrive] .shortcut-card:focus-within { border-color: var(--hg-ac) !important; }
+
+/* ---- reading: selected text and scrollbars are visible ---- */
+html[data-mode=overdrive] ::selection { background: color-mix(in srgb, var(--hg-ac) 45%, transparent); color: #fff; }
+html[data-mode=overdrive] { scrollbar-width: auto; scrollbar-color: color-mix(in srgb, var(--hg-ac) 55%, #26314a) #0b101b; }
+
+/* ---- calm mode follows the system setting: no pulsing, no scan sweep, no moving edges ---- */
+@media (prefers-reduced-motion: reduce) {
+  html[data-mode=overdrive] *, html[data-mode=overdrive] *::before, html[data-mode=overdrive] *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}

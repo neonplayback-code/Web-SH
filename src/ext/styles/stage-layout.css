@@ -1,0 +1,128 @@
+/* Launchpad layout: the 12-column stage grid, edit mode, the wobble while dragging and the rail that folds left. */
+
+/* Stage grid: each block spans a share of the 12 columns; the rest flow around it. */
+.stage-grid {
+  display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-auto-flow: row dense;
+  gap: 18px 14px; align-items: start; margin-top: 18px;
+}
+.stage-grid > .stage-block { grid-column: var(--x, auto) / span var(--span, 12); min-width: 0; margin: var(--dy, 0px) 0 0 0 !important; position: relative; }
+@media (max-width: 900px) { .stage-grid > .stage-block { grid-column: 1 / -1; margin-top: 0 !important; } }
+
+/* Edit mode: dashed outline, a tool strip on each block, and a drop line where the block will land. */
+.block-tools { display: none; position: absolute; top: 8px; right: 8px; z-index: 6; align-items: center; gap: 4px; padding: 3px; border-radius: 10px; background: rgba(4, 6, 12, .82); border: 1px solid rgba(255, 255, 255, .14); }
+html[data-layout=edit] .block-tools { display: flex; }
+html[data-layout=edit] .stage-block { outline: 1px dashed color-mix(in srgb, var(--cyan, #53efff) 40%, transparent); outline-offset: 6px; border-radius: 14px; }
+.block-handle, .block-step {
+  display: grid; place-items: center; min-width: 26px; height: 26px; padding: 0 6px;
+  border: 1px solid rgba(255, 255, 255, .16); border-radius: 8px; background: rgba(255, 255, 255, .06); color: #e8eefc; font: 600 13px/1 var(--mono, monospace); cursor: pointer;
+}
+.block-handle { cursor: grab; }
+.block-handle svg { width: 10px; height: 14px; fill: currentColor; }
+.block-handle:active { cursor: grabbing; }
+.block-step:hover, .block-handle:hover { border-color: var(--cyan, #53efff); }
+.block-size { min-width: 40px; text-align: center; font: 600 11px/1 var(--mono, monospace); color: #bfc8de; letter-spacing: .06em; }
+.stage-block.drop-before { box-shadow: -10px 0 0 -3px var(--cyan, #53efff), -16px 0 24px -6px var(--cyan, #53efff); }
+.stage-block.drop-after { box-shadow: 10px 0 0 -3px var(--cyan, #53efff), 16px 0 24px -6px var(--cyan, #53efff); }
+
+/* Wobble while a block or card is carried: a slow swing, solid and clearly visible. */
+@keyframes od-wobble {
+  0%, 100% { transform: translateY(-3px) rotate(-1.4deg); }
+  50% { transform: translateY(-3px) rotate(1.4deg); }
+}
+.stage-block.is-dragging, .shortcut-card.is-dragging {
+  opacity: .96; z-index: 4;
+  animation: od-wobble .55s ease-in-out infinite alternate;
+  box-shadow: 0 30px 60px -22px #000, 0 0 0 1px color-mix(in srgb, var(--cyan, #53efff) 70%, transparent), 0 0 34px -8px var(--cyan, #53efff);
+}
+@media (prefers-reduced-motion: reduce) { .stage-block.is-dragging, .shortcut-card.is-dragging { animation: none; } }
+
+/* Toggle buttons in the stage header. */
+.layout-toggle {
+  flex: none; align-self: center; height: 34px; padding: 0 14px; border: 1px solid rgba(255, 255, 255, .18); border-radius: 10px;
+  background: rgba(255, 255, 255, .05); color: #e8eefc; font: 600 11px/1 var(--mono, monospace); letter-spacing: .12em; text-transform: uppercase; cursor: pointer;
+}
+.layout-toggle[aria-pressed=true] { border-color: var(--cyan, #53efff); color: var(--cyan, #53efff); }
+.layout-toggle:hover { border-color: var(--cyan, #53efff); }
+.stage-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.stage-head .layout-toggle { margin-left: auto; }
+.stage-head .layout-toggle + .layout-toggle { margin-left: 0; }
+
+/* Rail: folds to the left. Only in HANGAR, where the rail is a real column. */
+.rail-toggle { display: none; }
+html[data-mode=overdrive] .rail-toggle {
+  display: grid; place-items: center; position: fixed; top: 50%; z-index: 30; width: 18px; height: 56px; transform: translateY(-50%);
+  left: clamp(290px, 25vw, 380px); margin-left: -9px; border: 1px solid #34415f; border-radius: 0; background: #0c1019; color: var(--hg-ac, #00e5ff); font: 700 13px/1 var(--hg-font-mono, monospace); cursor: pointer;
+  transition: left .45s cubic-bezier(.2, .8, .2, 1), color .2s;
+}
+html[data-mode=overdrive] .rail-toggle:hover { color: #fff; }
+html[data-mode=overdrive] .dashboard { transition: grid-template-columns .45s cubic-bezier(.2, .8, .2, 1); }
+html[data-mode=overdrive].rail-closed .dashboard { grid-template-columns: 0 minmax(0, 1fr); }
+html[data-mode=overdrive].rail-closed .rail-toggle { left: 0; margin-left: 0; }
+html[data-mode=overdrive].rail-closed .col-rail { opacity: 0; pointer-events: none; overflow: hidden; border-right: 0; }
+html[data-mode=overdrive] .col-rail { transition: opacity .3s; }
+
+/* ---- Edit mode, usability pass ---------------------------------------------------------------------------------------
+   The tool strip used to sit on top of each block and covered its own buttons (Añadir acceso, 0/3, Guardado, the search
+   field). It now lives in the gap above the block, with the block's name, and the gaps are wide enough to hold it. */
+html[data-layout=edit] .stage-grid { row-gap: 56px; padding-top: 34px; }
+.block-tools { top: -44px; right: 0; padding: 4px; gap: 6px; border-radius: 12px; background: rgba(4, 6, 12, .9); box-shadow: 0 8px 24px -10px #000; }
+.block-label { padding: 0 8px 0 6px; color: #f2f6ff; font: 700 12px/1 var(--mono, monospace); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+.block-handle, .block-step { min-width: 36px; height: 36px; font-size: 16px; border-radius: 9px; }
+.block-handle svg { width: 12px; height: 17px; }
+.block-size { min-width: 48px; font-size: 12.5px; color: #e4ebfb; }
+html[data-layout=edit] .stage-block { outline: 1px dashed rgba(255, 255, 255, .35); outline-offset: 8px; }
+html[data-layout=edit] .stage-block:hover, html[data-layout=edit] .stage-block:focus-within { outline-color: var(--cyan, #53efff); outline-style: solid; }
+/* the swatch row is a free-floating strip: give it a box so its frame and its swatches agree */
+html[data-layout=edit] .theme-row.stage-block { min-height: 52px; padding: 8px 14px; box-sizing: border-box; flex-wrap: wrap; }
+/* one line that explains what to do */
+html[data-layout=edit] .stage-head::after { content: "Arrastra ⠿ para mover un bloque · − / + cambia su ancho · Listo guarda"; flex: 0 0 100%; order: 9; margin-top: 6px; color: #b8c3dc; font: 500 13px/1.4 var(--sans, system-ui, sans-serif); }
+html[data-mode=overdrive][data-layout=edit] .block-tools { border-radius: 0; border-color: var(--hg-line2); background: rgba(8, 11, 16, .94); }
+html[data-mode=overdrive][data-layout=edit] .block-handle, html[data-mode=overdrive][data-layout=edit] .block-step { border-radius: 0; }
+html[data-mode=overdrive][data-layout=edit] .stage-block { outline-color: var(--hg-line2); }
+html[data-mode=overdrive][data-layout=edit] .stage-block:hover { outline-color: var(--hg-ac); }
+@media (max-width: 900px) { html[data-layout=edit] .stage-grid { row-gap: 60px; } .block-label { display: none; } }
+
+/* ---- Moving blocks: grab anywhere, smooth lift, a dashed slot shows where it lands ---- */
+/* in edit mode the content of a block is inert, so a press anywhere on it starts a drag (no tiny handle to hit) */
+html[data-layout=edit] .stage-block { cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
+html[data-layout=edit] .stage-block > *:not(.block-tools) { pointer-events: none; }
+html[data-layout=edit] .stage-block .block-tools { pointer-events: auto; cursor: default; }
+.block-handle { cursor: grab; touch-action: none; }
+.stage-block.is-dragging { cursor: grabbing; z-index: 40; opacity: .97; animation: none !important; transition: none !important; will-change: transform; box-shadow: 0 34px 70px -26px #000, 0 0 0 1px color-mix(in srgb, var(--cyan, #53efff) 65%, transparent), 0 0 38px -10px var(--cyan, #53efff) !important; outline: 0 !important; }
+.stage-grid { position: relative; }
+.drop-slot { position: absolute; z-index: 0; pointer-events: none; border: 1.5px dashed color-mix(in srgb, var(--cyan, #53efff) 80%, transparent); border-radius: 16px; background: color-mix(in srgb, var(--cyan, #53efff) 7%, transparent); transition: left .26s cubic-bezier(.2, .8, .2, 1), top .26s cubic-bezier(.2, .8, .2, 1), width .26s cubic-bezier(.2, .8, .2, 1), height .26s cubic-bezier(.2, .8, .2, 1); }
+.drop-slot[hidden] { display: none; }
+html[data-mode=overdrive] .drop-slot { border-radius: 0; border-color: var(--hg-ac, #00e5ff); background: color-mix(in srgb, var(--hg-ac, #00e5ff) 8%, transparent); }
+html.od-sorting, html.od-sorting * { cursor: grabbing !important; }
+html.od-sorting { user-select: none; }
+@media (prefers-reduced-motion: reduce) { .drop-slot { transition: none; } }
+/* shortcut cards: a calm lift instead of the wobble */
+.shortcut-card.is-dragging { animation: none !important; transform: scale(1.04) !important; opacity: .95; }
+
+/* Column guides while a block is carried: 12 faint columns show where it can be placed (free space is usable space). */
+.stage-grid::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0; transition: opacity .2s;
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, .028) 0 calc((100% - 11 * 14px) / 12), transparent calc((100% - 11 * 14px) / 12) calc((100% - 11 * 14px) / 12 + 14px)); border-radius: 12px; }
+html.od-sorting .stage-grid::before { opacity: 1; }
+html[data-mode=overdrive].od-sorting .stage-grid::before { background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--hg-ac, #00e5ff) 5%, transparent) 0 calc((100% - 11 * 14px) / 12), transparent calc((100% - 11 * 14px) / 12) calc((100% - 11 * 14px) / 12 + 14px)); border-radius: 0; }
+@media (max-width: 900px) { .stage-grid::before { display: none; } }
+
+/* ---- Mis plataformas in Diseñar mode: cards are carried, not clicked ---- */
+html[data-layout=edit] .shortcut-grid { pointer-events: auto; }
+html[data-layout=edit] .shortcut-grid .shortcut-card { pointer-events: auto; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; outline: 1px dashed rgba(255, 255, 255, .28); outline-offset: 3px; }
+html[data-layout=edit] .shortcut-grid .shortcut-card > * { pointer-events: none; }
+html[data-layout=edit] .shortcut-grid .shortcut-card:hover { outline: 1px solid var(--cyan, #53efff); }
+html[data-layout=edit] .shortcut-grid .add-card { pointer-events: none; opacity: .45; }
+.shortcut-card.is-carried { z-index: 40; cursor: grabbing; opacity: .97; will-change: transform; transition: none !important; animation: none !important; box-shadow: 0 26px 50px -20px #000, 0 0 0 1px color-mix(in srgb, var(--cyan, #53efff) 65%, transparent), 0 0 28px -8px var(--cyan, #53efff) !important; }
+.shortcut-card.drop-merge { outline: 2px solid var(--cyan, #53efff) !important; outline-offset: 3px; box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan, #53efff) 25%, transparent), 0 0 30px -6px var(--cyan, #53efff) !important; }
+html[data-mode=overdrive][data-layout=edit] .shortcut-grid .shortcut-card { outline-color: var(--hg-line2); }
+html[data-mode=overdrive][data-layout=edit] .shortcut-grid .shortcut-card:hover, html[data-mode=overdrive] .shortcut-card.drop-merge { outline-color: var(--hg-ac, #00e5ff) !important; }
+
+/* ---- Side blocks (the HANGAR rail): bigger toggles, the whole heading is clickable ---- */
+.collapse-toggle { width: 30px !important; height: 30px !important; font-size: 17px !important; border-radius: 8px; }
+.collapse-head { cursor: pointer; user-select: none; -webkit-user-select: none; }
+.collapse-head:hover .collapse-toggle { border-color: var(--cyan, #53efff); color: var(--text, #fff); }
+html[data-mode=overdrive] .collapse-toggle { border-radius: 0 !important; }
+html[data-mode=overdrive] .rail-toggle { width: 24px; height: 64px; margin-left: -12px; font-size: 16px; }
+
+/* The "Hangar N" heading stays in ASTRA; HANGAR already shows its own header, so the title is hidden there only. */
+html[data-mode=overdrive] .stage-head .stage-title { display: none; }

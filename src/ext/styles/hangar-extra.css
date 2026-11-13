@@ -1,0 +1,29 @@
+/* HANGAR extras, loaded after hangar-rgb.css. Only effects the other HANGAR layers do not already cover.
+   Kept to a few per component so the interface stays readable (see the "4 or 5 per component" rule). */
+
+/* Focus glow on the search field: a cyan ring and a soft outer glow while typing. */
+html[data-mode=overdrive] .search:focus-within {
+  box-shadow: 0 0 0 1px var(--hg-ac), 0 0 26px -8px var(--hg-ac), inset 0 0 0 1px rgba(255, 255, 255, .04);
+  transition: box-shadow .35s var(--hg-ease, ease);
+}
+
+/* Icon glow on card hover: the icon's halo follows the active accent. */
+html[data-mode=overdrive] .shortcut-card:hover .shortcut-icon {
+  box-shadow: 0 0 18px -4px var(--hg-ac);
+}
+html[data-mode=overdrive] .shortcut-card:hover .shortcut-icon img {
+  filter: drop-shadow(0 0 6px var(--hg-ac));
+}
+
+/* Active mode button: a small luminous underline, so the current mode reads at a glance. */
+/* Pulsing status dots (online indicator and live clock) follow the accent. */
+@keyframes hg-extra-dot {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--hg-ac) 70%, transparent); }
+  60% { box-shadow: 0 0 0 6px transparent; }
+}
+html[data-mode=overdrive] .clock-live::before {
+  animation: hg-extra-dot 2.2s ease-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-mode=overdrive] .clock-live::before { animation: none; }
+}

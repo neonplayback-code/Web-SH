@@ -1,0 +1,13 @@
+/* OVERDRIVE logo mark: the official shape is used as a mask and filled with the theme colours, so it recolours with the theme in both modes. */
+.od-logo {
+  display: inline-block; aspect-ratio: 900 / 705; flex: none;
+  background: linear-gradient(135deg, var(--logo-a, var(--cyan, #53efff)), var(--logo-b, var(--purple, #8d6bff)) 55%, var(--logo-c, var(--pink, #ef58df)));
+  -webkit-mask: url("../icons/logo-mark.svg") center / contain no-repeat; mask: url("../icons/logo-mark.svg") center / contain no-repeat;
+}
+.brand-mark .od-logo { width: 72%; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--logo-a, var(--cyan, #53efff)) 55%, transparent)); }
+/* HANGAR shows the mark itself (no "OD" text, no filled tile): a clipped control-room frame with the mark inside. */
+html[data-mode=overdrive] .brand-mark { width: 48px; height: 40px; border: 1px solid var(--hg-line2); background: var(--hg-panel); color: var(--hg-ac); -webkit-text-fill-color: currentColor; }
+html[data-mode=overdrive] .brand-mark::before { content: none; }
+html[data-mode=overdrive] .brand-mark .od-logo { width: 74%; --logo-a: var(--hg-ac); --logo-b: var(--hg-ac2); --logo-c: var(--hg-ac3); filter: drop-shadow(0 0 5px color-mix(in srgb, var(--hg-ac) 60%, transparent)); }
+/* Side panel follows its own palette tokens. */
+.brand .od-logo { width: 38px; --logo-a: var(--c1); --logo-b: var(--c2); --logo-c: var(--c3); }

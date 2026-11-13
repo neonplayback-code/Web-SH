@@ -1,0 +1,620 @@
+/* ==========================================================================
+   HANGAR · teclas — sistema de botones, opciones, interruptores y deslizadores de toda la app.
+
+   Cada botón es una tecla de equipo: un bisel fino (::before), la tecla en sí un poco más adentro (::after)
+   y una luz bajo el texto que dice en qué estado está.
+
+     reposo      luz corta y tenue
+     al pasar    la tecla se enciende: la luz se alarga, un foco sigue al cursor y el bisel brilla
+     pulsada     la tecla se hunde dentro del bisel
+     activa      luz ancha de acento y texto de acento
+
+   Variantes: principal (tecla de acento), fantasma (solo bisel; la tecla aparece al pasar), cápsula (orden y ♥),
+   de riel (pestañas y opciones: comparten el bisel de su regleta) y ficha (modo, tipografía y ambientes).
+
+   Cada estado solo cambia variables --tb-*; no se repiten fondos ni sombras:
+     --tb-line     bisel y filo de la tecla     --tb-ink     texto
+     --tb-face-a   tecla, parte superior        --tb-mark    color de la luz
+     --tb-face-b   tecla, parte inferior        --tb-ledw    ancho de la luz
+     --tb-on       0-1, cuánto está encendida   --tb-glow    color del foco y del halo
+     --tb-gap      hueco entre bisel y tecla    --tb-r       radio
+
+   El foco que sigue al cursor usa --px / --py, que pone lib/hangarFx.ts.
+   ========================================================================== */
+
+/* Registradas para que el encendido y los colores cambien con una transición suave. */
+@property --tb-on { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --tb-line { syntax: "<color>"; inherits: true; initial-value: #34415f; }
+@property --tb-face-a { syntax: "<color>"; inherits: true; initial-value: #131d2b; }
+@property --tb-face-b { syntax: "<color>"; inherits: true; initial-value: #0a121c; }
+@property --tb-sheen-x { syntax: "<percentage>"; inherits: true; initial-value: -150%; }
+@property --sw-on { syntax: "<number>"; inherits: true; initial-value: 0; }
+
+html[data-mode=overdrive] {
+  --tb-h: 42px;
+  --tb-r: max(4px, var(--hgp-r, 5px));
+  --tb-ease: var(--hg-ease, cubic-bezier(.2, .8, .2, 1));
+  --tb-spring: cubic-bezier(.34, 1.56, .64, 1);
+}
+
+/* ------------------------------------------------------------------ Tecla base */
+html[data-mode=overdrive] :is(
+  .tab, .ghost-button, .add-button, .save-button, .launcher-pill, .icon-button, .mode-btn, .sort-btn,
+  .pulse-customize, .crumb-back, .like-btn, .cz-seg > *, .hangar-presets > *, .cz-modes > *, .cz-fonts > *, .pe-check
+) {
+  --tb-on: 0;
+  --tb-gap: 3px;
+  --tb-line: color-mix(in srgb, var(--hg-ac) 26%, var(--hg-line2));
+  --tb-face-a: color-mix(in srgb, var(--hg-ac) 7%, #141e2c);
+  --tb-face-b: #0a121c;
+  --tb-ink: var(--hg-text2);
+  --tb-mark: color-mix(in srgb, var(--hg-ac) 55%, var(--hg-line2));
+  --tb-ledw: 12px;
+  --tb-glow: var(--hg-ac);
+  --tb-sheen: rgba(255, 255, 255, .09);
+  --tb-sheen-x: -150%;
+
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--tb-h);
+  padding: 0 20px;
+  border: 0;
+  border-radius: var(--tb-r);
+  clip-path: none;
+  background: none;
+  box-shadow: none;
+  color: var(--tb-ink);
+  font: 600 12px/1 var(--hg-font-mono, monospace);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: --tb-on .28s var(--tb-ease), --tb-line .2s, --tb-face-a .2s, --tb-face-b .2s, color .2s, transform .3s var(--tb-spring);
+}
+
+/* Bisel: marco fino con el fondo oscuro del hueco. Al encenderse la tecla, brilla hacia fuera. */
+html[data-mode=overdrive] :is(
+  .tab, .ghost-button, .add-button, .save-button, .launcher-pill, .icon-button, .sort-btn,
+  .pulse-customize, .crumb-back, .like-btn, .cz-seg > *, .hangar-presets > *, .cz-modes > *, .cz-fonts > *, .pe-check
+)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: auto;
+  height: auto;
+  transform: none;
+  clip-path: none;
+  pointer-events: none;
+  border: 1px solid var(--tb-line);
+  border-radius: inherit;
+  background: rgba(3, 7, 12, .55);
+  box-shadow: 0 0 calc(var(--tb-on) * 16px * var(--glow, 1)) -3px color-mix(in srgb, var(--tb-glow) 70%, transparent);
+}
+
+/* Tecla. Sus fondos, de arriba abajo: foco del cursor, franja de luz, luz inferior, trama de puntos y relleno. */
+html[data-mode=overdrive] :is(
+  .tab, .ghost-button, .add-button, .save-button, .launcher-pill, .icon-button, .sort-btn,
+  .pulse-customize, .crumb-back, .like-btn, .cz-seg > *, .hangar-presets > *, .cz-modes > *, .cz-fonts > *, .pe-check
+)::after {
+  content: "";
+  position: absolute;
+  inset: var(--tb-gap);
+  z-index: -1;
+  clip-path: none;
+  pointer-events: none;
+  border-radius: max(2px, calc(var(--tb-r) - var(--tb-gap) + 1px));
+  background-image:
+    radial-gradient(110px circle at var(--px, 50%) var(--py, 50%), color-mix(in srgb, var(--tb-glow) calc(var(--tb-on) * 32%), transparent), transparent 72%),
+    linear-gradient(105deg, transparent 40%, var(--tb-sheen) 50%, transparent 60%),
+    linear-gradient(var(--tb-mark), var(--tb-mark)),
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, .05) 0 .6px, transparent 1px),
+    linear-gradient(180deg, var(--tb-face-a), var(--tb-face-b));
+  background-repeat: no-repeat, no-repeat, no-repeat, repeat, no-repeat;
+  background-size: 100% 100%, 60% 100%, var(--tb-ledw) 2px, 5px 5px, 100% 100%;
+  background-position: 0 0, var(--tb-sheen-x) 0, center calc(100% - 3px), 0 0, 0 0;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--tb-line) 50%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, .08),
+    0 0 calc(var(--tb-on) * 8px) -1px color-mix(in srgb, var(--tb-mark) 60%, transparent);
+  /* La franja solo se anima al entrar; al salir vuelve a su sitio sin recorrer la tecla al revés. */
+  transition: inset .12s var(--tb-ease), background-size .3s var(--tb-ease), background-position 0s;
+}
+
+html[data-mode=overdrive] :is(
+  .tab, .ghost-button, .add-button, .save-button, .launcher-pill, .sort-btn, .pulse-customize,
+  .crumb-back, .like-btn, .cz-seg > *, .hangar-presets > *, .cz-modes > *, .cz-fonts > *, .pe-check
+) svg { flex: none; }
+
+/* --------------------------------------------------------------------- Estados */
+html[data-mode=overdrive] :is(
+  .tab, .ghost-button, .add-button, .save-button, .launcher-pill, .icon-button, .sort-btn,
+  .pulse-customize, .crumb-back, .like-btn, .cz-seg > *, .hangar-presets > *, .cz-modes > *, .cz-fonts > *, .pe-check
+):hover:not(:disabled) {
+  --tb-on: 1;
+  --tb-line: color-mix(in srgb, var(--hg-ac) 80%, var(--hg-line2));
+  --tb-face-a: color-mix(in srgb, var(--hg-ac) 18%, #141e2c);
+  --tb-face-b: color-mix(in srgb, var(--hg-ac) 6%, #0a121c);
+  --tb-ink: var(--hg-text);
+  --tb-mark: var(--hg-ac);
+  --tb-ledw: 44%;
+  --tb-sheen-x: 250%;
+  color: var(--tb-ink);
+  box-shadow: none;
+  filter: none;
+  transform: translateY(-1px);
+}
+html[data-mode=overdrive] :is(
+  .tab, .ghost-button, .add-button, .save-button, .launcher-pill, .icon-button, .sort-btn,
+  .pulse-customize, .crumb-back, .like-btn, .cz-seg > *, .hangar-presets > *, .cz-modes > *, .cz-fonts > *, .pe-check
+):hover:not(:disabled)::after {
+  transition: inset .12s var(--tb-ease), background-size .3s var(--tb-ease), background-position .75s var(--tb-ease);
+}
+
+/* Foco de teclado: la tecla se enciende igual que al pasar. El anillo exterior lo pone la capa "comfort". */
+html[data-mode=overdrive] :is(
+  .tab, .ghost-button, .add-button, .save-button, .launcher-pill, .icon-button, .sort-btn,
+  .pulse-customize, .crumb-back, .like-btn, .cz-seg > *, .hangar-presets > *, .cz-modes > *, .cz-fonts > *, .pe-check
+):focus-visible {
+  --tb-on: 1;
+  --tb-line: var(--hg-ac);
+  --tb-mark: var(--hg-ac);
+  --tb-ledw: 44%;
+  box-shadow: none;
+  filter: none;
+}
+
+/* Pulsada: la tecla se hunde dentro del bisel y la luz ocupa casi todo el ancho. */
+html[data-mode=overdrive] :is(
+  .tab, .ghost-button, .add-button, .save-button, .launcher-pill, .icon-button, .sort-btn,
+  .pulse-customize, .crumb-back, .like-btn, .cz-seg > *, .hangar-presets > *, .cz-modes > *, .cz-fonts > *, .pe-check
+):active:not(:disabled) {
+  --tb-ledw: 72%;
+  transform: translateY(1px) scale(.985);
+  filter: none;
+}
+html[data-mode=overdrive] :is(
+  .ghost-button, .add-button, .save-button, .launcher-pill:not(.tab), .icon-button, .sort-btn,
+  .pulse-customize, .crumb-back, .like-btn, .hangar-presets > *, .cz-modes > *, .cz-fonts > *, .pe-check
+):active:not(:disabled)::after { inset: calc(var(--tb-gap) + 1.5px); }
+
+html[data-mode=overdrive] :is(
+  .tab, .ghost-button, .add-button, .save-button, .launcher-pill, .icon-button, .sort-btn,
+  .pulse-customize, .crumb-back, .like-btn, .cz-seg > *, .hangar-presets > *, .cz-modes > *, .cz-fonts > *, .pe-check
+):disabled {
+  --tb-on: 0;
+  --tb-line: var(--hg-line2);
+  opacity: .45;
+  cursor: not-allowed;
+  filter: none;
+  transform: none;
+}
+
+/* ------------------------------------------------------------------- Variantes */
+/* Principal: tecla de acento con texto en tinta. Guardar, añadir, personalizar. */
+html[data-mode=overdrive] :is(.save-button, .add-button, .pulse-customize) {
+  --tb-line: color-mix(in srgb, var(--hg-ac) 75%, transparent);
+  --tb-face-a: color-mix(in srgb, #fff 16%, var(--hg-ac));
+  --tb-face-b: color-mix(in srgb, var(--hangar-secondary, var(--hg-ac2)) 22%, var(--hg-ac));
+  --tb-ink: var(--hg-ink, #04101a);
+  --tb-mark: color-mix(in srgb, var(--hg-ink, #04101a) 55%, transparent);
+  --tb-ledw: 18px;
+  --tb-sheen: rgba(255, 255, 255, .55);
+  padding: 0 26px;
+  font-weight: 700;
+}
+html[data-mode=overdrive] :is(.save-button, .add-button, .pulse-customize):hover:not(:disabled) {
+  --tb-line: #fff;
+  --tb-face-a: color-mix(in srgb, #fff 34%, var(--hg-ac));
+  --tb-face-b: color-mix(in srgb, #fff 8%, var(--hg-ac));
+  --tb-ink: var(--hg-ink, #04101a);
+  --tb-mark: var(--hg-ink, #04101a);
+  --tb-glow: #fff;
+}
+html[data-mode=overdrive] :is(.save-button, .add-button, .pulse-customize):focus-visible { --tb-line: #fff; --tb-mark: var(--hg-ink, #04101a); }
+/* En la tecla principal la trama es oscura y el halo, del color del acento. */
+html[data-mode=overdrive] :is(.save-button, .add-button, .pulse-customize)::before {
+  box-shadow: 0 0 calc((6px + var(--tb-on) * 16px) * var(--glow, 1)) -4px var(--hg-ac);
+}
+html[data-mode=overdrive] :is(.save-button, .add-button, .pulse-customize)::after {
+  background-image:
+    radial-gradient(110px circle at var(--px, 50%) var(--py, 50%), color-mix(in srgb, #fff calc(var(--tb-on) * 42%), transparent), transparent 72%),
+    linear-gradient(105deg, transparent 40%, var(--tb-sheen) 50%, transparent 60%),
+    linear-gradient(var(--tb-mark), var(--tb-mark)),
+    radial-gradient(circle at 1px 1px, rgba(0, 0, 0, .07) 0 .6px, transparent 1px),
+    linear-gradient(180deg, var(--tb-face-a), var(--tb-face-b));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), inset 0 -1px 0 rgba(0, 0, 0, .18);
+}
+html[data-mode=overdrive] .add-button .add-symbol { color: inherit; }
+
+/* Fantasma: solo el bisel y la luz. La tecla aparece al pasar. */
+html[data-mode=overdrive] .ghost-button {
+  --tb-line: color-mix(in srgb, var(--hg-ac) 40%, var(--hg-line2));
+  --tb-face-a: transparent;
+  --tb-face-b: transparent;
+}
+html[data-mode=overdrive] .ghost-button::before { background: rgba(6, 12, 20, .35); }
+html[data-mode=overdrive] .ghost-button:not(:hover, :focus-visible)::after {
+  box-shadow: none;
+  background-image: none, none, linear-gradient(var(--tb-mark), var(--tb-mark)), none, none;
+}
+
+/* Activa (pestañas, orden): luz ancha y texto de acento. */
+html[data-mode=overdrive] :is(.tab.is-active, .launcher-pill.is-active, .sort-btn.is-active),
+html[data-mode=overdrive] :is(.tab.is-active, .launcher-pill.is-active, .sort-btn.is-active):hover:not(:disabled) {
+  --tb-on: 1;
+  --tb-line: color-mix(in srgb, var(--hg-ac) 70%, transparent);
+  --tb-face-a: color-mix(in srgb, var(--hg-ac) 22%, #101a28);
+  --tb-face-b: color-mix(in srgb, var(--hg-ac) 9%, #0a121c);
+  --tb-ink: var(--hg-ac);
+  --tb-mark: var(--hg-ac);
+  --tb-ledw: 60%;
+  color: var(--tb-ink);
+}
+
+/* --------------------------------------------------------------------- Piezas */
+/* Icono: tecla cuadrada. */
+html[data-mode=overdrive] .icon-button { width: 44px; min-width: 44px; min-height: 44px; padding: 0; }
+html[data-mode=overdrive] .icon-button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+/* Pestañas de sección: teclas sin bisel propio; el bisel es la regleta (.tabbar). */
+html[data-mode=overdrive] .tab {
+  --tb-gap: 0px;
+  --tb-line: transparent;
+  --tb-face-a: transparent;
+  --tb-face-b: transparent;
+  --tb-mark: transparent;
+  min-height: 38px;
+  padding: 0 14px;
+  font-size: 11px;
+}
+html[data-mode=overdrive] .tab::before { display: none; }
+html[data-mode=overdrive] .tab:not(.is-active):hover:not(:disabled) {
+  --tb-line: color-mix(in srgb, var(--hg-ac) 35%, transparent);
+  --tb-face-a: color-mix(in srgb, var(--hg-ac) 12%, transparent);
+  --tb-face-b: transparent;
+  --tb-ledw: 30%;
+  transform: none;
+}
+
+/* Cápsulas: orden y "me gusta". */
+html[data-mode=overdrive] :is(.sort-btn, .like-btn) { border-radius: 999px; padding: 0 22px; }
+html[data-mode=overdrive] :is(.sort-btn, .like-btn)::after { border-radius: 999px; }
+
+/* Volver: el icono retrocede al pasar. */
+html[data-mode=overdrive] .crumb-back { padding: 0 20px 0 16px; }
+html[data-mode=overdrive] .crumb-back:hover:not(:disabled) { transform: translateX(-2px); }
+
+/* Botón ♥: el color secundario marca el "me gusta" dado. */
+html[data-mode=overdrive] .like-btn {
+  --tb-glow: var(--hangar-secondary, var(--hg-ac2));
+  gap: 10px;
+  padding: 0 20px 0 16px;
+  font-weight: 700;
+}
+html[data-mode=overdrive] .like-btn:hover:not(:disabled) {
+  --tb-mark: var(--hangar-secondary, var(--hg-ac2));
+  --tb-line: var(--hangar-secondary, var(--hg-ac2));
+}
+html[data-mode=overdrive] .like-btn.is-liked,
+html[data-mode=overdrive] .like-btn.is-liked:hover:not(:disabled) {
+  --tb-on: 1;
+  --tb-line: var(--hangar-secondary, var(--hg-ac2));
+  --tb-face-a: color-mix(in srgb, var(--hangar-secondary, var(--hg-ac2)) 55%, #101a28);
+  --tb-face-b: color-mix(in srgb, var(--hangar-secondary, var(--hg-ac2)) 28%, #0a121c);
+  --tb-ink: #fff;
+  --tb-mark: #fff;
+  --tb-ledw: 40%;
+  color: #fff;
+}
+html[data-mode=overdrive] .like-btn:disabled { opacity: .65; cursor: progress; }
+
+/* Acceso: el botón principal del formulario es más alto. */
+html[data-mode=overdrive] .auth-submit { min-height: 48px; padding: 0 18px; font-size: 13px; }
+
+/* Selector de modo (ASTRA / HANGAR): los botones no llevan tecla propia; la tecla encendida es el
+   indicador deslizante (.mode-thumb). El texto activo va en tinta sobre el acento. */
+html[data-mode=overdrive] .mode-btn { background: none; box-shadow: none; }
+html[data-mode=overdrive] .mode-btn:hover:not(:disabled) { color: var(--hg-text); transform: none; filter: none; }
+html[data-mode=overdrive] .mode-btn:active:not(:disabled) { transform: none; filter: none; }
+html[data-mode=overdrive] .mode-btn[aria-checked=true],
+html[data-mode=overdrive] .mode-btn[aria-checked=true]:hover:not(:disabled) { color: var(--hg-ink, #04101a); }
+html[data-mode=overdrive] .mode-selector { border-radius: calc(var(--tb-r) + 3px); border-image: none; }
+html[data-mode=overdrive] .mode-thumb {
+  clip-path: none;
+  border-radius: var(--tb-r);
+  background:
+    linear-gradient(color-mix(in srgb, var(--hg-ink, #04101a) 55%, transparent) 0 0) center calc(100% - 3px) / 18px 2px no-repeat,
+    linear-gradient(180deg, color-mix(in srgb, #fff 16%, var(--hg-ac)), color-mix(in srgb, var(--hangar-secondary, var(--hg-ac2)) 22%, var(--hg-ac)));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), 0 0 calc(14px * var(--glow, 1)) -4px var(--hg-ac);
+}
+
+/* ==========================================================================
+   Opciones, fichas, casillas, interruptores y deslizadores (Personalizar y editor de perfil).
+   ========================================================================== */
+
+/* ---- Opciones segmentadas: teclas dentro de una regleta ---- */
+html[data-mode=overdrive] .cz-seg {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 3px; padding: 3px; flex-wrap: nowrap;
+  border: 1px solid var(--hg-line2); border-radius: calc(var(--tb-r) + 3px);
+  background: var(--hgp-well, #060c15); box-shadow: inset 0 1px 3px #000;
+}
+html[data-mode=overdrive] .cz-seg > * {
+  --tb-gap: 0px;
+  --tb-line: transparent;
+  --tb-face-a: transparent;
+  --tb-face-b: transparent;
+  --tb-mark: transparent;
+  min-height: 36px;
+  padding: 0 14px;
+  font-size: 11px;
+  letter-spacing: .08em;
+}
+html[data-mode=overdrive] .cz-seg > *::before { display: none; }
+html[data-mode=overdrive] .cz-seg > *:not(.is-on):hover:not(:disabled) {
+  --tb-line: color-mix(in srgb, var(--hg-ac) 35%, transparent);
+  --tb-face-a: color-mix(in srgb, var(--hg-ac) 12%, transparent);
+  --tb-face-b: transparent;
+  --tb-ledw: 30%;
+  transform: none;
+}
+html[data-mode=overdrive] .cz-seg > .is-on,
+html[data-mode=overdrive] .cz-seg > .is-on:hover:not(:disabled) {
+  --tb-on: 1;
+  --tb-line: color-mix(in srgb, #fff 40%, var(--hg-ac));
+  --tb-face-a: color-mix(in srgb, #fff 16%, var(--hg-ac));
+  --tb-face-b: color-mix(in srgb, var(--hangar-secondary, var(--hg-ac2)) 22%, var(--hg-ac));
+  --tb-ink: var(--hg-ink, #04101a);
+  --tb-mark: color-mix(in srgb, var(--hg-ink, #04101a) 60%, transparent);
+  --tb-ledw: 16px;
+  --tb-glow: #fff;
+  font-weight: 700;
+  transform: none;
+}
+html[data-mode=overdrive] .cz-row:has(.cz-seg > :nth-child(4)) { flex-direction: column; align-items: stretch; gap: 10px; }
+html[data-mode=overdrive] .cz-row:has(.cz-seg > :nth-child(4)) .cz-seg { grid-auto-flow: row; grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 560px) {
+  html[data-mode=overdrive] .cz-row:has(.cz-seg > :nth-child(4)) .cz-seg { grid-template-columns: repeat(2, 1fr); }
+  html[data-mode=overdrive] .cz-row .cz-seg { width: 100%; }
+}
+
+/* ---- Fichas de opción (modo y tipografía): teclas altas con el texto a la izquierda ---- */
+html[data-mode=overdrive] :is(.cz-modes, .cz-fonts) > * {
+  --tb-face-a: #111b29;
+  --tb-face-b: #0a121c;
+  --tb-ink: var(--hg-text);
+  display: grid;
+  justify-content: stretch;
+  justify-items: start;
+  align-content: center;
+  gap: 5px;
+  min-height: 78px;
+  padding: 14px 18px;
+  border-radius: calc(var(--tb-r) + 2px);
+  text-align: left;
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--hg-font-ui);
+  white-space: normal;
+}
+html[data-mode=overdrive] :is(.cz-modes, .cz-fonts) > * b { font: 700 14px/1.2 var(--hg-font-mono); letter-spacing: .1em; }
+html[data-mode=overdrive] :is(.cz-modes, .cz-fonts) > * small { color: var(--hg-text3); font: 400 12px/1.3 var(--hg-font-ui); letter-spacing: 0; text-transform: none; }
+html[data-mode=overdrive] :is(.cz-modes, .cz-fonts) > .is-on,
+html[data-mode=overdrive] :is(.cz-modes, .cz-fonts) > .is-on:hover:not(:disabled) {
+  --tb-on: 1;
+  --tb-line: var(--hg-ac);
+  --tb-face-a: color-mix(in srgb, var(--hg-ac) 24%, #101a28);
+  --tb-face-b: color-mix(in srgb, var(--hg-ac) 9%, #0a121c);
+  --tb-ink: var(--hg-text);
+  --tb-mark: var(--hg-ac);
+  --tb-ledw: 60%;
+}
+html[data-mode=overdrive] :is(.cz-modes, .cz-fonts) > .is-on small { color: var(--hg-text2); }
+html[data-mode=overdrive] .cz-fonts > * { justify-items: center; text-align: center; }
+
+/* ---- Ambientes de HANGAR (Cyber Dock, Matrix Lab, GX Reactor): fichas con icono ---- */
+html[data-mode=overdrive] .hangar-presets > * {
+  --tb-face-a: color-mix(in srgb, var(--hg-ac) 10%, #111b29);
+  display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; justify-content: stretch; gap: 14px;
+  min-height: 78px; padding: 14px 18px; border-radius: calc(var(--tb-r) + 2px);
+  color: var(--hg-text); text-align: left; text-transform: none; letter-spacing: 0; white-space: normal;
+}
+html[data-mode=overdrive] .hp-ic {
+  display: grid; place-items: center; width: 40px; height: 40px; flex: none;
+  border: 1px solid var(--hg-aline); border-radius: var(--tb-r);
+  background: radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--hg-ac) 34%, transparent), color-mix(in srgb, var(--hg-ac) 6%, #0b1420));
+  color: var(--hg-ac); font: 700 18px/1 var(--hg-font-mono);
+  transition: color .2s, border-color .2s, box-shadow .25s;
+}
+html[data-mode=overdrive] .hangar-presets > *:hover .hp-ic {
+  color: #fff; border-color: var(--hg-ac);
+  box-shadow: 0 0 calc(14px * var(--glow, 1)) -3px var(--hg-ac);
+}
+html[data-mode=overdrive] .hp-tx { display: grid; gap: 3px; min-width: 0; }
+html[data-mode=overdrive] .hp-tx b { font: 700 13px/1.2 var(--hg-font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--hg-text); }
+html[data-mode=overdrive] .hp-tx small { font: 400 12px/1.3 var(--hg-font-ui); letter-spacing: 0; color: var(--hg-text3); }
+
+/* ---- Casillas de las secciones visibles (editor de perfil): tecla con un piloto cuadrado ---- */
+html[data-mode=overdrive] label.pe-check {
+  min-height: 40px;
+  padding: 0 16px 0 12px;
+  letter-spacing: .06em;
+  color: var(--hg-text2);
+}
+html[data-mode=overdrive] label.pe-check:has(input:checked) {
+  --tb-on: 1;
+  --tb-line: color-mix(in srgb, var(--hg-ac) 70%, transparent);
+  --tb-face-a: color-mix(in srgb, var(--hg-ac) 20%, #101a28);
+  --tb-face-b: color-mix(in srgb, var(--hg-ac) 8%, #0a121c);
+  --tb-ink: var(--hg-text);
+  --tb-mark: var(--hg-ac);
+  --tb-ledw: 50%;
+  color: var(--hg-text);
+}
+html[data-mode=overdrive] label.pe-check:has(input:focus-visible) { --tb-line: var(--hg-ac); }
+html[data-mode=overdrive] .dialog label.pe-check input {
+  -webkit-appearance: none; appearance: none; position: relative; flex: none;
+  width: 16px; min-height: 0; height: 16px; margin: 0; padding: 0; cursor: pointer;
+  border: 1px solid var(--hg-line2); border-radius: 3px; clip-path: none;
+  background: var(--hgp-well, #060c15); box-shadow: inset 0 1px 2px #000;
+  transition: background-color .18s, border-color .18s, box-shadow .25s;
+}
+html[data-mode=overdrive] .dialog label.pe-check input::before { content: none; }
+html[data-mode=overdrive] .dialog label.pe-check input:checked {
+  border-color: var(--hg-ac); background: var(--hg-ac);
+  box-shadow: 0 0 calc(10px * var(--glow, 1)) -2px var(--hg-ac);
+}
+html[data-mode=overdrive] .dialog label.pe-check input:checked::after {
+  content: ""; position: absolute; left: 4.5px; top: 1.5px; width: 4px; height: 8px;
+  border: solid var(--hg-ink, #04101a); border-width: 0 2px 2px 0; transform: rotate(45deg);
+}
+
+/* ---- Interruptores: carril con las marcas I / O y un mando que se desliza ----
+   Apagado, el mando tapa la "I" y se ve el aro "O"; encendido, el carril se carga de acento desde la izquierda,
+   el mando pasa a la derecha y queda a la vista la "I". --sw-on (0-1) mueve a la vez la carga y el mando. */
+html[data-mode=overdrive] .cz-switch {
+  --sw-on: 0;
+  --sw-line: var(--hg-line2);
+  -webkit-appearance: none; appearance: none;
+  position: relative; flex: none; width: 58px; height: 30px; min-height: 0; margin: 0; padding: 0;
+  border: 1px solid var(--sw-line); border-radius: calc(var(--tb-r) + 3px); clip-path: none; outline: none; cursor: pointer;
+  background:
+    radial-gradient(circle at calc(100% - 14px) 50%, transparent 0 2.6px, var(--hg-text3) 3px 4.2px, transparent 4.7px),
+    linear-gradient(var(--hg-ac), var(--hg-ac)) 13px 50% / 2px 10px no-repeat,
+    linear-gradient(90deg, color-mix(in srgb, var(--hg-ac) 42%, transparent), color-mix(in srgb, var(--hg-ac) 10%, transparent)) 0 0 / calc(var(--sw-on) * 100%) 100% no-repeat,
+    var(--hgp-well, #060c15);
+  box-shadow: inset 0 1px 3px #000, 0 0 calc(var(--sw-on) * 14px * var(--glow, 1)) -4px var(--hg-ac);
+  transition: --sw-on .34s var(--tb-spring), border-color .2s;
+}
+html[data-mode=overdrive] .cz-switch::before { content: none; }
+html[data-mode=overdrive] .cz-switch::after {
+  content: ""; position: absolute; left: 3px; top: 3px; z-index: 1; width: 24px; height: 22px;
+  border-radius: var(--tb-r); clip-path: none;
+  background:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, .4) 0 1px, transparent 1px 4px) center / 9px 8px no-repeat,
+    linear-gradient(180deg, #66758b, #3a4657);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .28), 0 2px 5px rgba(0, 0, 0, .6);
+  transform: translateX(calc(var(--sw-on) * 26px));
+  transition: background .2s, box-shadow .25s;
+}
+html[data-mode=overdrive] .cz-switch:hover { --sw-line: color-mix(in srgb, var(--hg-ac) 60%, var(--hg-line2)); }
+html[data-mode=overdrive] .cz-switch:checked { --sw-on: 1; --sw-line: color-mix(in srgb, var(--hg-ac) 80%, transparent); }
+html[data-mode=overdrive] .cz-switch:checked::after {
+  background:
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--hg-ink, #04101a) 55%, transparent) 0 1px, transparent 1px 4px) center / 9px 8px no-repeat,
+    linear-gradient(180deg, color-mix(in srgb, #fff 34%, var(--hg-ac)), var(--hg-ac));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), 0 0 calc(12px * var(--glow, 1)) -1px var(--hg-ac);
+}
+html[data-mode=overdrive] .cz-switch:focus-visible { --sw-line: var(--hg-text); }
+html[data-mode=overdrive] .cz-switch:active::after { width: 27px; }
+html[data-mode=overdrive] .cz-switch:checked:active::after { margin-left: -3px; }
+
+/* ---- Deslizadores: medidor de segmentos con un mando estriado ----
+   El tramo recorrido se rellena de segmentos de acento; el resto queda apagado. El tono usa su degradado. */
+html[data-mode=overdrive] .dialog .cz-range:not(.cz-hue) input[type=range] {
+  height: 10px; padding: 12px 0;
+  background:
+    repeating-linear-gradient(90deg, var(--hg-ac) 0 5px, transparent 5px 8px) 0 0 / var(--fill, 50%) 100% no-repeat,
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--hg-line2) 80%, transparent) 0 5px, transparent 5px 8px) 0 0 / 100% 100% no-repeat;
+  background-clip: content-box; background-origin: content-box;
+}
+html[data-mode=overdrive] .dialog .cz-range.cz-hue input[type=range] {
+  height: 10px; padding: 12px 0;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 5px, var(--hg-panel, #111a22) 5px 8px),
+    linear-gradient(90deg, hsl(0 100% 62%), hsl(60 100% 62%), hsl(120 100% 62%), hsl(180 100% 62%), hsl(240 100% 62%), hsl(300 100% 62%), hsl(360 100% 62%));
+  background-clip: content-box; background-origin: content-box;
+}
+html[data-mode=overdrive] .dialog .cz-range input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 16px; height: 26px; border: 0; border-radius: var(--tb-r); clip-path: none; cursor: pointer;
+  background:
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--hg-ink, #04101a) 55%, transparent) 0 1px, transparent 1px 4px) center / 8px 9px no-repeat,
+    linear-gradient(180deg, color-mix(in srgb, #fff 34%, var(--hg-ac)), var(--hg-ac));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), 0 0 calc(12px * var(--glow, 1)) -2px var(--hg-ac), 0 2px 5px rgba(0, 0, 0, .6);
+  transition: transform .15s var(--tb-ease);
+}
+html[data-mode=overdrive] .dialog .cz-range input[type=range]:hover::-webkit-slider-thumb { transform: scaleY(1.1); }
+html[data-mode=overdrive] .dialog .cz-range input[type=range]:active::-webkit-slider-thumb { transform: scale(.94); }
+html[data-mode=overdrive] .dialog .cz-range input[type=range]::-moz-range-thumb {
+  width: 16px; height: 26px; border: 0; border-radius: var(--tb-r); cursor: pointer;
+  background: linear-gradient(180deg, color-mix(in srgb, #fff 34%, var(--hg-ac)), var(--hg-ac));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), 0 0 calc(12px * var(--glow, 1)) -2px var(--hg-ac);
+}
+
+/* Ambientes de color: muestras con el radio de las teclas. */
+html[data-mode=overdrive] :is(.cz-swatch, .cz-custom) { border-radius: var(--tb-r); clip-path: none; }
+html[data-mode=overdrive] .cz-custom:hover, html[data-mode=overdrive] .cz-custom.is-selected { transform: translateY(-1px); box-shadow: none; filter: brightness(1.15); }
+html[data-mode=overdrive] .cz-custom.is-selected { outline: 2px solid var(--hg-text); outline-offset: 2px; }
+
+/* Texto-botón de "Usar el logo original": enlace de consola. */
+html[data-mode=overdrive] .pe-reset {
+  color: var(--hg-ac); font: 600 11px var(--hg-font-mono); letter-spacing: .1em; text-transform: uppercase; text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--hg-ac) 45%, transparent); transition: color .18s, border-color .18s;
+}
+html[data-mode=overdrive] .pe-reset:hover { color: var(--hg-text); border-color: var(--hg-text); }
+
+/* ==========================================================================
+   Movimiento: iconos que reaccionan, brillo en reposo de la tecla principal y espera al guardar.
+   ========================================================================== */
+@keyframes tb-idle-sheen { 0%, 62% { --tb-sheen-x: -150%; } 82%, 100% { --tb-sheen-x: 250%; } }
+@keyframes tb-busy { from { opacity: .55; } to { opacity: 1; } }
+
+html[data-mode=overdrive] :is(.ghost-button, .launcher-pill, .save-button, .add-button, .pulse-customize, .crumb-back, .sort-btn) svg {
+  transition: transform .3s var(--tb-spring);
+}
+html[data-mode=overdrive] :is(.ghost-button, .launcher-pill, .save-button, .add-button, .pulse-customize):hover:not(:disabled) svg { transform: translateX(3px); }
+html[data-mode=overdrive] .crumb-back:hover svg { transform: translateX(-3px); }
+html[data-mode=overdrive] .sort-btn:hover:not(:disabled) svg { transform: scale(1.15); }
+
+/* La tecla principal destella de vez en cuando para invitar a pulsarla. */
+html[data-mode=overdrive]:not([data-motion=off], [data-fx=minimal]) :is(.pulse-customize, .save-button, .add-button):not(:hover, :focus-visible, :disabled)::after {
+  animation: tb-idle-sheen 7s var(--tb-ease) 1.5s infinite;
+}
+/* Guardando…: la tecla principal deshabilitada respira mientras espera. */
+html[data-mode=overdrive]:not([data-motion=off]) :is(.save-button, .add-button):disabled::after {
+  animation: tb-busy 1s ease-in-out infinite alternate;
+}
+html[data-mode=overdrive] :is(.save-button, .add-button):disabled { cursor: progress; opacity: .8; }
+
+/* Fichas de opción y ambientes: se elevan con resorte. */
+html[data-mode=overdrive] :is(.cz-modes, .cz-fonts, .hangar-presets) > *:hover:not(:disabled) { transform: translateY(-2px); }
+
+/* ------------------------------------------------------- Preferencias y accesibilidad */
+/* "Botones y tarjetas: Mínimos": sin foco, franja de luz ni halo. */
+html[data-mode=overdrive][data-fx=minimal] :is(
+  .tab, .ghost-button, .add-button, .save-button, .launcher-pill, .icon-button, .sort-btn, .pulse-customize,
+  .crumb-back, .like-btn, .cz-seg > *, .hangar-presets > *, .cz-modes > *, .cz-fonts > *, .pe-check
+) { --tb-sheen: transparent; --tb-glow: transparent; }
+
+/* Móvil: objetivos táctiles de al menos 44px de alto. */
+@media (max-width: 640px) {
+  html[data-mode=overdrive] :is(.tab, .ghost-button, .add-button, .save-button, .launcher-pill, .mode-btn, .sort-btn, .crumb-back, .like-btn, .cz-seg > *, .hangar-presets > *, .cz-modes > *, .cz-fonts > *, .pe-check) {
+    min-height: 44px;
+  }
+}
+@media (max-width: 480px) {
+  html[data-mode=overdrive] .sort-btn { padding: 0 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-mode=overdrive] :is(
+    .tab, .ghost-button, .add-button, .save-button, .launcher-pill, .icon-button, .mode-btn, .sort-btn, .pulse-customize,
+    .crumb-back, .like-btn, .cz-seg > *, .hangar-presets > *, .cz-modes > *, .cz-fonts > *, .pe-check
+  ) { --tb-sheen: transparent; transition: none; }
+  html[data-mode=overdrive] :is(
+    .tab, .ghost-button, .add-button, .save-button, .launcher-pill, .icon-button, .sort-btn, .pulse-customize,
+    .crumb-back, .like-btn, .cz-seg > *, .hangar-presets > *, .cz-modes > *, .cz-fonts > *, .pe-check
+  ):is(:hover, :active) { transform: none; }
+  html[data-mode=overdrive] :is(
+    .tab, .ghost-button, .add-button, .save-button, .launcher-pill, .icon-button, .sort-btn, .pulse-customize,
+    .crumb-back, .like-btn, .cz-seg > *, .hangar-presets > *, .cz-modes > *, .cz-fonts > *, .pe-check
+  )::after { transition: none; animation: none !important; }
+  html[data-mode=overdrive] :is(.ghost-button, .launcher-pill, .save-button, .add-button, .pulse-customize, .crumb-back, .sort-btn):hover svg { transform: none; }
+  html[data-mode=overdrive] .cz-switch, html[data-mode=overdrive] .cz-switch::after { transition: none; }
+}

@@ -1,0 +1,19 @@
+/* Accesibilidad: enlace para saltar al contenido con teclado. Oculto hasta que recibe el foco. */
+.skip-link {
+  position: fixed;
+  left: 16px;
+  top: -200px;
+  z-index: 10000;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: #000;
+  color: #fff;
+  font: 600 14px/1.2 "DM Sans", system-ui, sans-serif;
+  text-decoration: none;
+}
+
+.skip-link:focus-visible {
+  top: 12px;
+  outline: 3px solid #7dd3fc;
+  outline-offset: 2px;
+}

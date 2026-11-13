@@ -1,0 +1,58 @@
+/* Personalización del visitante (src/lib/prefs.ts).
+   El script pone atributos data-* y variables CSS en <html>; aquí es donde cambian el aspecto de verdad. */
+
+:root {
+  --glow: 1;
+  --card-scale: 1;
+  --fx-speed: 1;
+  /* El brillo (0-100 %) escala todos los resplandores de la extensión. */
+  --bloom-sm: 0 0 calc(12px * var(--glow)) color-mix(in srgb, var(--cyan) calc(55% * var(--glow)), transparent);
+  --bloom-lg: 0 0 calc(28px * var(--glow)) color-mix(in srgb, var(--cyan) calc(35% * var(--glow)), transparent), 0 0 calc(70px * var(--glow)) color-mix(in srgb, var(--purple) calc(22% * var(--glow)), transparent);
+}
+
+/* ---------- Tipografía ---------- */
+html[data-font=modern][data-mode] {
+  --display: "Space Grotesk", system-ui, sans-serif;
+  --body: "DM Sans", system-ui, sans-serif;
+  --hg-font-display: "Space Grotesk", system-ui, sans-serif;
+  --hg-font-ui: "DM Sans", system-ui, sans-serif;
+}
+html[data-font=tech][data-mode] {
+  --display: "OD Orbitron", "Bahnschrift", system-ui, sans-serif;
+  --body: "OD Exo 2", system-ui, sans-serif;
+  --hg-font-display: "OD Orbitron", "Bahnschrift", system-ui, sans-serif;
+  --hg-font-ui: "OD Exo 2", system-ui, sans-serif;
+}
+html[data-font=editorial][data-mode] {
+  --display: "Playfair Display", Georgia, serif;
+  --body: "DM Sans", system-ui, sans-serif;
+  --hg-font-display: "Playfair Display", Georgia, serif;
+  --hg-font-ui: "DM Sans", system-ui, sans-serif;
+}
+html[data-font=cosmic][data-mode] {
+  --display: "Unbounded", system-ui, sans-serif;
+  --body: "Sora", system-ui, sans-serif;
+  --mono: "Sora", "JetBrains Mono", system-ui, sans-serif;
+  --hg-font-display: "Unbounded", system-ui, sans-serif;
+  --hg-font-ui: "Sora", system-ui, sans-serif;
+}
+html[data-font=cosmic][data-mode] :is(h1, h2, h3, .creator-name, .wordmark) { letter-spacing: -.01em; }
+html[data-font=cosmic][data-mode] .hero #greeting { font-size: clamp(25px, 2.6vw, 37px); line-height: 1.16; }
+
+/* ---------- Espaciado ---------- */
+html[data-density=compact] .tab-grid { gap: 12px; }
+html[data-density=compact] .item { padding: 10px; }
+html[data-density=compact] :is(.project-page, .profile-page, .page-shell .col-stage, .tab-body) { gap: 12px; }
+html[data-density=compact] .pub-article { padding: 18px 20px; }
+html[data-density=roomy] .tab-grid { gap: 30px; }
+html[data-density=roomy] .item { padding: 22px; }
+html[data-density=roomy] :is(.project-page, .profile-page, .page-shell .col-stage, .tab-body) { gap: 32px; }
+html[data-density=roomy] .pub-article { padding: 34px 38px; }
+
+/* ---------- Fondo ---------- */
+html[data-nebula=off] :is(.astra-deco .nebula, .aurora) { display: none; }
+
+/* ---------- Animaciones quietas: nada se mueve ---------- */
+html[data-motion=off] *, html[data-motion=off] *::before, html[data-motion=off] *::after {
+  animation: none !important; transition-duration: .01ms !important; scroll-behavior: auto !important;
+}

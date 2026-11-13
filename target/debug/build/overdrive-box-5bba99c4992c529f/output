@@ -1,0 +1,3 @@
+cargo:rerun-if-changed=.env
+cargo:rustc-env=OVERDRIVE_SUPABASE_URL=https://lelrllnbmjsszwijwefb.supabase.co
+cargo:rustc-env=OVERDRIVE_SUPABASE_KEY=sb_publishable_8YyeJZSQiaWUmWpluhXKTg_Gk0jVilm

@@ -1,0 +1,21 @@
+/* Tipografías de ASTRA y HANGAR (opción "Clásica" de Personalizar; las demás familias no cambian).
+   Se cargan desde Google Fonts en index.html; si no hay red, caen a las fuentes incluidas.
+   ASTRA  · Cormorant Garamond (títulos, serif de contraste alto con cursiva elegante) + Manrope (interfaz).
+   HANGAR · Oxanium (títulos angulares, de panel de mando) + Barlow (texto) + JetBrains Mono (etiquetas y botones). */
+html[data-font=classic][data-mode=astra] {
+  --display: "Cormorant Garamond", "OD Cinzel", Georgia, serif;
+  --body: "Manrope", "OD Josefin Sans", system-ui, sans-serif;
+  --mono: "Cormorant Garamond", Georgia, serif;
+}
+html[data-font=classic][data-mode=astra] :is(h1, h2, h3, .creator-name, .pulse-stat b, .item-title) { font-weight: 600; }
+html[data-font=classic][data-mode=astra] .wordmark { font-weight: 700; letter-spacing: .2em; }
+html[data-font=classic][data-mode=overdrive][data-theme] {
+  --hg-font-display: "Oxanium", "OD Orbitron", "Segoe UI", sans-serif;
+  --hg-font-ui: "Barlow", "Segoe UI", system-ui, sans-serif;
+  --hg-font-mono: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
+}
+html[data-font=classic][data-mode=overdrive] .hero #greeting { letter-spacing: -.02em; }
+html[data-font=classic][data-mode=overdrive] :is(.item-title, .creator-name, .pulse-last strong) { font-weight: 600; }
+html[data-font=classic][data-mode=astra] .item-title { font-size: 18px; font-weight: 700; letter-spacing: 0; }
+html[data-font=classic][data-mode=astra] .item-tile .item-title { font-size: 17px; }
+html[data-font=classic][data-mode=astra] .item-meta { font-family: var(--body); font-size: 10.5px; letter-spacing: .08em; }

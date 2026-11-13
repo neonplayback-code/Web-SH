@@ -1,0 +1,54 @@
+/* Typography and text colours per mode. Loaded last so it wins over the mode stylesheets.
+   ASTRA: soft, airy sans for the interface and a serif accent for labels (the "celestial" look).
+   HANGAR: condensed display for titles, a neutral sans for text and a mono for telemetry. */
+
+/* Bundled OFL fonts (see fonts/OFL.txt). Local files, so they work offline and need no remote stylesheet. */
+@font-face { font-family: "OD Cinzel"; src: url("../fonts/Cinzel.ttf") format("truetype"); font-weight: 400 900; font-display: swap; }
+@font-face { font-family: "OD Josefin Sans"; src: url("../fonts/JosefinSans.ttf") format("truetype"); font-weight: 100 700; font-display: swap; }
+@font-face { font-family: "OD Orbitron"; src: url("../fonts/Orbitron.ttf") format("truetype"); font-weight: 400 900; font-display: swap; }
+@font-face { font-family: "OD Exo 2"; src: url("../fonts/Exo2.ttf") format("truetype"); font-weight: 100 900; font-display: swap; }
+
+html[data-mode=astra] {
+  --display: "OD Cinzel", Constantia, Georgia, serif;
+  --body: "OD Josefin Sans", "Segoe UI", system-ui, sans-serif;
+  --text: #f4f7ff;
+  --muted: #bcc6dd;
+  --dim: #8590ab;
+}
+html[data-mode=astra] body { color: var(--text); font-weight: 400; letter-spacing: .005em; }
+html[data-mode=astra] :is(h1, h2, h3, .wordmark, .utility-heading h2, .hero-title) { font-family: var(--display); color: #ffffff; text-shadow: 0 0 18px rgba(170, 200, 255, .22); }
+html[data-mode=astra] .shortcut-name { color: #ffffff; }
+html[data-mode=astra] .shortcut-domain, html[data-mode=astra] .hero-subtitle { color: var(--muted); }
+html[data-mode=astra] .search input::placeholder { color: #9ea8c2; }
+html[data-mode=astra] .search kbd, html[data-mode=astra] .theme-row > span { color: #a9b3cc; }
+
+html[data-mode=overdrive] {
+  --hg-font-display: "OD Orbitron", "Bahnschrift", "Segoe UI", sans-serif;
+  --hg-font-ui: "OD Exo 2", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  --hg-font-mono: "Cascadia Mono", "Cascadia Code", Consolas, monospace;
+  --hg-text: #f5f9fc;
+  --hg-text2: #c3cfdc;
+  --hg-text3: #8fa0b5;
+}
+html[data-mode=overdrive] body { color: var(--hg-text); letter-spacing: .01em; }
+html[data-mode=overdrive] :is(h1, h2, h3) { font-family: var(--hg-font-display); letter-spacing: .05em; text-transform: uppercase; }
+html[data-mode=overdrive] .shortcut-name { color: var(--hg-text); font-family: var(--hg-font-display); letter-spacing: .03em; text-transform: uppercase; }
+html[data-mode=overdrive] .shortcut-domain, html[data-mode=overdrive] .tele-label { color: var(--hg-text3); }
+
+/* HANGAR type roles: each kind of text gets its own voice instead of one face for everything.
+   display (Orbitron) for titles and names, UI (Exo 2 light) for running text, mono (Cascadia) for labels and buttons, numerals in Orbitron. */
+html[data-mode=overdrive] :is(.hero-subtitle, .mode-desc, .plugin-desc, .shortcut-domain, .sg-item) { font-family: var(--hg-font-ui); font-weight: 300; color: var(--hg-text2); }
+html[data-mode=overdrive] .shortcut-name { font-weight: 700; font-size: 13px; }
+html[data-mode=overdrive] :is(.eyebrow, .section-kicker, .plugin-chip, .mode-btn, .theme-row > span, .search kbd, .clock-label, .clock-live) { font-family: var(--hg-font-mono); text-transform: uppercase; letter-spacing: .14em; font-weight: 500; }
+html[data-mode=overdrive] :is(time, .clock-panel time, .tele-cell b) { font-family: var(--hg-font-display); font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+
+/* Animated RGB gradient on the big text: titles, wordmark and numerals. Static when reduced motion is on. */
+@keyframes od-hg-flow { from { background-position: 0% 50%; } to { background-position: 200% 50%; } }
+html[data-mode=overdrive] :is(h1, .wordmark, time, .tele-cell b) {
+  background-image: linear-gradient(100deg, var(--hg-ac), var(--hg-ac2) 33%, var(--hg-ac3) 66%, var(--hg-ac));
+  background-size: 250% 100%;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+  animation: od-hg-flow 7s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) { html[data-mode=overdrive] :is(h1, .wordmark, time, .tele-cell b) { animation: none; } }

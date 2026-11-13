@@ -1,0 +1,86 @@
+/* ========================================
+   ESTILOS DE BÚSQUEDA PARA MODO HANGAR
+   ======================================== */
+
+html[data-mode=overdrive] .search-input {
+  border-radius: 0;
+  border: 1px solid var(--hg-line2);
+  background: var(--hg-soft);
+  font-family: var(--hg-font-body, var(--body));
+}
+
+html[data-mode=overdrive] .search-input:hover {
+  border-color: var(--hg-line);
+  background: color-mix(in srgb, var(--hg-soft) 80%, var(--hg-bg));
+}
+
+html[data-mode=overdrive] .search-input:focus {
+  border-color: var(--hg-ac);
+  background: var(--hg-bg);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--hg-ac) 25%, transparent),
+    inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+html[data-mode=overdrive] .search-icon {
+  color: var(--hg-dim);
+}
+
+html[data-mode=overdrive] .search-input:focus ~ .search-icon {
+  color: var(--hg-ac);
+}
+
+html[data-mode=overdrive] .search-clear {
+  border-radius: 0;
+  background: transparent;
+  border: 1px solid var(--hg-line2);
+}
+
+html[data-mode=overdrive] .search-clear:hover {
+  background: var(--hg-soft);
+  border-color: var(--hg-ac);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--hg-ac) 20%, transparent);
+}
+
+html[data-mode=overdrive] .tab-sort {
+  border-radius: 0;
+  background: var(--hg-bg);
+  border: 1px solid var(--hg-line2);
+  padding: 3px;
+}
+
+html[data-mode=overdrive] .sort-btn.is-active svg {
+  filter: drop-shadow(0 0 6px var(--hg-ac));
+}
+
+/* Efecto de borde RGB animado para HANGAR */
+html[data-mode=overdrive] .search-input:focus {
+  animation: search-glow 3s ease-in-out infinite;
+}
+
+@keyframes search-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 0 2px color-mix(in srgb, var(--hg-ac) 25%, transparent),
+      inset 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2px color-mix(in srgb, var(--hg-ac) 40%, transparent),
+      0 0 20px color-mix(in srgb, var(--hg-ac) 20%, transparent),
+      inset 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+}
+
+@keyframes button-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 16px color-mix(in srgb, var(--hg-ac) 25%, transparent),
+      inset 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 24px color-mix(in srgb, var(--hg-ac) 35%, transparent),
+      inset 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+}

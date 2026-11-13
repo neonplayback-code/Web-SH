@@ -1,0 +1,515 @@
+/* HANGAR — the OVERDRIVE interface mode (see GUIA_DISENO_HANGAR.md).
+   Hard geometry (no border-radius), one accent per theme, cut corners, instrument typography and
+   telemetry. Everything is scoped to html[data-mode=overdrive]; Astra is untouched. Theme mapping:
+   ice → Ice, ember → Ember, toxic and violet reuse the neutrals with their own accent. */
+
+@property --hg-bg { syntax: "<color>"; inherits: true; initial-value: #07090b; }
+@property --hg-bg2 { syntax: "<color>"; inherits: true; initial-value: #0b0e11; }
+@property --hg-panel { syntax: "<color>"; inherits: true; initial-value: #0f1317; }
+@property --hg-panel2 { syntax: "<color>"; inherits: true; initial-value: #151a20; }
+@property --hg-line { syntax: "<color>"; inherits: true; initial-value: #212831; }
+@property --hg-line2 { syntax: "<color>"; inherits: true; initial-value: #333e4a; }
+@property --hg-text { syntax: "<color>"; inherits: true; initial-value: #eef3f7; }
+@property --hg-text2 { syntax: "<color>"; inherits: true; initial-value: #9ba8b4; }
+@property --hg-text3 { syntax: "<color>"; inherits: true; initial-value: #66737f; }
+@property --hg-ac { syntax: "<color>"; inherits: true; initial-value: #6cc4ff; }
+@property --hg-ac2 { syntax: "<color>"; inherits: true; initial-value: #a6f0ff; }
+@property --hg-ac3 { syntax: "<color>"; inherits: true; initial-value: #3b7bff; }
+@property --hg-ink { syntax: "<color>"; inherits: true; initial-value: #04101a; }
+@property --hg-soft { syntax: "<color>"; inherits: true; initial-value: rgba(108, 196, 255, .12); }
+@property --hg-aline { syntax: "<color>"; inherits: true; initial-value: rgba(108, 196, 255, .55); }
+
+html[data-mode=overdrive] {
+  --hg-bg: #07090b; --hg-bg2: #0b0e11; --hg-panel: #0f1317; --hg-panel2: #151a20; --hg-line: #212831; --hg-line2: #333e4a;
+  --hg-text: #eef3f7; --hg-text2: #9ba8b4; --hg-text3: #66737f;
+  --hg-ac: #6cc4ff; --hg-ac2: #a6f0ff; --hg-ac3: #3b7bff; --hg-ink: #04101a; --hg-soft: rgba(108, 196, 255, .12); --hg-aline: rgba(108, 196, 255, .55);
+  --hg-danger: #ff5c6c; --hg-danger-soft: rgba(255, 92, 108, .12); --hg-ok: #3ddc84; --hg-grid: rgba(120, 190, 255, .025);
+  --hg-font-display: "Bahnschrift SemiBold Condensed", "Bahnschrift", "DIN Alternate", "Arial Narrow", "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+  --hg-font-ui: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --hg-font-mono: "Cascadia Mono", "Cascadia Code", Consolas, "SF Mono", "Liberation Mono", monospace;
+  --hg-grad: linear-gradient(120deg, var(--hg-ac3) 0%, var(--hg-ac) 48%, var(--hg-ac2) 100%);
+  --hg-ease: cubic-bezier(.2, .8, .2, 1);
+  --hg-cut: 14px;
+  /* Remap the shared tokens so any rule that still reads the old palette stays inside the accent family. */
+  --cyan: var(--hg-ac); --purple: var(--hg-ac3); --pink: var(--hg-ac2); --green: var(--hg-ok);
+  --bg: var(--hg-bg); --text: var(--hg-text); --muted: var(--hg-text2); --dim: var(--hg-text3);
+  --edge: var(--hg-line); --edge-hi: var(--hg-line2); --radius: 0px; --blur: 0px;
+  --display: var(--hg-font-display); --body: var(--hg-font-ui); --mono: var(--hg-font-mono);
+  --bloom-sm: none; --bloom-lg: none; --ease: var(--hg-ease);
+  --accent: var(--hg-ac);
+  color-scheme: dark;
+  transition: --hg-bg .6s, --hg-bg2 .6s, --hg-panel .6s, --hg-panel2 .6s, --hg-line .6s, --hg-line2 .6s, --hg-text .6s, --hg-text2 .6s, --hg-text3 .6s, --hg-ac .6s, --hg-ac2 .6s, --hg-ac3 .6s, --hg-ink .6s, --hg-soft .6s, --hg-aline .6s;
+}
+html[data-mode=overdrive][data-theme=ember] {
+  --hg-bg: #0a0a0b; --hg-bg2: #0e0f11; --hg-panel: #131417; --hg-panel2: #1a1c20; --hg-line: #25272c; --hg-line2: #393c43;
+  --hg-text: #f4f2ee; --hg-text2: #a5a8af; --hg-text3: #6d7078;
+  --hg-ac: #ff5a1f; --hg-ac2: #ffb02e; --hg-ac3: #ff2e3a; --hg-ink: #0a0a0b; --hg-soft: rgba(255, 90, 31, .12); --hg-aline: rgba(255, 90, 31, .55);
+  --hg-danger: #ff4545; --hg-danger-soft: rgba(255, 69, 69, .12); --hg-grid: rgba(255, 255, 255, .022);
+}
+html[data-mode=overdrive][data-theme=toxic] {
+  --hg-ac: #7be04f; --hg-ac2: #d6ff6e; --hg-ac3: #17b890; --hg-ink: #05100a; --hg-soft: rgba(123, 224, 79, .12); --hg-aline: rgba(123, 224, 79, .55); --hg-grid: rgba(150, 255, 150, .022);
+}
+html[data-mode=overdrive][data-theme=white] {
+  --hg-ac: #dfe8f5; --hg-ac2: #ffffff; --hg-ac3: #9fb0c9; --hg-ink: #07090b; --hg-soft: rgba(223, 232, 245, .12); --hg-aline: rgba(223, 232, 245, .55); --hg-grid: rgba(220, 232, 255, .025);
+}
+html[data-mode=overdrive][data-theme=violet] {
+  --hg-ac: #a78bff; --hg-ac2: #d9c9ff; --hg-ac3: #5b6bff; --hg-ink: #0b0716; --hg-soft: rgba(167, 139, 255, .12); --hg-aline: rgba(167, 139, 255, .55); --hg-grid: rgba(190, 160, 255, .025);
+}
+
+/* ======================================================================= base */
+html[data-mode=overdrive], html[data-mode=overdrive] body { background: var(--hg-bg); }
+html[data-mode=overdrive] body {
+  height: 100vh; min-height: 0; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr);
+  font: 13px/1.4 var(--hg-font-ui); color: var(--hg-text); -webkit-font-smoothing: antialiased;
+}
+html[data-mode=overdrive] body::after { display: none; }
+html[data-mode=overdrive] body::before {
+  content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(var(--hg-grid) 1px, transparent 1px), linear-gradient(90deg, var(--hg-grid) 1px, transparent 1px); background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse 90% 80% at 60% 30%, #000 20%, transparent 100%); mask-image: radial-gradient(ellipse 90% 80% at 60% 30%, #000 20%, transparent 100%);
+}
+html[data-mode=overdrive] ::selection { background: var(--hg-ac); color: var(--hg-ink); }
+html[data-mode=overdrive] ::-webkit-scrollbar { width: 8px; height: 8px; }
+html[data-mode=overdrive] ::-webkit-scrollbar-track { background: transparent; }
+html[data-mode=overdrive] ::-webkit-scrollbar-thumb { background: var(--hg-line2); border: 0; border-radius: 0; }
+html[data-mode=overdrive] ::-webkit-scrollbar-thumb:hover { background: var(--hg-ac); }
+html[data-mode=overdrive] :focus-visible { outline: 2px solid var(--hg-ac); outline-offset: 2px; border-radius: 0; }
+
+/* Astra-only layers */
+html[data-mode=overdrive] #particles, html[data-mode=overdrive] #od-space-field, html[data-mode=overdrive] .astra-deco,
+html[data-mode=overdrive] .grid-glow, html[data-mode=overdrive] .grid-fx, html[data-mode=overdrive] .clock-orbit,
+html[data-mode=overdrive] .astra-spark { display: none !important; }
+
+/* Living background: two drifting radial stains, no blur. */
+html[data-mode=overdrive] .aurora {
+  width: 60vw; height: 60vw; border-radius: 0; filter: none; mix-blend-mode: normal; opacity: .1;
+  background: radial-gradient(closest-side, var(--hg-ac), transparent); animation: hg-aurora-a 28s ease-in-out infinite alternate;
+}
+html[data-mode=overdrive] .aurora-two { opacity: .08; background: radial-gradient(closest-side, var(--hg-ac3), transparent); animation-name: hg-aurora-b; animation-duration: 36s; }
+@keyframes hg-aurora-a { to { transform: translate(8vw, 6vh) scale(1.15); } }
+@keyframes hg-aurora-b { to { transform: translate(-7vw, -5vh) scale(1.1); } }
+
+/* Top line */
+html[data-mode=overdrive] .hangar-line { display: block; position: fixed; z-index: 90; top: 0; left: 0; right: 0; height: 3px; overflow: hidden; background: var(--hg-ac); pointer-events: none; }
+html[data-mode=overdrive] .hangar-line::after { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 28vw; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .85), transparent); animation: hg-topline 7s linear infinite; }
+@keyframes hg-topline { from { transform: translateX(-30vw); } to { transform: translateX(105vw); } }
+@keyframes hg-led { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+@keyframes hg-rise { from { opacity: 0; transform: translateY(10px); } }
+@keyframes hg-pop { 0% { transform: scale(1); } 40% { transform: scale(1.22); } 100% { transform: scale(1); } }
+
+/* ===================================================================== topbar */
+html[data-mode=overdrive] .topbar {
+  position: relative; z-index: 3; width: auto; height: auto; min-height: 66px; margin: 0; padding: 3px 0 0;
+  display: flex; align-items: stretch; justify-content: space-between;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .03), transparent 70%), var(--hg-bg2); border-bottom: 1px solid var(--hg-line);
+}
+html[data-mode=overdrive] .wordmark {
+  gap: 0; padding: 0 26px 0 20px; border-right: 1px solid var(--hg-line);
+  font: 700 clamp(24px, 2.4vw, 32px)/1.05 var(--hg-font-display); letter-spacing: .05em; text-transform: uppercase;
+  background: linear-gradient(100deg, var(--hg-text) 35%, var(--hg-ac2) 125%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+html[data-mode=overdrive] .brand-mark {
+  width: 40px; height: 40px; margin-right: 14px; border: 0; border-radius: 0; background: var(--hg-grad); box-shadow: none; animation: none;
+  -webkit-text-fill-color: var(--hg-ink); color: var(--hg-ink); font: 700 18px var(--hg-font-display); letter-spacing: .02em; text-shadow: none;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 11px), calc(100% - 11px) 100%, 0 100%);
+}
+html[data-mode=overdrive] .brand-mark::before { content: "OD"; position: static; inset: auto; border: 0; background: none; animation: none; }
+html[data-mode=overdrive] .brand-mark img { display: none; }
+html[data-mode=overdrive] .brand-period { color: var(--hg-ac); -webkit-text-fill-color: var(--hg-ac); text-shadow: none; }
+html[data-mode=overdrive] .topbar-right { align-items: stretch; gap: 0; }
+
+.tele-cell { display: none; }
+html[data-mode=overdrive] .tele-cell {
+  display: flex; flex-direction: column; justify-content: center; gap: 4px; padding: 0 22px; border-left: 1px solid var(--hg-line);
+  animation: hg-rise .55s var(--hg-ease) both;
+}
+html[data-mode=overdrive] .tele-count { animation-delay: .05s; }
+html[data-mode=overdrive] .tele-label { font: 9px var(--hg-font-mono); letter-spacing: .22em; text-transform: uppercase; color: var(--hg-text3); }
+html[data-mode=overdrive] .tele-cell :is(time, b) { font: 600 24px/1 var(--hg-font-display); font-variant-numeric: tabular-nums; color: var(--hg-text); }
+html[data-mode=overdrive] .tele-cell b.pop { animation: hg-pop .45s var(--hg-ease); }
+html[data-mode=overdrive] .online-pill {
+  margin: 0; padding: 0 22px; gap: 10px; border: 0; border-left: 1px solid var(--hg-line); border-radius: 0; background: none; backdrop-filter: none;
+  font: 10px var(--hg-font-mono); letter-spacing: .16em; color: var(--hg-text2); text-transform: uppercase;
+}
+html[data-mode=overdrive] .online-pill strong { color: var(--hg-text); font-weight: 600; }
+html[data-mode=overdrive] .online-dot, html[data-mode=overdrive] .clock-live i, html[data-mode=overdrive] .footer-center i, html[data-mode=overdrive] .hero-session i {
+  width: 8px; height: 8px; border-radius: 0; background: var(--hg-ok); box-shadow: none; animation: hg-led 2.4s ease-in-out infinite;
+}
+html[data-mode=overdrive] .palette-button kbd { font: 10px var(--hg-font-mono); letter-spacing: .18em; text-transform: uppercase; color: var(--hg-text3); }
+
+/* ===================================================================== layout */
+html[data-mode=overdrive] .dashboard {
+  position: relative; z-index: 2; width: 100%; height: 100%; min-height: 0; margin: 0; padding: 0; overflow: hidden;
+  display: grid; grid-template-columns: clamp(290px, 25vw, 380px) minmax(0, 1fr);
+}
+html[data-mode=overdrive] .col-rail, html[data-mode=overdrive] .col-stage { display: block; min-width: 0; min-height: 0; overflow-x: hidden; overflow-y: auto; }
+html[data-mode=overdrive] .col-rail {
+  display: flex; flex-direction: column; border-right: 1px solid var(--hg-line);
+  background: radial-gradient(560px 280px at 0% 0%, var(--hg-soft), transparent 70%), linear-gradient(180deg, var(--hg-bg2), var(--hg-bg));
+}
+html[data-mode=overdrive] .col-stage { padding: 0 30px 34px; }
+html[data-mode=overdrive] body:not(.is-ready) :is(.col-rail > *, .stage-head, .search, .theme-row, .section-heading, .utility-card, .footer) { animation: hg-rise .6s var(--hg-ease) both; }
+
+/* Stage header */
+.stage-head, .rail-extra { display: none; }
+html[data-mode=overdrive] .stage-head {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin: 0 -30px 22px; padding: 22px 30px 20px;
+  border-bottom: 1px solid var(--hg-line); background: linear-gradient(90deg, var(--hg-soft), transparent 42%);
+}
+html[data-mode=overdrive] .eyebrow, html[data-mode=overdrive] .stage-head .eyebrow {
+  display: flex; align-items: center; gap: 9px; margin: 0; font: 10px var(--hg-font-mono); letter-spacing: .26em; text-transform: uppercase; color: var(--hg-text3);
+}
+html[data-mode=overdrive] .stage-head .eyebrow::before { content: ""; width: 7px; height: 7px; background: var(--hg-ac); }
+html[data-mode=overdrive] .stage-title { display: flex; align-items: center; gap: 16px; margin: 10px 0 0; font: 600 38px/1.1 var(--hg-font-display); letter-spacing: .03em; text-transform: uppercase; }
+html[data-mode=overdrive] .stage-title .count {
+  min-width: 46px; height: 46px; padding: 0 10px; display: inline-grid; place-items: center; background: var(--hg-grad); color: var(--hg-ink); font-size: 26px; font-variant-numeric: tabular-nums; letter-spacing: 0;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+}
+html[data-mode=overdrive] .stage-title .count.pop { animation: hg-pop .45s var(--hg-ease); }
+
+/* ======================================================================= rail */
+html[data-mode=overdrive] .hero { display: block; margin: 0; gap: 0; }
+html[data-mode=overdrive] .hero-copy {
+  flex: none; padding: 22px 24px 18px; overflow: visible; border: 0; border-bottom: 1px solid var(--hg-line); border-radius: 0; background: none; backdrop-filter: none; box-shadow: none;
+}
+html[data-mode=overdrive] .hero-copy::before, html[data-mode=overdrive] .hero-copy::after { display: none; }
+html[data-mode=overdrive] .hero-topline { margin-bottom: 14px; font: 10px var(--hg-font-mono); letter-spacing: .26em; text-transform: uppercase; }
+html[data-mode=overdrive] .hero-id { color: var(--hg-text3); }
+html[data-mode=overdrive] .hero-id .od-icon { color: var(--hg-ac); }
+html[data-mode=overdrive] .hero-session { color: var(--hg-text3); font-size: 9px; }
+html[data-mode=overdrive] .hero-greeting { margin: 0 0 8px; color: var(--hg-ac); font: 10px var(--hg-font-mono); letter-spacing: .2em; }
+html[data-mode=overdrive] .hero #greeting {
+  font: 600 30px/1.18 var(--hg-font-display); letter-spacing: .03em; text-transform: uppercase; text-shadow: none; padding-top: .08em;
+  background: linear-gradient(180deg, var(--hg-text) 20%, var(--hg-text2) 130%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+html[data-mode=overdrive] .hero #greeting span { color: inherit; -webkit-text-fill-color: inherit; font-size: 1em; font-weight: 600; letter-spacing: inherit; margin: 0; }
+html[data-mode=overdrive] .hero #greeting .hero-title-lead { font-size: .72em; color: var(--hg-text2); -webkit-text-fill-color: var(--hg-text2); }
+html[data-mode=overdrive] .hero #greeting .hero-title-main, html[data-mode=overdrive] .hero #greeting .hero-title-dot { color: var(--hg-ac); -webkit-text-fill-color: var(--hg-ac); }
+html[data-mode=overdrive] .hero-subtitle { margin: 12px 0 0; font-size: 12.5px; color: var(--hg-text2); }
+html[data-mode=overdrive] .hero-subtitle span { color: var(--hg-text); }
+html[data-mode=overdrive] .hero-bottom { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--hg-line); color: var(--hg-text3); }
+html[data-mode=overdrive] .hero-command-hint kbd, html[data-mode=overdrive] .palette-foot kbd, html[data-mode=overdrive] .search kbd b {
+  border: 1px solid var(--hg-line2); border-radius: 0; background: var(--hg-panel); color: var(--hg-text2);
+}
+
+/* Clock = instrument cell */
+html[data-mode=overdrive] .clock-panel {
+  margin: 22px 24px 0; min-height: 0; padding: 16px 18px; overflow: visible;
+  border: 1px solid var(--hg-line); border-left: 3px solid var(--hg-ac); border-radius: 0; background: var(--hg-panel); backdrop-filter: none; box-shadow: none; animation: none;
+}
+html[data-mode=overdrive] .clock-panel::before { display: none; }
+html[data-mode=overdrive] .hero .clock-panel { width: auto; }
+html[data-mode=overdrive] .clock-panel::after { content: ""; display: block; position: absolute; inset: auto; top: 0; right: 0; width: 11px; height: 11px; padding: 0; z-index: auto; border-top: 2px solid var(--hg-line2); border-right: 2px solid var(--hg-line2); background: none; mask: none; opacity: 1; }
+html[data-mode=overdrive] .clock-label, html[data-mode=overdrive] .clock-live { font: 9px var(--hg-font-mono); letter-spacing: .22em; color: var(--hg-text3); }
+html[data-mode=overdrive] .clock-panel time {
+  margin: 8px 0 6px; font: 600 clamp(40px, 4vw, 52px)/1 var(--hg-font-display); letter-spacing: 0; text-shadow: none; color: var(--hg-text); background: none; -webkit-text-fill-color: currentColor;
+}
+html[data-mode=overdrive] .clock-bottom span:last-child, html[data-mode=overdrive] .date-button { font: 10.5px var(--hg-font-mono); letter-spacing: .1em; color: var(--hg-text2); text-transform: uppercase; }
+html[data-mode=overdrive] .clock-cross { color: var(--hg-ac); text-shadow: none; animation: none; }
+html[data-mode=overdrive] .date-button:hover { color: var(--hg-ac); border-bottom-color: var(--hg-aline); }
+html[data-mode=overdrive] .weather-chip { margin-top: 12px; padding: 9px 12px; border: 1px solid var(--hg-line); border-bottom: 2px solid var(--hg-line2); border-radius: 0; background: var(--hg-bg2); color: var(--hg-text2); box-shadow: none; }
+html[data-mode=overdrive] .weather-chip:hover { background: var(--hg-panel2); border-bottom-color: var(--hg-ac); box-shadow: none; }
+html[data-mode=overdrive] .weather-icon { filter: none; color: var(--hg-ac); }
+html[data-mode=overdrive] .weather-text b { color: var(--hg-text); font: 600 18px var(--hg-font-display); }
+
+/* Rail extras: numbered fields */
+html[data-mode=overdrive] .rail-extra { display: flex; flex-direction: column; gap: 24px; padding: 22px 24px; }
+html[data-mode=overdrive] .field-label, html[data-mode=overdrive] .rail-extra .field-label {
+  display: flex; align-items: center; gap: 10px; margin: 0 0 10px; font: 10px var(--hg-font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--hg-text3);
+}
+html[data-mode=overdrive] .field-label .idx { color: var(--hg-ac); }
+html[data-mode=overdrive] .field-label::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--hg-line2), transparent); }
+html[data-mode=overdrive] .mode-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--hg-line); border-bottom: 2px solid var(--hg-line2); background: var(--hg-panel); }
+html[data-mode=overdrive] .mode-switch button { min-height: 40px; padding: 0 8px; border-radius: 0; color: var(--hg-text2); font: 15px var(--hg-font-display); letter-spacing: .12em; text-transform: uppercase; transition: background .15s, color .15s; }
+html[data-mode=overdrive] .mode-switch button:hover { background: var(--hg-panel2); color: var(--hg-text); }
+html[data-mode=overdrive] .mode-switch button.is-active { background: var(--hg-grad); color: var(--hg-ink); font-weight: 700; }
+html[data-mode=overdrive] .key-list { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+html[data-mode=overdrive] .key-list li { display: flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 10px; border: 1px solid var(--hg-line); border-left: 3px solid var(--hg-line2); background: var(--hg-panel); color: var(--hg-text2); font-size: 12.5px; font-weight: 600; }
+html[data-mode=overdrive] .key-list li span { margin-left: auto; }
+html[data-mode=overdrive] .key-list kbd { padding: 1px 6px; border: 1px solid var(--hg-line2); background: var(--hg-bg2); color: var(--hg-text); font: 10px var(--hg-font-mono); letter-spacing: .06em; }
+
+/* ======================================================================= stage */
+html[data-mode=overdrive] :is(.clock-panel, .search, .shortcut-card, .utility-card, .dialog, .search-engine-menu, .catalog-card, .custom-preview, .calendar-pop, .game-card) {
+  border-radius: 0; backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+html[data-mode=overdrive] :is(.search, .shortcut-card, .utility-card, .search-engine-menu, .catalog-card, .custom-preview, .game-card)::before { display: none; }
+html[data-mode=overdrive] :is(.search, .shortcut-card, .utility-card)::after { display: none; }
+
+html[data-mode=overdrive] .search {
+  height: 54px; margin: 0 0 14px; padding: 0 16px 0 8px; gap: 12px;
+  border: 1px solid var(--hg-line); border-bottom: 2px solid var(--hg-line2); background: var(--hg-panel); box-shadow: none; transform: none; transition: border-color .15s, background .15s;
+}
+html[data-mode=overdrive] .search:focus-within { background: var(--hg-panel2); border-color: var(--hg-aline); border-bottom-color: var(--hg-ac); box-shadow: none; transform: none; }
+html[data-mode=overdrive] .search input { font: 600 14px var(--hg-font-ui); }
+html[data-mode=overdrive] .search input::placeholder { color: var(--hg-text3); font-weight: 500; }
+html[data-mode=overdrive] .search kbd { font: 10px var(--hg-font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--hg-text3); }
+html[data-mode=overdrive] .search-engine-trigger > img { filter: none; }
+html[data-mode=overdrive] .search-engine-menu { border: 1px solid var(--hg-line2); background: var(--hg-panel); box-shadow: 0 18px 40px rgba(0, 0, 0, .5); animation: hg-rise .2s var(--hg-ease) both; }
+html[data-mode=overdrive] .search-engine-option { border-radius: 0; border: 0; border-left: 3px solid transparent; color: var(--hg-text2); font-weight: 600; }
+html[data-mode=overdrive] .search-engine-option:hover { background: var(--hg-panel2); color: var(--hg-text); border-color: transparent; border-left-color: var(--hg-line2); }
+html[data-mode=overdrive] .search-engine-option.is-selected { background: var(--hg-soft); border-left-color: var(--hg-ac); color: var(--hg-text); }
+html[data-mode=overdrive] .search-engine-option.is-selected::after { color: var(--hg-ac); text-shadow: none; }
+
+html[data-mode=overdrive] .theme-row { margin: 0 0 22px; justify-content: flex-end; gap: 8px; }
+html[data-mode=overdrive] .theme-row > span { margin-right: 6px; font: 10px var(--hg-font-mono); letter-spacing: .26em; color: var(--hg-text3); }
+html[data-mode=overdrive] .theme-swatch, html[data-mode=overdrive] .theme-swatch.od-button {
+  width: 22px; height: 22px; border: 1px solid var(--hg-line2); border-radius: 0; opacity: 1; background: var(--swatch) !important; box-shadow: none; transform: none;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%); transition: border-color .15s, outline-color .15s;
+}
+html[data-mode=overdrive] .theme-swatch::after { display: none; }
+html[data-mode=overdrive] .theme-swatch:hover { transform: translateY(-1px); box-shadow: none; }
+html[data-mode=overdrive] .theme-swatch.is-selected { box-shadow: inset 0 0 0 2px var(--hg-bg), inset 0 0 0 3px var(--hg-text); transform: none; }
+
+/* Section headings */
+html[data-mode=overdrive] .section-heading { align-items: flex-end; margin: 0 0 16px; padding-bottom: 12px; border-bottom: 1px solid var(--hg-line); }
+html[data-mode=overdrive] .section-kicker {
+  display: flex; align-items: center; gap: 9px; margin: 0 0 8px; font: 10px var(--hg-font-mono); letter-spacing: .26em; text-transform: uppercase; color: var(--hg-text3); text-shadow: none;
+}
+html[data-mode=overdrive] .section-kicker::before { content: ""; width: 7px; height: 7px; margin: 0; background: var(--hg-ac); animation: none; font-size: 0; }
+html[data-mode=overdrive] .section-title::after { display: none; }
+html[data-mode=overdrive] .section-title h2 { font: 600 28px/1.1 var(--hg-font-display); letter-spacing: .03em; text-transform: uppercase; }
+html[data-mode=overdrive] .heading-period { color: var(--hg-ac); text-shadow: none; }
+html[data-mode=overdrive] .shortcuts-section, html[data-mode=overdrive] .games-section { margin-top: 0; }
+html[data-mode=overdrive] .games-section, html[data-mode=overdrive] .utility-grid { margin-top: 34px; }
+
+/* Shortcuts = strips */
+html[data-mode=overdrive] .shortcut-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 8px; }
+html[data-mode=overdrive] .shortcut-card {
+  min-height: 74px; padding: 12px 14px 12px 20px; background: var(--hg-panel); border: 1px solid var(--hg-line); box-shadow: none;
+  transition: background .15s, border-color .15s;
+}
+html[data-mode=overdrive] .shortcut-card:nth-child(n) { transform: none; }
+html[data-mode=overdrive] .shortcut-card::before {
+  display: block; content: ""; position: absolute; z-index: 1; left: -1px; top: -1px; bottom: -1px; width: 5px; border-radius: 0; background: var(--hg-line2); mask: none; opacity: 1; padding: 0; pointer-events: none; transition: background .15s;
+}
+html[data-mode=overdrive] .shortcut-card::after {
+  display: block; content: ""; position: absolute; z-index: 1; inset: -1px -1px auto auto; width: 11px; height: 11px; padding: 0;
+  border-top: 2px solid var(--hg-line2); border-right: 2px solid var(--hg-line2); background: none; mask: none; opacity: 1; pointer-events: none; transition: border-color .15s;
+}
+html[data-mode=overdrive] .shortcut-card:hover, html[data-mode=overdrive] .shortcut-card:focus-within { background: var(--hg-panel2); border-color: var(--hg-line2); transform: none; box-shadow: none; }
+html[data-mode=overdrive] .shortcut-card:hover::before { background: var(--hg-ac); }
+html[data-mode=overdrive] .shortcut-card:hover::after { border-color: var(--hg-ac); opacity: 1; }
+html[data-mode=overdrive] .shortcut-icon {
+  flex-basis: 46px; width: 46px; height: 46px; border: 1px solid var(--hg-line2); border-radius: 0; background: var(--hg-bg2); box-shadow: none;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%); transition: border-color .15s, background .15s;
+}
+html[data-mode=overdrive] .shortcut-card:hover .shortcut-icon { transform: none; box-shadow: none; border-color: var(--hg-ac); background: var(--hg-soft); }
+html[data-mode=overdrive] .shortcut-icon::before { display: none; }
+html[data-mode=overdrive] .shortcut-icon img { filter: none; }
+html[data-mode=overdrive] .shortcut-icon img[src$="/steam.svg"], html[data-mode=overdrive] .shortcut-icon img[src$="/epicgames.svg"], html[data-mode=overdrive] .shortcut-icon img[src$="/roblox.svg"], html[data-mode=overdrive] .shortcut-icon img[src$="/x.svg"] { filter: brightness(0) invert(1); }
+html[data-mode=overdrive] .shortcut-icon .fallback-mark { color: var(--hg-ac); text-shadow: none; }
+html[data-mode=overdrive] .shortcut-name { color: var(--hg-text); font: 600 20px/1.15 var(--hg-font-display); letter-spacing: .02em; }
+html[data-mode=overdrive] .shortcut-domain { color: var(--hg-text3); font: 11px var(--hg-font-mono); letter-spacing: 0; }
+html[data-mode=overdrive] .shortcut-visits { color: var(--hg-ac); text-shadow: none; font-family: var(--hg-font-mono); }
+html[data-mode=overdrive] .shortcut-edit { width: 28px; height: 26px; border: 1px solid var(--hg-line2); border-radius: 0; background: var(--hg-bg2); backdrop-filter: none; color: var(--hg-text2); }
+html[data-mode=overdrive] .shortcut-edit:hover { color: var(--hg-ac); border-color: var(--hg-ac); }
+html[data-mode=overdrive] .add-card { background: var(--hg-bg2); border: 1px dashed var(--hg-line2); }
+html[data-mode=overdrive] .add-card-icon { border-radius: 0; border: 1px solid var(--hg-line2); background: transparent; color: var(--hg-ac); box-shadow: none; }
+html[data-mode=overdrive] .add-card .shortcut-name { color: var(--hg-text2); font: 600 15px var(--hg-font-display); letter-spacing: .06em; text-transform: uppercase; }
+html[data-mode=overdrive] .add-card:hover .add-card-icon { background: var(--hg-soft); border-color: var(--hg-ac); box-shadow: none; transform: none; }
+html[data-mode=overdrive] .add-card-arrow { stroke: var(--hg-ac); }
+html[data-mode=overdrive] .shortcut-card.drop-merge, html[data-mode=overdrive] .shortcut-card.drop-before, html[data-mode=overdrive] .shortcut-card.drop-after { box-shadow: none; border-color: var(--hg-ac); }
+
+/* Games */
+html[data-mode=overdrive] .games-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr)); gap: 10px; }
+html[data-mode=overdrive] .game-card { background: var(--hg-panel); border: 1px solid var(--hg-line); box-shadow: none; transition: border-color .15s, background .15s; }
+html[data-mode=overdrive] .game-card:hover { transform: none; border-color: var(--hg-aline); background: var(--hg-panel2); box-shadow: none; }
+html[data-mode=overdrive] .game-card::after { content: ""; position: absolute; inset: auto; top: -1px; right: -1px; z-index: 3; width: 11px; height: 11px; border-top: 2px solid var(--hg-ac); border-right: 2px solid var(--hg-ac); background: none; opacity: 1; pointer-events: none; }
+html[data-mode=overdrive] .game-art { background: linear-gradient(135deg, var(--hg-soft), transparent 60%), var(--hg-bg2); }
+html[data-mode=overdrive] .game-art::before { text-shadow: none; font: 600 34px var(--hg-font-display); letter-spacing: .04em; }
+html[data-mode=overdrive] .game-card:hover .game-art img { transform: scale(1.03); filter: none; }
+html[data-mode=overdrive] .game-info strong { font: 600 18px/1.2 var(--hg-font-display); letter-spacing: .02em; }
+html[data-mode=overdrive] .game-info small { font: 10px var(--hg-font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--hg-text3); }
+html[data-mode=overdrive] .game-play {
+  right: 0; top: 0; padding: 7px 14px; border-radius: 0; background: var(--hg-grad); color: var(--hg-ink); box-shadow: none; font: 12px var(--hg-font-display); letter-spacing: .14em;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+}
+html[data-mode=overdrive] .game-add { background: var(--hg-bg2); border: 1px dashed var(--hg-line2); }
+html[data-mode=overdrive] .game-add::before, html[data-mode=overdrive] .game-add:only-child::before { display: none; }
+html[data-mode=overdrive] .game-add .add-card-icon { border-radius: 0; border-style: dashed; box-shadow: none; }
+html[data-mode=overdrive] .game-add:hover { border-color: var(--hg-ac); }
+html[data-mode=overdrive] .game-add:hover .add-card-icon { transform: none; box-shadow: none; }
+html[data-mode=overdrive] .game-add-logos img { opacity: .6; }
+html[data-mode=overdrive] .game-add:only-child .game-info strong { font: 600 30px var(--hg-font-display); letter-spacing: .03em; text-transform: uppercase; }
+/* Utility cards */
+html[data-mode=overdrive] .utility-grid { gap: 10px; }
+html[data-mode=overdrive] .utility-card { padding: 18px 20px; background: var(--hg-panel); border: 1px solid var(--hg-line); border-left: 3px solid var(--hg-ac); box-shadow: none; }
+html[data-mode=overdrive] .utility-heading h2 { font: 600 22px var(--hg-font-display); letter-spacing: .04em; text-transform: uppercase; color: var(--hg-text); }
+html[data-mode=overdrive] :is(.progress-label, .notes-status) {
+  padding: 4px 8px; border: 1px solid var(--hg-aline); border-radius: 0; background: var(--hg-soft); color: var(--hg-ac); font: 600 9.5px var(--hg-font-mono); letter-spacing: .16em;
+}
+html[data-mode=overdrive] .progress-track { height: 6px; border-radius: 0; background: var(--hg-bg2); box-shadow: inset 0 0 0 1px var(--hg-line); }
+html[data-mode=overdrive] .progress-track span { border-radius: 0; background: var(--hg-grad); background-size: 200% 100%; box-shadow: none; animation: hg-grad-flow 9s ease-in-out infinite; }
+html[data-mode=overdrive] .progress-track span::after { display: none; }
+@keyframes hg-grad-flow { 50% { background-position: 100% 0; } }
+html[data-mode=overdrive] :is(.task-entry input, .notes-card textarea, .dialog label:not(.catalog-search) input, .catalog-search, .weather-form input) {
+  border: 1px solid var(--hg-line); border-bottom: 2px solid var(--hg-line2); border-radius: 0; background: var(--hg-panel); box-shadow: none; color: var(--hg-text); font-weight: 600; transition: border-color .15s, background .15s;
+}
+html[data-mode=overdrive] :is(.task-entry input, .notes-card textarea, .dialog label:not(.catalog-search) input, .weather-form input):focus {
+  background: var(--hg-panel2); border-color: var(--hg-aline); border-bottom-color: var(--hg-ac); box-shadow: none;
+}
+html[data-mode=overdrive] .dialog .catalog-search:focus-within { border-color: var(--hg-aline); border-bottom-color: var(--hg-ac); box-shadow: none; }
+html[data-mode=overdrive] ::placeholder { color: var(--hg-text3); font-weight: 500; }
+html[data-mode=overdrive] .task-entry button{
+  border: 1px solid var(--hg-aline); border-radius: 0; background: var(--hg-soft); color: var(--hg-ac); box-shadow: none; transform: none;
+}
+html[data-mode=overdrive] .task-entry button:hover{ background: var(--hg-ac); color: var(--hg-ink); box-shadow: none; transform: none; }
+html[data-mode=overdrive] .task-row { border-radius: 0; border-left: 3px solid transparent; }
+html[data-mode=overdrive] .task-row:hover { background: var(--hg-panel2); border-left-color: var(--hg-line2); }
+html[data-mode=overdrive] .task-check { border-radius: 0; border: 1px solid var(--hg-line2); background: var(--hg-bg2); }
+html[data-mode=overdrive] .task-check.is-done { background: var(--hg-ac); border-color: var(--hg-ac); color: var(--hg-ink); box-shadow: none; }
+html[data-mode=overdrive] .task-remove:hover { color: var(--hg-danger); }
+html[data-mode=overdrive] .notes-footer, html[data-mode=overdrive] .focus-hint { font-family: var(--hg-font-mono); color: var(--hg-text3); }
+html[data-mode=overdrive] .footer { margin-top: 34px; border-top: 1px solid var(--hg-line); color: var(--hg-text3); }
+html[data-mode=overdrive] .footer-center b, html[data-mode=overdrive] .footer-right b { color: var(--hg-text2); text-shadow: none; }
+
+/* ===================================================================== buttons */
+html[data-mode=overdrive] .add-symbol { color: var(--hg-ac); }
+html[data-mode=overdrive] :is(.ghost-button, .back-link, .calendar-nav, .calendar-today) {
+  border: 1px solid var(--hg-line2); border-radius: 0; background: transparent; box-shadow: none; color: var(--hg-text2); font-weight: 600;
+}
+html[data-mode=overdrive] :is(.ghost-button, .back-link, .calendar-nav, .calendar-today):hover:not(:disabled) { border-color: var(--hg-ac); color: var(--hg-text); background: var(--hg-soft); box-shadow: none; }
+html[data-mode=overdrive] .dialog-close{ width: 42px; height: 42px; border: 1px solid var(--hg-line2); border-radius: 0; background: transparent; backdrop-filter: none; color: var(--hg-text2); box-shadow: none; }
+html[data-mode=overdrive] .od-button { transition: background .15s, border-color .15s, color .15s !important; }
+html[data-mode=overdrive].od-launchpad .od-button[data-od-effect] { animation-name: none; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+html[data-mode=overdrive].od-launchpad .shortcut-card.od-button[data-od-effect], html[data-mode=overdrive].od-launchpad .shortcut-card.od-button[data-od-effect]:is(:hover, :focus-within) {
+  background: var(--hg-panel) !important; border-color: var(--hg-line) !important; box-shadow: none !important; transform: none !important;
+}
+html[data-mode=overdrive].od-launchpad .shortcut-card.od-button[data-od-effect]:is(:hover, :focus-within) { background: var(--hg-panel2) !important; border-color: var(--hg-line2) !important; }
+html[data-mode=overdrive].od-launchpad .od-button[data-od-effect=halo] { background: transparent !important; border-radius: 0; }
+html[data-mode=overdrive].od-launchpad .od-button[data-od-effect=ripple] { background-color: transparent !important; box-shadow: none !important; }
+html[data-mode=overdrive].od-launchpad .od-button[data-od-effect=chroma] { background: var(--swatch, transparent) !important; animation: none; }
+html[data-mode=overdrive].od-launchpad .od-button:active { transform: scale(.97) !important; }
+html[data-mode=overdrive].od-launchpad .shortcut-card.od-button:active { transform: none !important; }
+html[data-mode=overdrive] .od-button-wave { display: none; }
+html[data-mode=overdrive] .od-button[data-od-effect=bloom]::after { background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, .28) 50%, transparent 62%); }
+
+/* ============================================================ dialogs and menus */
+html[data-mode=overdrive] .dialog {
+  --cut: 20px; padding: 28px; border: 1px solid var(--hg-line2); border-radius: 0; color: var(--hg-text); box-shadow: none; background-origin: border-box;
+  background:
+    linear-gradient(135deg, transparent calc(var(--cut) * .7071), var(--hg-line2) calc(var(--cut) * .7071) calc(var(--cut) * .7071 + 1.2px), transparent calc(var(--cut) * .7071 + 1.2px)),
+    linear-gradient(-45deg, transparent calc(var(--cut) * .7071), var(--hg-line2) calc(var(--cut) * .7071) calc(var(--cut) * .7071 + 1.2px), transparent calc(var(--cut) * .7071 + 1.2px)),
+    linear-gradient(180deg, var(--hg-soft), transparent 90px), var(--hg-panel);
+  clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+}
+html[data-mode=overdrive] .dialog[open] { animation: hg-rise .2s var(--hg-ease) both; }
+html[data-mode=overdrive] .dialog::before, html[data-mode=overdrive] .dialog::after { display: none; }
+html[data-mode=overdrive] .dialog::backdrop { background: rgba(4, 4, 5, .84); backdrop-filter: none; }
+html[data-mode=overdrive] .dialog h2 { font: 600 26px var(--hg-font-display); letter-spacing: .04em; text-transform: uppercase; }
+html[data-mode=overdrive] .dialog-head .eyebrow { color: var(--hg-text3); font-size: 10px; margin-bottom: 8px; }
+html[data-mode=overdrive] .eyebrow-index { color: var(--hg-ac); margin-left: 6px; }
+html[data-mode=overdrive] .dialog label { color: var(--hg-text3); font: 10px var(--hg-font-mono); letter-spacing: .2em; text-transform: uppercase; }
+html[data-mode=overdrive] .dialog label input { text-transform: none; letter-spacing: 0; font: 600 13px var(--hg-font-ui); }
+html[data-mode=overdrive] .dialog-actions { position: sticky; bottom: -28px; margin: 18px -28px -28px; padding: 14px 28px 20px; background: var(--hg-panel); border-top: 1px solid var(--hg-line); }
+html[data-mode=overdrive] .settings-dialog .dialog-head { background: linear-gradient(180deg, var(--hg-panel) 80%, transparent); }
+html[data-mode=overdrive] .settings-dialog { scrollbar-color: var(--hg-line2) transparent; box-shadow: none; }
+html[data-mode=overdrive] .settings-block { padding: 18px 20px; border: 1px solid var(--hg-line); border-left: 3px solid var(--hg-line2); border-radius: 0; background: var(--hg-bg2); box-shadow: none; }
+html[data-mode=overdrive] .settings-block h3 { font: 600 18px var(--hg-font-display); letter-spacing: .06em; text-transform: uppercase; }
+html[data-mode=overdrive] .settings-block h3::before { color: var(--hg-ac); }
+html[data-mode=overdrive] .field-hint { color: var(--hg-text3); }
+html[data-mode=overdrive] .backdrop-preview { border: 1px dashed var(--hg-line2); border-radius: 0; background: var(--hg-bg2); color: var(--hg-text3); }
+html[data-mode=overdrive] .backdrop-preview > span { border-radius: 0; background: var(--hg-panel); }
+html[data-mode=overdrive] .segmented { padding: 0; gap: 0; border: 1px solid var(--hg-line); border-bottom: 2px solid var(--hg-line2); border-radius: 0; background: var(--hg-panel); }
+html[data-mode=overdrive] .segmented span { padding: 11px 6px; border-radius: 0; color: var(--hg-text2); font: 14px var(--hg-font-display); letter-spacing: .1em; text-transform: uppercase; }
+html[data-mode=overdrive] .segmented span:hover { background: var(--hg-panel2); color: var(--hg-text); }
+html[data-mode=overdrive] .segmented input:checked + span { background: var(--hg-grad); color: var(--hg-ink); box-shadow: none; font-weight: 700; }
+html[data-mode=overdrive] .dialog .check-row { color: var(--hg-text2); font: 600 13px var(--hg-font-ui); letter-spacing: 0; text-transform: none; }
+html[data-mode=overdrive] .check-row::after {
+  flex-basis: 48px; width: 48px; height: 24px; border: 1px solid var(--hg-line2); border-radius: 0; background: radial-gradient(circle at 0 0, transparent 0) , var(--hg-bg);
+  background-image: linear-gradient(var(--hg-text3), var(--hg-text3)); background-size: 16px 16px; background-position: 3px 3px; background-repeat: no-repeat; transition: background-position .18s ease, border-color .18s, background-color .18s;
+}
+html[data-mode=overdrive] .check-row:has(input:checked)::after { border-color: var(--hg-ac); box-shadow: none; background-color: var(--hg-soft); background-image: var(--hg-grad); background-position: 27px 3px; }
+html[data-mode=overdrive] .dialog .range-row input[type=range]::-webkit-slider-runnable-track { height: 6px; border-radius: 0; background: var(--hg-grad) 0 0 / var(--fill, 50%) 100% no-repeat, var(--hg-bg2); }
+html[data-mode=overdrive] .dialog .range-row input[type=range]::-webkit-slider-thumb { width: 12px; height: 18px; margin-top: -6px; border: 2px solid var(--hg-text); border-radius: 0; background: var(--hg-ac); box-shadow: none; }
+html[data-mode=overdrive] .range-row output { border-radius: 0; background: var(--hg-soft); color: var(--hg-ac); }
+html[data-mode=overdrive] .add-tabs { border-bottom: 1px solid var(--hg-line); }
+html[data-mode=overdrive] .add-tab.is-active span { color: var(--hg-ac); }
+html[data-mode=overdrive] .catalog-card { background: var(--hg-panel); border: 1px solid var(--hg-line); border-left: 3px solid var(--hg-line2); box-shadow: none; }
+html[data-mode=overdrive] .catalog-card:hover { transform: none; border-color: var(--hg-line2); border-left-color: var(--hg-ac); box-shadow: none; background: var(--hg-panel2); }
+html[data-mode=overdrive] .catalog-icon { border-radius: 0 !important; }
+html[data-mode=overdrive] .custom-preview { background: var(--hg-panel); border: 1px solid var(--hg-line); box-shadow: none; }
+html[data-mode=overdrive] .folder-row { border-radius: 0; border: 1px solid var(--hg-line); border-left: 3px solid var(--hg-line2); background: var(--hg-panel); }
+html[data-mode=overdrive] .folder-name { font: 600 28px var(--hg-font-display); letter-spacing: .04em; text-transform: uppercase; }
+html[data-mode=overdrive] .folder-mini { border-radius: 0; }
+html[data-mode=overdrive] .calendar-pop { border: 1px solid var(--hg-line2); background: var(--hg-panel); box-shadow: 0 18px 40px rgba(0, 0, 0, .5); }
+html[data-mode=overdrive] .calendar-head strong { font: 600 18px var(--hg-font-display); letter-spacing: .05em; text-transform: uppercase; }
+html[data-mode=overdrive] .calendar-day { border-radius: 0; }
+html[data-mode=overdrive] .calendar-day.is-today { background: var(--hg-grad); color: var(--hg-ink); box-shadow: none; }
+html[data-mode=overdrive] .palette-dialog { padding: 0; }
+html[data-mode=overdrive] .palette-input { border-bottom: 1px solid var(--hg-line); }
+html[data-mode=overdrive] .palette-input > span { color: var(--hg-ac); text-shadow: none; }
+html[data-mode=overdrive] .palette-item { border-radius: 0; border: 0; border-left: 3px solid transparent; color: var(--hg-text2); }
+html[data-mode=overdrive] .palette-item.is-active { background: var(--hg-soft); border-left-color: var(--hg-ac); color: var(--hg-text); box-shadow: none; }
+html[data-mode=overdrive] .palette-icon { border-radius: 0; background: var(--hg-bg2); color: var(--hg-ac); }
+html[data-mode=overdrive] .palette-group { color: var(--hg-text3); letter-spacing: .26em; }
+html[data-mode=overdrive] .palette-foot { border-top: 1px solid var(--hg-line); color: var(--hg-text3); }
+html[data-mode=overdrive] .palette-dialog .dialog-actions { position: static; }
+
+/* Mode picker inside Settings */
+html[data-mode=overdrive] .dialog .mode-card { border-radius: 0; border: 1px solid var(--hg-line); border-left: 3px solid var(--hg-line2); background: var(--hg-panel); color: var(--hg-text); text-transform: none; letter-spacing: 0; font-family: var(--hg-font-ui); }
+html[data-mode=overdrive] .mode-card:hover { transform: none; border-color: var(--hg-line2); }
+html[data-mode=overdrive] .mode-card:has(input:checked) { border-color: var(--hg-ac); border-left-color: var(--hg-ac); background: var(--hg-soft); box-shadow: none; }
+html[data-mode=overdrive] .mode-name { font: 600 18px var(--hg-font-display); letter-spacing: .06em; text-transform: uppercase; }
+html[data-mode=overdrive] .mode-card:has(input:checked) .mode-name::after { color: var(--hg-ac); }
+html[data-mode=overdrive] .mode-desc { color: var(--hg-text3); }
+html[data-mode=overdrive] .mode-preview-astra { border-radius: 0; }
+
+/* ================================================================ responsive */
+@media (max-width: 1000px) {
+  html[data-mode=overdrive] .dashboard { grid-template-columns: 272px minmax(0, 1fr); }
+  html[data-mode=overdrive] .col-stage { padding: 0 22px 28px; }
+  html[data-mode=overdrive] .stage-head { margin: 0 -22px 20px; padding: 20px 22px 18px; }
+  html[data-mode=overdrive] .stage-title { font-size: 28px; }
+  html[data-mode=overdrive] .hero #greeting { font-size: 24px; }
+  html[data-mode=overdrive] .online-pill span:not(.online-dot), html[data-mode=overdrive] .tele-count { display: none; }
+  html[data-mode=overdrive] .online-pill { padding: 0 16px; }
+  html[data-mode=overdrive] .hero-session, html[data-mode=overdrive] .hero-index { display: none; }
+}
+@media (max-width: 920px) {
+  html[data-mode=overdrive] .tele-time { display: none; }
+  html[data-mode=overdrive] .utility-grid { grid-template-columns: 1fr; }
+  html[data-mode=overdrive] .quests-card { grid-row: auto; }
+}
+@media (max-width: 760px) {
+  html[data-mode=overdrive] body { height: auto; min-height: 100vh; overflow-y: auto; display: block; }
+  html[data-mode=overdrive] .dashboard { display: block; height: auto; overflow: visible; }
+  html[data-mode=overdrive] .col-rail, html[data-mode=overdrive] .col-stage { overflow: visible; }
+  html[data-mode=overdrive] .col-rail { border-right: 0; border-bottom: 1px solid var(--hg-line); }
+  html[data-mode=overdrive] .col-stage { padding: 0 16px 28px; }
+  html[data-mode=overdrive] .stage-head { margin: 0 -16px 18px; padding: 18px 16px 16px; }
+  html[data-mode=overdrive] .rail-extra { display: none; }
+  html[data-mode=overdrive] .online-pill, html[data-mode=overdrive] .palette-button kbd { display: none; }
+  html[data-mode=overdrive] .wordmark { padding: 0 14px; border-right: 0; }
+  html[data-mode=overdrive] .shortcut-grid, html[data-mode=overdrive] .games-grid { grid-template-columns: minmax(0, 1fr); }
+  html[data-mode=overdrive] .dialog { padding: 20px; }
+  html[data-mode=overdrive] .dialog-actions { bottom: -20px; margin: 18px -20px -20px; padding: 14px 20px 18px; }
+}
+@media (max-height: 700px) {
+  html[data-mode=overdrive] .hero-copy { padding-top: 16px; padding-bottom: 14px; }
+  html[data-mode=overdrive] .rail-extra { padding-top: 16px; gap: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-mode=overdrive] *, html[data-mode=overdrive] *::before, html[data-mode=overdrive] *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+/* ======================= HANGAR 1.10: mode selector, plugin center ======================= */
+html[data-mode=overdrive] .mode-selector { align-self: center; margin: 0 auto; padding: 0; gap: 0; border: 1px solid var(--hg-line2); border-radius: 0; background: var(--hg-panel); backdrop-filter: none; font: 15px var(--hg-font-display); letter-spacing: .14em; }
+html[data-mode=overdrive] .mode-thumb { left: 0; top: 0; bottom: 0; width: 50%; border-radius: 0; background: var(--hg-grad); box-shadow: none; clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 9px 100%, 0 calc(100% - 9px)); }
+html[data-mode=overdrive] .plugin-row, html[data-mode=overdrive] .plugin-detail { border-radius: 0; border: 1px solid var(--hg-line); border-left: 3px solid var(--hg-line2); background: var(--hg-bg2); }
+html[data-mode=overdrive] .plugin-row:hover, html[data-mode=overdrive] .plugin-detail[open] { border-color: var(--hg-line2); border-left-color: var(--hg-ac); background: var(--hg-panel2); }
+html[data-mode=overdrive] .plugin-chip { border-radius: 0; border-color: var(--hg-line2); font-family: var(--hg-font-mono); }
+html[data-mode=overdrive] .plugin-chip.is-active { color: var(--hg-ok); border-color: var(--hg-ok); background: transparent; }
+html[data-mode=overdrive] .plugin-chip.is-error, html[data-mode=overdrive] .plugin-chip.is-quarantined, html[data-mode=overdrive] .plugin-chip.is-incompatible { color: var(--hg-danger); border-color: var(--hg-danger); background: var(--hg-danger-soft); }
+html[data-mode=overdrive] .plugin-switch::after { width: 44px; height: 22px; border-radius: 0; border-color: var(--hg-line2); background: linear-gradient(var(--hg-text3), var(--hg-text3)) 3px 3px / 14px 14px no-repeat, var(--hg-bg); transition: background-position .18s ease, border-color .18s; }
+html[data-mode=overdrive] .plugin-switch:has(input:checked)::after { border-color: var(--hg-ac); background: var(--hg-grad) 27px 3px / 14px 14px no-repeat, var(--hg-soft); }
+html[data-mode=overdrive] .plugin-detail-body { border-top-color: var(--hg-line); }
+html[data-mode=overdrive] .plugin-detail-body h4 { color: var(--hg-text3); letter-spacing: .26em; }
+html[data-mode=overdrive] .plugin-issues { border-left-color: var(--hg-danger); background: var(--hg-danger-soft); color: var(--hg-text); }
+html[data-mode=overdrive] .plugin-errors { color: var(--hg-danger); }
+html[data-mode=overdrive] .plugin-widget { border-radius: 0; border: 1px solid var(--hg-line); border-left: 3px solid var(--hg-ac); background: var(--hg-panel); backdrop-filter: none; }
+html[data-mode=overdrive] .plugin-widget h3 { font: 600 20px var(--hg-font-display); letter-spacing: .04em; text-transform: uppercase; }
+html[data-mode=overdrive] .pw-stats b { font-family: var(--hg-font-display); font-weight: 600; color: var(--hg-text); }
+html[data-mode=overdrive] .plugin-widgets { margin-top: 34px; gap: 10px; }
+@media (max-width: 1000px) { }
+@media (max-width: 760px) { html[data-mode=overdrive] .mode-btn span { display: none; } }

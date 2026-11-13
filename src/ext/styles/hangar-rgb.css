@@ -1,0 +1,151 @@
+/* HANGAR — RGB control room (loaded last, after hangar.css and glass.css).
+   Identity: industrial black and graphite, electric cyan / violet / magenta, glass panels, circuit flow, a cyber grid and
+   reactive light on the edges of whatever is active. It keeps HANGAR's hard geometry (cut corners, no radius) and layout.
+   Effects are layered: base (tokens, grid) → ambient (circuits, scanlines) → components (RGB edges, glass) → interaction
+   (magnetic hover, ripple, sweep). "lite" performance mode removes the ambient and animated layers. */
+
+/* ------------------------------------------------------------------ tokens */
+html[data-mode=overdrive], html[data-mode=overdrive][data-theme=ice], html[data-mode=overdrive][data-theme=ember], html[data-mode=overdrive][data-theme=toxic],
+html[data-mode=overdrive][data-theme=violet], html[data-mode=overdrive][data-theme=white] {
+  --hg-bg: #090b12; --hg-bg2: #0c1019; --hg-panel: #141b2d; --hg-panel2: #1a2338; --hg-line: #222c45; --hg-line2: #34415f;
+  --hg-text: #eaf1ff; --hg-text2: #9fb0cf; --hg-text3: #6b7a99;
+  --hg-ac: #00e5ff; --hg-ac2: #8a2eff; --hg-ac3: #ff2bd6; --hg-ink: #02060d; --hg-ok: #8cff4f; --hg-danger: #ff4d6d;
+  --hg-soft: color-mix(in srgb, var(--hg-ac) 12%, transparent); --hg-aline: color-mix(in srgb, var(--hg-ac) 55%, transparent);
+  --hg-danger-soft: rgba(255, 77, 109, .12); --hg-grid: color-mix(in srgb, var(--hg-ac) 6%, transparent);
+  --hg-grad: linear-gradient(120deg, var(--hg-ac), var(--hg-ac2) 52%, var(--hg-ac3));
+  --glass-fill: linear-gradient(135deg, color-mix(in srgb, var(--hg-ac) 7%, transparent), transparent 42%, color-mix(in srgb, var(--hg-ac3) 5%, transparent)), color-mix(in srgb, var(--hg-panel) 56%, transparent);
+  --glass-blur: 14px;
+}
+html[data-mode=overdrive][data-theme=violet] { --hg-ac: #8a2eff; --hg-ac2: #ff2bd6; --hg-ac3: #00e5ff; }
+html[data-mode=overdrive][data-theme=toxic] { --hg-ac: #8cff4f; --hg-ac2: #00e5ff; --hg-ac3: #8a2eff; --hg-ink: #031006; }
+html[data-mode=overdrive][data-theme=ember] { --hg-ac: #ff7a1a; --hg-ac2: #ff2bd6; --hg-ac3: #ffd02b; --hg-ink: #120700; }
+html[data-mode=overdrive][data-theme=white] { --hg-ac: #e8f1ff; --hg-ac2: #9fb0cf; --hg-ac3: #ffffff; --hg-ink: #05080f; }
+
+/* ------------------------------------------------------------ base + ambience */
+html[data-mode=overdrive], html[data-mode=overdrive] body {
+  background: radial-gradient(ellipse 60% 42% at 12% -8%, color-mix(in srgb, var(--hg-ac2) 20%, transparent), transparent 70%), radial-gradient(ellipse 50% 40% at 100% 0, color-mix(in srgb, var(--hg-ac) 13%, transparent), transparent 70%), radial-gradient(ellipse 60% 40% at 50% 125%, color-mix(in srgb, var(--hg-ac3) 11%, transparent), transparent 70%), var(--hg-bg);
+}
+/* Cyber grid: flat grid fading from the top + an animated perspective floor */
+html[data-mode=overdrive] body::before { display: block; z-index: 1; opacity: 1; background-size: 48px 48px; -webkit-mask-image: radial-gradient(ellipse 85% 70% at 55% 20%, #000 15%, transparent 100%); mask-image: radial-gradient(ellipse 85% 70% at 55% 20%, #000 15%, transparent 100%); }
+html[data-mode=overdrive] .grid-glow { display: block !important; z-index: 1; opacity: .55; height: 44vh; bottom: -5vh; background-image: linear-gradient(color-mix(in srgb, var(--hg-ac) 55%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--hg-ac2) 55%, transparent) 1px, transparent 1px); }
+/* RGB ambient glow: the old aurora blobs, recoloured */
+html[data-mode=overdrive] .aurora { display: block; z-index: 1; opacity: .13; animation-duration: 24s; }
+html[data-mode=overdrive] .aurora-one { background: radial-gradient(closest-side, var(--hg-ac2), transparent); }
+html[data-mode=overdrive] .aurora-two { background: radial-gradient(closest-side, var(--hg-ac3), transparent); opacity: .1; }
+/* Scanlines + a slow scanning band */
+html[data-mode=overdrive] body::after {
+  display: block; content: ""; position: fixed; inset: 0; z-index: 4; pointer-events: none; opacity: .5; background:
+    linear-gradient(180deg, transparent, color-mix(in srgb, var(--hg-ac) 8%, transparent), transparent) 0 -25% / 100% 22% no-repeat,
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, .022) 0 1px, transparent 1px 3px);
+  animation: hg-scanband 9s linear infinite;
+}
+@keyframes hg-scanband { to { background-position: 0 130%, 0 0; } }
+/* Circuit flow + cursor spotlight (created by scripts/hangar-fx.js) */
+#hg-circuits, #hg-spot { position: fixed; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; display: none; }
+html[data-mode=overdrive] #hg-circuits, html[data-mode=overdrive] #hg-spot { display: block; }
+#hg-spot { background: radial-gradient(380px circle at var(--mx, 50%) var(--my, 30%), color-mix(in srgb, var(--hg-ac) 13%, transparent), transparent 62%); mix-blend-mode: screen; }
+.hg-trace { fill: none; stroke: color-mix(in srgb, var(--hg-ac) 26%, transparent); stroke-width: 1; stroke-linejoin: round; }
+.hg-packet { fill: none; stroke: var(--hg-ac); stroke-width: 1.8; stroke-linecap: round; stroke-dasharray: 22 900; filter: drop-shadow(0 0 4px var(--hg-ac)); animation: hg-flow 7s linear infinite; }
+.hg-packet:nth-of-type(3n) { stroke: var(--hg-ac3); filter: drop-shadow(0 0 4px var(--hg-ac3)); }
+.hg-packet:nth-of-type(3n+1) { stroke: var(--hg-ac2); filter: drop-shadow(0 0 4px var(--hg-ac2)); }
+.hg-node { fill: var(--hg-ac); opacity: .65; }
+@keyframes hg-flow { from { stroke-dashoffset: 922; } to { stroke-dashoffset: 0; } }
+html[data-mode=overdrive] .backdrop-media { opacity: .55; }
+
+/* ----------------------------------------------------------------- RGB edge flow */
+html[data-mode=overdrive] :is(.clock-panel, .utility-card, .plugin-widget) {
+  border: 1px solid transparent; border-image: conic-gradient(from var(--ring), var(--hg-ac), var(--hg-ac2), var(--hg-ac3), var(--hg-ac2), var(--hg-ac)) 1; animation: ring 10s linear infinite;
+}
+html[data-mode=overdrive] .utility-card:nth-of-type(2) { animation-duration: 14s; animation-direction: reverse; }
+html[data-mode=overdrive] :is(.shortcut-card, .game-card, .plugin-row, .catalog-card):hover { border-image: conic-gradient(from var(--ring), var(--hg-ac), var(--hg-ac2), var(--hg-ac3), var(--hg-ac2), var(--hg-ac)) 1; animation: ring 3.4s linear infinite; }
+html[data-mode=overdrive] .search:focus-within { border: 1px solid transparent; border-bottom-width: 2px; border-image: conic-gradient(from var(--ring), var(--hg-ac), var(--hg-ac2), var(--hg-ac3), var(--hg-ac2), var(--hg-ac)) 1; animation: ring 3.4s linear infinite; background: color-mix(in srgb, var(--hg-panel2) 70%, transparent); }
+html[data-mode=overdrive] .utility-card::before, html[data-mode=overdrive] .clock-panel::before {
+  display: block; content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .7; padding: 0; background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .03) 0 1px, transparent 1px 3px); mask: none; -webkit-mask: none;
+}
+/* Circuit corners: tech accents on two opposite corners */
+html[data-mode=overdrive] :is(.utility-card, .plugin-widget)::after {
+  display: block; content: ""; position: absolute; inset: -1px; z-index: 2; pointer-events: none; padding: 0; mask: none; -webkit-mask: none; opacity: .9; border: 0; width: auto; height: auto;
+  background:
+    linear-gradient(var(--hg-ac), var(--hg-ac)) 100% 0 / 16px 2px no-repeat, linear-gradient(var(--hg-ac), var(--hg-ac)) 100% 0 / 2px 16px no-repeat,
+    linear-gradient(var(--hg-ac3), var(--hg-ac3)) 0 100% / 16px 2px no-repeat, linear-gradient(var(--hg-ac3), var(--hg-ac3)) 0 100% / 2px 16px no-repeat;
+}
+html[data-mode=overdrive] .shortcut-card { overflow: hidden; }
+html[data-mode=overdrive] .shortcut-card:hover::before { background: var(--hg-grad); box-shadow: 0 0 12px var(--hg-ac); }
+html[data-mode=overdrive] .shortcut-card:hover .shortcut-icon { border-color: var(--hg-ac); box-shadow: 0 0 16px -2px var(--hg-ac); }
+/* Light sweep across a card on hover */
+html[data-mode=overdrive] .shortcut-link::after { content: ""; position: absolute; inset: -16px; z-index: 0; pointer-events: none; background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, .13) 50%, transparent 62%); transform: translateX(-130%); }
+html[data-mode=overdrive] .shortcut-card:hover .shortcut-link::after { transform: translateX(130%); transition: transform .8s var(--hg-ease); }
+
+/* ----------------------------------------------------------------- buttons */
+html[data-mode=overdrive] :focus-visible { outline: 2px solid var(--hg-ac); outline-offset: 3px; box-shadow: 0 0 0 5px color-mix(in srgb, var(--hg-ac) 14%, transparent), 0 0 16px color-mix(in srgb, var(--hg-ac) 45%, transparent); }
+html[data-mode=overdrive] :is(input:not([type=checkbox], [type=radio], [type=range]), textarea):focus-visible { outline: 0; box-shadow: none; }
+html[data-mode=overdrive] :is(input, textarea):focus { box-shadow: 0 6px 18px -10px var(--hg-ac); }
+html[data-mode=overdrive] .mode-selector { border-image: conic-gradient(from var(--ring), var(--hg-ac), var(--hg-ac2), var(--hg-ac3), var(--hg-ac2), var(--hg-ac)) 1; animation: ring 12s linear infinite; border-width: 1px; border-style: solid; }
+html[data-mode=overdrive] .theme-swatch.is-selected { box-shadow: inset 0 0 0 2px var(--hg-bg), inset 0 0 0 3px var(--hg-text), 0 0 12px var(--swatch); }
+
+/* ------------------------------------------------ ripple, magnetic hover, glitch */
+.hg-ripple { position: fixed; z-index: 9990; width: 14px; height: 14px; margin: -7px 0 0 -7px; pointer-events: none; border: 2px solid var(--hg-ac); box-shadow: 0 0 14px var(--hg-ac), inset 0 0 8px var(--hg-ac); transform: rotate(45deg) scale(0); opacity: .95; animation: hg-ripple .7s cubic-bezier(.2, .8, .2, 1) forwards; }
+.hg-ripple.is-b { border-color: var(--hg-ac3); box-shadow: 0 0 14px var(--hg-ac3); animation-delay: .08s; }
+@keyframes hg-ripple { to { transform: rotate(45deg) scale(7); opacity: 0; } }
+.hg-glitch { animation: hg-glitch .3s steps(2, end); }
+@keyframes hg-glitch {
+  0% { text-shadow: 3px 0 var(--hg-ac3), -3px 0 var(--hg-ac); transform: translateX(-1px); }
+  25% { text-shadow: -3px 0 var(--hg-ac3), 3px 0 var(--hg-ac); clip-path: inset(10% 0 52% 0); }
+  50% { text-shadow: 2px 0 var(--hg-ac), -2px 0 var(--hg-ac3); clip-path: inset(58% 0 6% 0); transform: translateX(2px); }
+  75% { text-shadow: -2px 0 var(--hg-ac3); clip-path: inset(0 0 0 0); transform: none; }
+  100% { text-shadow: none; clip-path: none; transform: none; }
+}
+
+/* --------------------------------------------------- navigation, boot, telemetry */
+html[data-mode=overdrive] .search-engine-option { animation: hg-slide .3s var(--hg-ease) both; }
+html[data-mode=overdrive] .search-engine-option:nth-child(2) { animation-delay: .04s; } html[data-mode=overdrive] .search-engine-option:nth-child(3) { animation-delay: .08s; } html[data-mode=overdrive] .search-engine-option:nth-child(4) { animation-delay: .12s; }
+@keyframes hg-slide { from { opacity: 0; transform: translateX(-12px); } }
+#hg-boot { position: fixed; inset: 0; z-index: 9998; display: grid; align-content: center; justify-content: center; gap: 14px; background: rgba(5, 7, 12, .93); pointer-events: none; transition: opacity .4s; }
+#hg-boot pre { margin: 0; color: var(--hg-ac); font: 13px/1.7 var(--hg-font-mono); text-shadow: 0 0 10px color-mix(in srgb, var(--hg-ac) 70%, transparent); }
+#hg-boot i { display: block; width: 0; height: 2px; background: var(--hg-grad); box-shadow: 0 0 12px var(--hg-ac); transition: width .12s linear; }
+#hg-boot.is-done { opacity: 0; }
+
+html[data-mode=overdrive] .hg-meter { position: relative; border: 1px solid var(--hg-line); border-left: 3px solid var(--hg-ac); background: color-mix(in srgb, var(--hg-bg2) 70%, transparent); padding: 6px 8px 4px; }
+html[data-mode=overdrive] .hg-meter canvas { display: block; width: 100%; height: 56px; }
+html[data-mode=overdrive] .hg-meter-read { position: absolute; top: 6px; right: 10px; display: flex; align-items: baseline; gap: 6px; font: 9px var(--hg-font-mono); letter-spacing: .2em; color: var(--hg-text3); }
+html[data-mode=overdrive] .hg-meter-read b { font: 600 20px/1 var(--hg-font-display); letter-spacing: 0; color: var(--hg-ac); text-shadow: 0 0 12px color-mix(in srgb, var(--hg-ac) 60%, transparent); }
+html[data-mode=overdrive] .hg-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 10px 0 0; }
+html[data-mode=overdrive] .hg-stats div { padding: 8px 10px; border: 1px solid var(--hg-line); border-left: 3px solid var(--hg-line2); background: color-mix(in srgb, var(--hg-panel) 60%, transparent); }
+html[data-mode=overdrive] .hg-stats dt { font: 9px var(--hg-font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--hg-text3); }
+html[data-mode=overdrive] .hg-stats dd { margin: 2px 0 0; font: 600 22px/1.1 var(--hg-font-display); font-variant-numeric: tabular-nums; }
+html[data-mode=overdrive] .hg-status { display: grid; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; font: 11px var(--hg-font-mono); letter-spacing: .1em; color: var(--hg-text2); text-transform: uppercase; }
+html[data-mode=overdrive] .hg-status li { display: flex; align-items: center; gap: 8px; }
+html[data-mode=overdrive] .hg-status i { width: 8px; height: 8px; background: var(--hg-ok); animation: hg-led 2.4s ease-in-out infinite; }
+html[data-mode=overdrive] .hg-status b { margin-left: auto; font-weight: 600; color: var(--hg-text); }
+html[data-mode=overdrive] #hg-net[data-state=down] { color: var(--hg-danger); }
+
+/* ------------------------------------------------------------- plugins */
+html[data-mode=overdrive] .plugin-widget { animation: hg-dock .65s var(--hg-ease) both, ring 10s linear .65s infinite; }
+@keyframes hg-dock { 0% { opacity: 0; transform: translateY(-16px) scale(.96); filter: brightness(2.4); } 55% { opacity: 1; transform: none; filter: brightness(1.5); } 100% { filter: none; } }
+html[data-mode=overdrive] .plugin-chip.is-active::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 6px; background: var(--hg-ok); box-shadow: 0 0 8px var(--hg-ok); animation: hg-led 2.4s ease-in-out infinite; }
+html[data-mode=overdrive] .plugin-chip.is-activating { position: relative; overflow: hidden; padding-left: 8px; border-color: var(--hg-ac); color: var(--hg-ac); }
+html[data-mode=overdrive] .plugin-chip.is-activating::before { display: none; }
+html[data-mode=overdrive] .plugin-chip.is-activating::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--hg-ac) 55%, transparent), transparent); animation: hg-scan-x 1s linear infinite; }
+@keyframes hg-scan-x { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+html[data-mode=overdrive] .plugin-row:hover { box-shadow: 0 0 20px -10px var(--hg-ac); }
+html[data-mode=overdrive] .plugin-switch:has(input:checked)::after { box-shadow: 0 0 12px -2px var(--hg-ac); }
+
+/* ----------------------------------------------- search suggestions (HANGAR skin) */
+html[data-mode=overdrive] .search-suggest { border: 1px solid var(--hg-line2); border-top: 2px solid transparent; border-image: var(--hg-grad) 1; border-image-slice: 1; border-radius: 0; background: color-mix(in srgb, var(--hg-panel) 88%, transparent); backdrop-filter: blur(16px) saturate(130%); box-shadow: 0 24px 50px -18px rgba(0, 0, 0, .8), 0 0 40px -22px var(--hg-ac); }
+html[data-mode=overdrive] .sg-item { border-left: 3px solid transparent; font: 600 14px var(--hg-font-ui); }
+html[data-mode=overdrive] .sg-item .sg-icon svg { color: var(--hg-ac); }
+html[data-mode=overdrive] .sg-item:hover, html[data-mode=overdrive] .sg-item.is-active { background: var(--hg-soft); border-left-color: var(--hg-ac); }
+html[data-mode=overdrive] .sg-clear { font: 10px var(--hg-font-mono); letter-spacing: .18em; text-transform: uppercase; color: var(--hg-text3); }
+html[data-mode=overdrive] .search-clear { border-radius: 0; color: var(--hg-text2); }
+html[data-mode=overdrive] .search-clear:hover { color: var(--hg-ac); background: var(--hg-soft); }
+
+/* ----------------------------------------------------------- graphics levels */
+html.perf-lite[data-mode=overdrive] body::after, html.perf-lite[data-mode=overdrive] #hg-circuits, html.perf-lite[data-mode=overdrive] #hg-spot, html.perf-lite[data-mode=overdrive] .aurora { display: none; }
+html.perf-lite[data-mode=overdrive] :is(.clock-panel, .utility-card, .plugin-widget, .search:focus-within, .mode-selector) { animation: none; border-image: none; border: 1px solid var(--hg-line2); }
+html.perf-lite[data-mode=overdrive] .grid-glow { animation: none; opacity: .3; }
+html.perf-lite[data-mode=overdrive] .hg-packet { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  html[data-mode=overdrive] body::after { animation: none; }
+  .hg-packet, .hg-ripple, .hg-glitch, html[data-mode=overdrive] :is(.clock-panel, .utility-card, .plugin-widget, .mode-selector) { animation: none !important; }
+  #hg-boot { display: none; }
+}

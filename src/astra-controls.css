@@ -1,0 +1,108 @@
+/* ASTRA · controles de sección: barra de búsqueda, filtros, "Ver más info" y etiquetas.
+   Los bordes son degradados que giran (conic + @property) y los fondos son nebulosas suaves.
+   Todo va con html[data-mode=astra], así que HANGAR no cambia. */
+
+@property --ang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes astra-orbit { to { --ang: 360deg; } }
+@keyframes astra-aurora { from { background-position: 0% 50%; } to { background-position: 200% 50%; } }
+
+/* Cápsula de búsqueda: nebulosa dentro y un borde de color que da vueltas despacio */
+html[data-mode=astra] .tab-filters {
+  position: relative;
+  gap: 12px; padding: 10px; border-radius: 24px;
+  border: 1.5px solid transparent;
+  background:
+    radial-gradient(120% 200% at 0% 0%, color-mix(in srgb, var(--purple) 24%, transparent), transparent 60%),
+    radial-gradient(90% 160% at 100% 100%, color-mix(in srgb, var(--cyan) 18%, transparent), transparent 62%),
+    linear-gradient(120deg, #0b0f1f, #070a18) padding-box,
+    conic-gradient(from var(--ang), var(--cyan), var(--purple), var(--pink), var(--cyan)) border-box;
+  box-shadow: 0 10px 34px -16px color-mix(in srgb, var(--purple) 55%, transparent);
+  animation: astra-orbit 10s linear infinite;
+}
+html[data-mode=astra] .tab-filters:focus-within {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 14%, transparent), 0 10px 34px -12px color-mix(in srgb, var(--cyan) 60%, transparent);
+  animation-duration: 4s;
+}
+
+/* Caja del texto: un hueco de cristal oscuro */
+html[data-mode=astra] .tab-filters .search-box { flex: 1; min-width: 0; height: 58px; isolation: isolate; }
+
+/* Lupa: icono luminoso integrado */
+html[data-mode=astra] .tab-filters .search-icon {
+  position: absolute;
+  left: 18px; top: 50%; width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  transform: translateY(-50%);
+  background: none; border: none; box-shadow: none; border-radius: 0;
+  color: var(--cyan);
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--cyan) 60%, transparent));
+  pointer-events: none;
+  animation: none;
+  transition: transform .25s var(--ease), color .25s, filter .25s;
+}
+html[data-mode=astra] .tab-filters .search-icon svg {
+  width: 20px; height: 20px; fill: none; stroke: currentColor;
+  stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
+}
+
+html[data-mode=astra] .tab-filters .search-input {
+  width: 100%; height: 100%; padding: 0 52px 0 52px;
+  border: 1px solid rgba(255, 255, 255, .12); border-radius: 18px;
+  background: rgba(4, 8, 20, .55);
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, .35);
+  font: 500 16px/1.2 var(--body); letter-spacing: .01em; color: #eef2ff;
+  transform: none; animation: none;
+  transition: border-color .3s, box-shadow .3s;
+}
+html[data-mode=astra] .tab-filters .search-input::before { display: none; }
+html[data-mode=astra] .tab-filters .search-input:hover { transform: none; background: rgba(4, 8, 20, .7); box-shadow: inset 0 2px 10px rgba(0, 0, 0, .35); }
+html[data-mode=astra] .tab-filters .search-input:focus {
+  transform: none; animation: none; outline: none;
+  border-color: color-mix(in srgb, var(--cyan) 70%, transparent);
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, .35), 0 0 0 4px color-mix(in srgb, var(--cyan) 14%, transparent), 0 0 30px -6px color-mix(in srgb, var(--cyan) 60%, transparent);
+}
+html[data-mode=astra] .tab-filters .search-box:focus-within .search-icon {
+  color: #fff;
+  filter: drop-shadow(0 0 10px var(--cyan));
+  transform: translateY(-50%) scale(1.1);
+}
+html[data-mode=astra] .tab-filters .search-input::placeholder { color: #9ea8c2; opacity: .85; font-weight: 500; }
+
+html[data-mode=astra] .tab-filters .search-clear {
+  position: absolute;
+  right: 12px; top: 50%; width: 34px; height: 34px; border-radius: 50%;
+  transform: translateY(-50%);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+html[data-mode=astra] .tab-filters .search-clear:hover {
+  transform: translateY(-50%) scale(1.06);
+}
+
+/* Filtros: usan el estilo espacial general de astra-fx.css (aquí solo alineación y tamaño) */
+html[data-mode=astra] .tab-sort { gap: 8px; padding: 0; border: 0; background: none; }
+html[data-mode=astra] .tab-sort .sort-btn {
+  padding: 12px 18px; border-radius: 999px; font-weight: 600; letter-spacing: .02em;
+}
+html[data-mode=astra] .tab-sort .sort-btn .sort-icon { font-size: 15px; }
+
+/* "Ver más info": usa el estilo espacial general de astra-fx.css (aquí solo se ajusta su alineación). */
+html[data-mode=astra] .item-more {
+  position: relative; align-self: flex-start;
+  padding: 10px 20px; border-radius: 999px;
+  font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+}
+
+/* Etiquetas: chips con degradado suave */
+html[data-mode=astra] .item-tags i {
+  font-style: normal; font-size: 12px; font-weight: 600; letter-spacing: .02em;
+  padding: 3px 10px; border-radius: 999px; color: #c6f7ff;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--cyan) 20%, transparent), color-mix(in srgb, var(--pink) 16%, transparent));
+  border: 1px solid color-mix(in srgb, var(--cyan) 34%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-mode=astra] .tab-filters,
+  html[data-mode=astra] .tab-sort .sort-btn.is-active,
+  html[data-mode=astra] .item-more:hover { animation: none !important; }
+}

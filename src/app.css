@@ -1,0 +1,136 @@
+/* Piezas de la web de publicar que la extensión no tiene. Usan los mismos tokens
+   (--cyan, --edge, --mono, --display...) para verse como parte de ella en ASTRA y en HANGAR.
+   La estructura (.dashboard > .col-rail + .col-stage) es la de la extensión: HANGAR la usa tal cual
+   (riel lateral + escenario) y ASTRA la reordena con la rejilla del mockup. */
+
+.stack > * + * { margin-top: 18px; }
+
+/* ---------- Portada en ASTRA (esquema del mockup) ----------
+   Fila 1: bloque principal + panel de resumen. Fila 2-3: buscador y rejilla 3x2 a la izquierda,
+   dos columnas altas (Avances, Más gustados) a la derecha. */
+html[data-mode=astra] .dashboard {
+  display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 22px 28px; align-items: stretch;
+  width: min(1240px, 92vw); padding-top: clamp(24px, 5vh, 56px);
+}
+html[data-mode=astra] .home-hero-wrap { display: contents; }
+html[data-mode=astra] .home-hero { grid-column: 1; grid-row: 1; margin: 0; }
+html[data-mode=astra] .home-stats { grid-column: 2; grid-row: 1; flex: none; min-height: 0; }
+html[data-mode=astra] .home-search { grid-column: 1; grid-row: 2; margin: 0; }
+html[data-mode=astra] .home-main { grid-column: 1; grid-row: 3; }
+html[data-mode=astra] .home-side { grid-column: 2; grid-row: 2 / span 2; }
+html[data-mode=astra] .dashboard .footer { grid-column: 1 / -1; }
+html[data-mode=astra] .page-shell { display: block; width: min(960px, 92vw); }
+html[data-mode=astra] .page-shell .col-rail { display: none; }
+html[data-mode=astra] .home-hero #greeting { font-size: clamp(34px, 3.6vw, 54px); }
+@media (max-width: 1000px) {
+  html[data-mode=astra] .dashboard { grid-template-columns: minmax(0, 1fr); }
+  html[data-mode=astra] :is(.home-hero, .home-stats, .home-search, .home-main, .home-side) { grid-column: 1; grid-row: auto; }
+}
+
+.home-stats { margin: 0; }
+.home-stats .theme-row { justify-content: flex-start; flex-wrap: wrap; margin: 18px 0 0; }
+.home-search { margin-bottom: 22px; }
+.home-main { min-width: 0; }
+.home-main .pub-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.home-side { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: stretch; min-width: 0; }
+.hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 26px; }
+.hero-actions .add-button, .pub-actions .add-button { text-decoration: none; }
+.clock-panel .weather-chip { text-decoration: none; }
+.side-card { display: flex; flex-direction: column; min-height: 100%; }
+.side-empty { margin: 0; color: var(--muted); font-size: 13px; }
+.mini-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.mini-list a {
+  display: grid; gap: 3px; padding: 11px 13px; color: var(--text); text-decoration: none;
+  border: 1px solid var(--edge); border-radius: 12px; background: rgba(255, 255, 255, .03);
+  transition: border-color .25s, box-shadow .25s, transform .25s var(--ease);
+}
+.mini-list a:hover { border-color: color-mix(in srgb, var(--cyan) 50%, transparent); box-shadow: var(--bloom-sm); transform: translateY(-1px); }
+.mini-list strong { overflow: hidden; font-size: 13px; white-space: nowrap; text-overflow: ellipsis; }
+.mini-list small { overflow: hidden; color: var(--muted); font: 10px var(--mono); letter-spacing: .06em; white-space: nowrap; text-overflow: ellipsis; }
+html[data-mode=overdrive] .mini-list a { border-radius: 0; }
+@media (max-width: 1100px) { .home-main .pub-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .home-main .pub-grid, .home-side { grid-template-columns: minmax(0, 1fr); } }
+
+/* Iconos SVG sueltos (la extensión los inserta con su propio script de iconos) */
+:is(.add-button, .search-engine-trigger, .clock-cross, .like-button) svg {
+  width: 16px; height: 16px; flex: 0 0 auto; fill: none; stroke: currentColor;
+  stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
+}
+.search-engine-trigger { color: #cdd1dc; display: grid; place-items: center; }
+.search-engine-trigger svg { width: 20px; height: 20px; }
+.clock-cross svg { width: 15px; height: 15px; }
+.task-entry button svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+
+/* ---------- Avisos y estados vacíos ---------- */
+.pub-notice { padding: 20px 22px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.pub-notice a, .pub-notice code { color: var(--cyan); }
+.pub-empty { padding: 34px 22px; text-align: center; color: var(--muted); font-size: 14px; }
+.pub-empty strong { display: block; margin-bottom: 6px; color: var(--text); font: 800 22px var(--display); }
+
+/* ---------- Rejilla de publicaciones ---------- */
+.pub-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+.pub-summary {
+  display: -webkit-box; margin-top: 6px; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  color: var(--muted); font-size: 12px; line-height: 1.5;
+}
+.pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
+.pill-row .launcher-pill { cursor: pointer; }
+.launcher-pill.is-active {
+  border-color: color-mix(in srgb, var(--cyan) 60%, transparent); color: var(--cyan); box-shadow: var(--bloom-sm);
+}
+
+/* ---------- Formularios (mismo aspecto que los campos de los diálogos de la extensión) ---------- */
+.form-card { width: min(560px, 100%); margin: 0 auto; padding: 26px; }
+.form-card.wide { width: min(760px, 100%); }
+.form-card label { display: block; margin: 0 0 17px; color: #a9b0c3; font-size: 12px; }
+.form-card :is(input:not([type=file]), textarea) {
+  display: block; width: 100%; margin-top: 8px; padding: 12px 14px;
+  border: 1px solid var(--edge); border-radius: 12px; outline: 0;
+  background: rgba(3, 5, 12, .45); color: var(--text);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, .35);
+  transition: border-color .25s, box-shadow .25s;
+}
+.form-card textarea { min-height: 160px; resize: vertical; line-height: 1.6; }
+.form-card :is(input:not([type=file]), textarea):focus {
+  border-color: color-mix(in srgb, var(--cyan) 55%, transparent);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, .35), 0 0 0 3px color-mix(in srgb, var(--cyan) 12%, transparent), var(--bloom-sm);
+}
+.form-card ::placeholder { color: #737a8e; }
+.form-card input[type=file] { display: block; margin-top: 8px; color: var(--muted); font-size: 12px; }
+.form-card input[type=file]::file-selector-button {
+  margin-right: 12px; padding: 8px 12px; cursor: pointer;
+  border: 1px solid var(--edge); border-radius: 10px; background: rgba(255, 255, 255, .05);
+  color: #cdd1dc; font: 10px var(--mono); letter-spacing: .08em;
+}
+html[data-mode=overdrive] .form-card :is(input:not([type=file]), textarea),
+html[data-mode=overdrive] .form-card input[type=file]::file-selector-button { border-radius: 0; }
+.form-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; margin-top: 18px; }
+.form-error { margin: 14px 0 0; color: #ff8a9c; font-size: 12px; line-height: 1.5; }
+.form-hint { margin: -6px 0 18px; color: var(--muted); font-size: 12px; }
+.form-card .ghost-button, .form-card .save-button, .form-actions .ghost-button { cursor: pointer; }
+.form-card .ghost-button:disabled, .form-card .save-button:disabled { opacity: .5; cursor: not-allowed; }
+.like-button { cursor: pointer; }
+.like-button[aria-pressed=true] { color: var(--pink); border-color: color-mix(in srgb, var(--pink) 55%, transparent); }
+
+/* ---------- Página de una publicación ---------- */
+.pub-article { padding: 28px; }
+.pub-meta { margin: 0; color: var(--cyan); font: 10px var(--mono); letter-spacing: .14em; text-shadow: var(--bloom-sm); }
+.pub-meta a { color: inherit; }
+.pub-title { margin: 10px 0 12px; font: 800 clamp(30px, 5vw, 46px)/1.05 var(--display); letter-spacing: -.02em; overflow-wrap: anywhere; }
+.pub-lead { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.6; }
+.pub-cover, .pub-media { display: block; width: 100%; margin-top: 20px; border: 1px solid var(--edge); border-radius: 14px; }
+.pub-body { margin: 24px 0 0; color: #d6dbea; line-height: 1.75; white-space: pre-wrap; overflow-wrap: anywhere; }
+.pub-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.pub-links .launcher-pill { text-decoration: none; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pub-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 22px; }
+.update-list { display: grid; gap: 10px; margin-top: 16px; }
+.update-item { padding: 14px 16px; border: 1px solid var(--edge); border-radius: 14px; background: rgba(255, 255, 255, .03); }
+.update-item time { display: block; margin-bottom: 6px; color: var(--muted); font: 10px var(--mono); letter-spacing: .1em; }
+.update-item p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.6; }
+html[data-mode=overdrive] :is(.update-item, .pub-cover, .pub-media) { border-radius: 0; }
+
+@media (max-width: 640px) {
+  .pub-article, .form-card { padding: 20px; }
+  .topbar-right .add-button span:last-child { display: none; }
+}

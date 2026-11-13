@@ -1,0 +1,34 @@
+/* Aspecto de la extensión OVERDRIVE (copia de sus hojas de estilo, en src/ext/styles).
+   El orden es el mismo que en su newtab.html. */
+@import "./ext/styles/main.css";
+@import "./ext/styles/features.css";
+@import "./ext/styles/button-effects.css";
+@import "./ext/styles/icons.css";
+@import "./ext/styles/hero.css";
+@import "./ext/styles/astra.css";
+@import "./ext/styles/hangar.css";
+@import "./ext/styles/glass.css";
+@import "./ext/styles/hangar-rgb.css";
+@import "./ext/styles/brand.css";
+@import "./ext/styles/starrynight.css";
+@import "./ext/styles/typography.css";
+@import "./ext/styles/hangar-extra.css";
+@import "./ext/styles/launchpad-fx.css";
+@import "./ext/styles/stage-layout.css";
+@import "./ext/styles/hangar-comfort.css";
+
+/* Piezas propias de la web de publicar, hechas con los mismos tokens. */
+@import "./app.css";
+@import "./site.css";
+@import "./app-ui.css";
+@import "./astra-fx.css";
+@import "./astra-controls.css";
+@import "./prefs.css";
+@import "./modes.css";
+@import "./hangar-web.css";
+@import "./hangar-tech.css";
+@import "./search-redesign.css";
+@import "./search-hangar.css";
+@import "./hangar-controls.css";
+@import "./astra-polish.css";
+@import "./fonts-refresh.css";

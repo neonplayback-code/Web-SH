@@ -1,0 +1,17 @@
+/* Selector de modo (ASTRA / HANGAR) y botón de añadir, sobre los estilos de la extensión. */
+
+/* ---------- Selector de modo (dos opciones) ---------- */
+html .mode-selector { display: flex; flex-wrap: nowrap; }
+html .mode-selector .mode-thumb { width: calc(100% / 2 - 4px); }
+.mode-selector[data-active=overdrive] .mode-thumb { transform: translateX(100%); }
+.mode-btn { flex: 1 1 0; min-width: 0; padding-inline: 12px; white-space: nowrap; }
+
+/* ---------- Botones: marco completo, sin subrayado ---------- */
+.add-button {
+  text-decoration: none; min-height: 38px; padding: 0 16px; white-space: nowrap;
+  border-color: color-mix(in srgb, var(--cyan) 50%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--cyan) 16%, transparent), rgba(255, 255, 255, .02));
+  color: var(--text); font-size: 11px; letter-spacing: .12em;
+}
+.add-button:hover { color: var(--text); }
+.topbar-right .add-button { font-weight: 700; }

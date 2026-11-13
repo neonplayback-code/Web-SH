@@ -1,0 +1,489 @@
+/* ==========================================================================
+   HANGAR · capa de acabado. Se carga la última (después de hangar-tech-buttons.css, ver main.tsx).
+
+   No cambia la identidad de HANGAR (panel técnico oscuro, acento + secundario, teclas con luz,
+   etiquetas monoespaciadas): unifica lo que las capas anteriores dejaron desigual.
+
+   1. Tokens          radio interior, superficies, sombras y ritmo, en un solo sitio.
+   2. Barra superior  a sangre, alineada con el contenido.
+   3. Riel de tabs    las secciones como un control segmentado.
+   4. Creador         cabecera, título y ficha.
+   5. Pulso           panel de resumen que se adapta a su propio ancho.
+   6. Sección         encabezado y rejilla.
+   7. Tarjetas        una superficie, un hover y un foco para todas las estructuras.
+   8. Ventanas        personalización y formularios.
+   9. Interiores      publicación, perfil y acceso.
+   10. Movimiento     entradas discretas; respeta "Animaciones" y prefers-reduced-motion.
+
+   Todo va bajo html[data-mode=overdrive]: ASTRA no se toca.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 1. Tokens */
+html[data-mode=overdrive] {
+  /* Radio interior (portadas, casillas, campos): la mitad del "Redondeo de esquinas" elegido. Por defecto, 5 px
+     (hangar-neo.css fija --radius en 10 px). */
+  --hgp-r: clamp(0px, calc(var(--radius, 0px) * .5), 10px);
+  --hgp-well: #060c15;   /* superficie hundida: campos, casillas de cifras */
+  --hgp-bar: #0b1420;    /* superficie de barras: tabs y filtros */
+  --hgp-pad: 16px;       /* relleno de tarjeta; sigue el "Espaciado" de Personalizar */
+  --hgp-shadow: inset 0 1px 0 rgba(223, 246, 255, .06), 0 16px 36px -22px rgba(0, 0, 0, .85);
+  --hgp-shadow-hi: inset 0 1px 0 rgba(223, 246, 255, .1), 0 24px 44px -22px #000,
+    0 0 calc(30px * var(--glow, 1)) -8px color-mix(in srgb, var(--hg-ac) 55%, transparent);
+  --hgp-t: .28s;
+}
+html[data-mode=overdrive][data-density=compact] { --hgp-pad: 11px; }
+html[data-mode=overdrive][data-density=roomy] { --hgp-pad: 22px; }
+/* "Botones y tarjetas: Mínimos" ya quita las sombras; el hover tampoco las añade. */
+html[data-mode=overdrive][data-fx=minimal] { --hgp-shadow: none; --hgp-shadow-hi: none; }
+
+/* Los paneles toman su fondo de --glass-fill (glass.css lo aplica con !important).
+   Un relleno más denso da mejor contraste al texto y un tono parejo sobre el fondo animado. */
+html[data-mode=overdrive][data-theme] {
+  --glass-fill:
+    linear-gradient(150deg, color-mix(in srgb, var(--hg-ac) 8%, transparent), transparent 44%, color-mix(in srgb, var(--hangar-secondary, var(--hg-ac3)) 6%, transparent)),
+    color-mix(in srgb, #0b1421 80%, transparent);
+}
+
+/* ------------------------------------------------------------ 2. Barra superior */
+html[data-mode=overdrive] .topbar {
+  width: 100%; min-height: 72px; margin: 0;
+  padding-block: 12px;
+  /* A sangre, con la marca y los botones alineados a los bordes del contenido (.dashboard). */
+  padding-inline: max(32px, calc((100% - 1240px) / 2));
+  gap: 20px;
+  border-bottom: 1px solid var(--hg-line);
+  background: linear-gradient(180deg, #0c1724f2, #0a111cdb);
+  box-shadow: 0 18px 44px -30px #000;
+}
+html[data-mode=overdrive] .topbar::after {
+  content: ""; position: absolute; inset: auto 0 -1px; height: 1px; pointer-events: none; opacity: .55;
+  background: linear-gradient(90deg, transparent, var(--hg-ac) 22%, var(--hangar-secondary, var(--hg-ac2)) 68%, transparent);
+}
+html[data-mode=overdrive] .brand-mark .od-logo { transition: filter var(--hgp-t); }
+html[data-mode=overdrive] .wordmark:hover .brand-mark .od-logo { filter: drop-shadow(0 0 calc(8px * var(--glow, 1)) var(--hg-ac)); }
+html[data-mode=overdrive] .topbar-right { align-items: center; }
+
+/* Selector de modo */
+html[data-mode=overdrive] .mode-selector {
+  padding: 3px; border-color: var(--hg-line2); border-radius: calc(var(--hgp-r) + 3px); background: var(--hgp-well); box-shadow: none;
+}
+/* La tecla deslizante se dibuja en hangar-tech-buttons.css; aquí solo su sitio y su paso. */
+html[data-mode=overdrive] .mode-thumb {
+  top: 3px; bottom: 3px; left: 3px; width: calc((100% - 6px) / 2);
+  transition: transform .5s cubic-bezier(.34, 1.3, .64, 1);
+}
+html[data-mode=overdrive] .mode-btn { min-height: 38px; padding: 0 14px; transition: color .2s; }
+
+/* ------------------------------------------------------------- 3. Riel de tabs */
+html[data-mode=overdrive] .dashboard { gap: 22px 24px; padding: 24px 0 44px; }
+/* Regleta hundida con una tecla por sección (las teclas son .tab, en hangar-tech-buttons.css). */
+html[data-mode=overdrive] .tabbar {
+  justify-self: start; max-width: 100%; gap: 4px; margin: 0; padding: 5px;
+  border: 1px solid var(--hg-line2); border-radius: calc(var(--hgp-r) + 4px);
+  background: color-mix(in srgb, var(--hgp-well) 88%, transparent);
+  box-shadow: var(--hgp-shadow);
+}
+
+/* ---------------------------------------------------------------- 4. Creador */
+html[data-mode=overdrive] .home-hero { padding: 64px clamp(22px, 3vw, 36px) 88px; }
+html[data-mode=overdrive] .hero #greeting { text-wrap: balance; }
+html[data-mode=overdrive] .hero-subtitle { max-width: 60ch; margin-top: 18px; font-weight: 400; }
+html[data-mode=overdrive] .creator-bio { max-width: 60ch; color: var(--hg-text2); opacity: 1; }
+html[data-mode=overdrive] .creator-links { gap: 8px; margin-top: 20px; }
+
+html[data-mode=overdrive] .home-hero .creator-head {
+  gap: 16px; padding: 14px 22px 14px 14px; margin-bottom: 26px;
+  border-radius: var(--hgp-r); border-color: var(--hg-line2); border-left-color: var(--hg-ac);
+  background: linear-gradient(110deg, #08101be6, #122235f2);
+}
+html[data-mode=overdrive] .home-hero .creator-logo { width: 72px; height: 72px; padding: 4px; border-radius: var(--hgp-r); }
+html[data-mode=overdrive] .home-hero .creator-logo img { border-radius: var(--hgp-r); }
+html[data-mode=overdrive] .creator-logo:hover img { transform: scale(1.05); }
+html[data-mode=overdrive] .home-hero .creator-id { gap: 3px; }
+html[data-mode=overdrive] .home-hero .creator-name { font-weight: 650; letter-spacing: 0; }
+html[data-mode=overdrive] .creator-chips { gap: 6px; margin-top: 8px; }
+html[data-mode=overdrive] .creator-chip {
+  gap: 7px; padding: 5px 10px; border-color: var(--hg-line2); border-radius: var(--hgp-r);
+  background: var(--hgp-well); color: var(--hg-text2); font-size: 12px;
+}
+html[data-mode=overdrive] .creator-chip svg { stroke: var(--hg-ac); }
+html[data-mode=overdrive] .creator-chip.is-status { color: var(--hg-text); }
+html[data-mode=overdrive] .creator-chip.is-status i { border-radius: 0; box-shadow: 0 0 8px var(--hg-ok); }
+
+/* ------------------------------------------------------------------ 5. Pulso */
+html[data-mode=overdrive] .home-stats.pulse {
+  display: flex; flex-direction: column; gap: 18px; padding: 22px;
+  container-type: inline-size;   /* las cifras se reordenan según el ancho del panel, no de la ventana */
+}
+html[data-mode=overdrive] .pulse-head { gap: 10px; padding-bottom: 14px; }
+html[data-mode=overdrive] .pulse-title { min-width: 0; font: 600 17px/1.25 var(--hg-font-display); letter-spacing: 0; }
+html[data-mode=overdrive] .pulse-live {
+  flex: none; gap: 7px; padding: 4px 9px; white-space: nowrap;
+  border: 1px solid color-mix(in srgb, var(--hg-ok) 45%, transparent); border-radius: var(--hgp-r);
+  background: color-mix(in srgb, var(--hg-ok) 7%, transparent);
+  color: var(--hg-ok); font: 600 10px/1.4 var(--hg-font-mono); letter-spacing: .14em;
+}
+html[data-mode=overdrive] .pulse-live i { border-radius: 0; box-shadow: 0 0 8px var(--hg-ok); }
+
+html[data-mode=overdrive] .pulse-stats { gap: 8px; }
+html[data-mode=overdrive] .pulse-stat {
+  position: relative; gap: 7px; min-width: 0; padding: 15px 6px 12px; overflow: hidden;
+  border-color: var(--hg-line2); border-radius: var(--hgp-r); background: var(--hgp-well); box-shadow: none;
+}
+/* Línea superior de color: el acento para las cifras propias y el secundario para los "me gusta". */
+html[data-mode=overdrive] .pulse-stat::before {
+  content: ""; position: absolute; inset: 0 0 auto; height: 2px; background: var(--hg-ac); opacity: .75;
+}
+html[data-mode=overdrive] .pulse-stat b { font-size: clamp(22px, 9.5cqi, 30px); }
+html[data-mode=overdrive] .pulse-stat span {
+  max-width: 100%; overflow: hidden; color: var(--hg-text3);
+  font: 500 11.5px/1.2 var(--hg-font-ui); letter-spacing: .01em; white-space: nowrap; text-overflow: ellipsis;
+}
+html[data-mode=overdrive] .pulse-stat.is-likes::before { background: var(--hangar-secondary, var(--hg-ac2)); }
+html[data-mode=overdrive] .pulse-stat.is-likes b {
+  color: var(--hangar-secondary, var(--hg-ac2));
+  text-shadow: 0 0 calc(15px * var(--glow, 1)) color-mix(in srgb, var(--hangar-secondary, var(--hg-ac2)) 50%, transparent);
+}
+/* Panel estrecho (columna lateral en pantallas medianas): cada cifra pasa a ser una fila etiqueta · valor. */
+@container (max-width: 290px) {
+  html[data-mode=overdrive] .pulse-title { font-size: 15px; }
+  html[data-mode=overdrive] .pulse-stats { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  html[data-mode=overdrive] .pulse-stat {
+    grid-template-columns: minmax(0, 1fr) auto; align-items: center; justify-items: start; padding: 10px 12px 9px;
+  }
+  html[data-mode=overdrive] .pulse-stat b { order: 2; font-size: 22px; }
+}
+
+/* "Qué hay publicado": las barras estaban ocultas en HANGAR y el panel quedaba medio vacío. */
+html[data-mode=overdrive] .pulse-bars { display: grid; gap: 9px; }
+html[data-mode=overdrive] .pulse-bar {
+  grid-template-columns: minmax(64px, .9fr) minmax(40px, 1.5fr) 22px; gap: 10px; color: var(--hg-text2); font-size: 12.5px;
+}
+html[data-mode=overdrive] .pulse-bar > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html[data-mode=overdrive] .pulse-bar > i { height: 4px; border-radius: var(--hgp-r); background: color-mix(in srgb, var(--hg-line2) 70%, transparent); }
+html[data-mode=overdrive] .pulse-bar > i u {
+  border-radius: 0; box-shadow: none; transform-origin: left center;
+  background: linear-gradient(90deg, var(--hg-ac), var(--hangar-secondary, var(--hg-ac2)));
+}
+html[data-mode=overdrive] .pulse-bar > b { color: var(--hg-text); font: 600 12px var(--hg-font-mono); font-variant-numeric: tabular-nums; }
+html[data-mode=overdrive] .pulse-empty { color: var(--hg-text3); font-size: 13px; }
+
+/* "Lo último" es un enlace: marco, acento lateral y una flecha que avanza al pasar. */
+html[data-mode=overdrive] .pulse-last {
+  position: relative; gap: 3px; padding: 11px 40px 11px 14px;
+  border: 1px solid var(--hg-line2); border-left: 2px solid var(--hg-ac); border-radius: var(--hgp-r);
+  background: color-mix(in srgb, var(--hg-ac) 5%, transparent);
+  transition: border-color .2s, background-color .2s;
+}
+html[data-mode=overdrive] .pulse-last::after {
+  content: "→"; position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--hg-ac); font: 16px/1 var(--hg-font-mono); opacity: .65;
+  transition: transform var(--hgp-t) var(--hg-ease), opacity .2s;
+}
+html[data-mode=overdrive] .pulse-last:hover {
+  transform: none; box-shadow: none; border-color: var(--hg-aline); border-left-color: var(--hg-ac);
+  background: color-mix(in srgb, var(--hg-ac) 10%, transparent);
+}
+html[data-mode=overdrive] .pulse-last:is(:hover, :focus-visible)::after { transform: translate(4px, -50%); opacity: 1; }
+html[data-mode=overdrive] .pulse-last strong { font: 600 15px/1.3 var(--hg-font-display); }
+html[data-mode=overdrive] .pulse-last small { font-size: 12px; }
+/* El botón queda anclado al pie del panel cuando este es más alto que su contenido. */
+html[data-mode=overdrive] .pulse-customize { margin-top: auto; }
+
+/* ---------------------------------------------------------------- 6. Sección */
+html[data-mode=overdrive] .dashboard .tab-body { gap: 16px; margin-top: 10px; }
+html[data-mode=overdrive] .tab-head {
+  align-items: end; padding-bottom: 14px; border-bottom: 0;
+  background: linear-gradient(90deg, var(--hg-aline), var(--hg-line) 32%, transparent) left bottom / 100% 1px no-repeat;
+}
+html[data-mode=overdrive] .tab-head :is(h2, .tab-blurb, .section-kicker) { text-shadow: 0 1px 14px rgba(3, 7, 12, .9); }
+html[data-mode=overdrive] .section-kicker { font-size: 11px; }
+html[data-mode=overdrive] .tab-blurb { max-width: 44ch; text-align: right; text-wrap: balance; }
+
+/* Los filtros son una barra opaca: sin desenfoque y con el mismo tono que su etiqueta "BUSCAR//". */
+html[data-mode=overdrive] .tab-filters {
+  --glass-fill: color-mix(in srgb, var(--hgp-bar) 94%, transparent);
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+}
+
+/* Rejilla: auto-fill mantiene el ancho de las tarjetas aunque queden pocas (auto-fit las estiraba a toda la fila). */
+html[data-mode=overdrive] .tab-grid { gap: 16px; }
+html[data-mode=overdrive] .tab-grid[data-layout=tile] {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(210px * var(--card-scale, 1))), 1fr));
+}
+html[data-mode=overdrive] .tab-more { display: flex; width: fit-content; min-width: min(280px, 100%); margin: 4px auto 0; }
+
+/* Avisos y estados vacíos */
+html[data-mode=overdrive] .pub-empty { padding: 44px 22px; color: var(--hg-text2); }
+html[data-mode=overdrive] .pub-empty strong { font: 600 20px/1.3 var(--hg-font-display); }
+html[data-mode=overdrive] .pub-notice { padding: 18px 20px; border-left: 2px solid var(--hg-ac) !important; color: var(--hg-text2); }
+
+/* --------------------------------------------------------------- 7. Tarjetas */
+/* Las tarjetas de la rejilla son muchas y están sobre un fondo animado: superficie casi opaca y sin
+   desenfoque (cada backdrop-filter se recalcula en cada fotograma del fondo). */
+html[data-mode=overdrive] :is(.tab-grid .item.utility-card, .item-step-card, .game-card) {
+  --glass-fill:
+    linear-gradient(155deg, color-mix(in srgb, var(--hg-ac) 7%, transparent), transparent 46%),
+    color-mix(in srgb, #0c1522 94%, transparent);
+  backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+}
+html[data-mode=overdrive] .item:not(.item-step, .item-short) { padding: var(--hgp-pad); }
+html[data-mode=overdrive] :is(a, article).item, html[data-mode=overdrive] .item-step-card {
+  transition: transform var(--hgp-t) var(--hg-ease), box-shadow var(--hgp-t), border-color .2s;
+}
+/* El borde RGB de cada tarjeta queda quieto (cada una en un ángulo distinto) y solo orbita al pasar o enfocar:
+   una rejilla entera girando a la vez repinta sin parar y distrae. */
+html[data-mode=overdrive][data-hangar-buttons] :is(.item.utility-card, .item-step-card, .game-card)::before { animation-play-state: paused; }
+html[data-mode=overdrive][data-hangar-buttons] :is(.item.utility-card, .item-step-card, .game-card):is(:hover, :focus-within, :focus-visible)::before {
+  animation-play-state: running; opacity: 1;
+}
+
+/* Hover y foco. Las tarjetas que son un enlace se elevan; las que contienen botones solo se encienden. */
+html[data-mode=overdrive] a.item:is(:hover, :focus-visible),
+html[data-mode=overdrive] .item-step-card:is(:hover, :focus-visible) {
+  transform: translateY(-3px); border-color: var(--hg-ac) !important; box-shadow: var(--hgp-shadow-hi) !important;
+}
+html[data-mode=overdrive] a.item:active, html[data-mode=overdrive] .item-step-card:active { transform: translateY(-1px); }
+html[data-mode=overdrive] article.item:hover { transform: none; }
+html[data-mode=overdrive] article.item.utility-card:is(:hover, :focus-within) {
+  border-color: color-mix(in srgb, var(--hg-ac) 78%, transparent) !important; box-shadow: var(--hgp-shadow-hi) !important;
+}
+html[data-mode=overdrive] .item-step:hover { box-shadow: none; }
+
+/* Portada */
+html[data-mode=overdrive] .item-cover {
+  border-radius: var(--hgp-r) !important; border-color: rgba(255, 255, 255, .08); border-bottom-color: var(--hg-aline);
+}
+html[data-mode=overdrive] .item-cover::before { transition: transform .5s var(--hg-ease); }
+html[data-mode=overdrive] .item-cover img { transition: transform .6s var(--hg-ease); }
+html[data-mode=overdrive] .item:hover .item-cover::before { transform: scale(1.07); }
+html[data-mode=overdrive] .item:hover .item-cover img { transform: scale(1.04); }
+
+/* Texto */
+html[data-mode=overdrive] .item-title { transition: color .2s; }
+html[data-mode=overdrive] :is(a.item, .item-step-card):is(:hover, :focus-visible) .item-title { color: var(--hg-ac2); }
+html[data-mode=overdrive] .item-tile .item-title { font: 600 16px/1.3 var(--hg-font-display); }
+html[data-mode=overdrive] .item-sum { color: var(--hg-text2); }
+html[data-mode=overdrive] .item-meta { font-variant-numeric: tabular-nums; }
+html[data-mode=overdrive] .item-tags { gap: 5px; }
+html[data-mode=overdrive] .item-tags i {
+  padding: 2px 6px; border: 1px solid var(--hg-line2); border-radius: var(--hgp-r); background: var(--hgp-well);
+  color: var(--hg-ac); font: 500 10.5px/1.5 var(--hg-font-mono);
+}
+
+/* Estructuras con acciones al pie: en columna flexible los botones quedan alineados entre tarjetas vecinas. */
+html[data-mode=overdrive] :is(.item-tall, .item-video, .item-beta, .item-demo) { display: flex; flex-direction: column; }
+html[data-mode=overdrive] .item-tall { min-height: 0; }
+html[data-mode=overdrive] :is(.item-tall, .item-video) > .item-more { margin-top: auto; }
+html[data-mode=overdrive] :is(.item-beta, .item-demo) .item-actions { gap: 8px; padding-top: 4px; }
+html[data-mode=overdrive] .item-badge {
+  align-self: flex-start; padding: 4px 9px; border-radius: var(--hgp-r);
+  background: var(--hg-soft); font: 600 10px/1.4 var(--hg-font-mono); letter-spacing: .14em;
+}
+
+/* Video: el botón de reproducir manda; las iniciales pasan a marca de agua para no cruzarse con él. */
+html[data-mode=overdrive] .item-video .item-cover::before { opacity: .2; }
+html[data-mode=overdrive] .item-play {
+  width: 54px; height: 54px; padding-left: 3px; border-width: 1px; font-size: 16px;
+  background: color-mix(in srgb, var(--hg-ink) 78%, transparent);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--hg-ac) 10%, transparent), 0 0 calc(22px * var(--glow, 1)) -4px var(--hg-ac);
+  transition: transform var(--hgp-t) var(--hg-ease), background-color .2s, color .2s;
+}
+html[data-mode=overdrive] .item-stage:is(:hover, :focus-visible) .item-play {
+  transform: translate(-50%, -50%) scale(1.08); background: var(--hg-ac); color: var(--hg-ink);
+}
+
+/* Anuncios */
+html[data-mode=overdrive] .item-date {
+  align-self: stretch; align-content: center; gap: 5px; padding: 10px 8px;
+  border-color: var(--hg-line2); border-radius: var(--hgp-r); background: var(--hgp-well);
+}
+html[data-mode=overdrive] .item-date b { font: 700 26px/1 var(--hg-font-display); font-variant-numeric: tabular-nums; }
+html[data-mode=overdrive] .item-date i { font: 600 10px/1 var(--hg-font-mono); letter-spacing: .16em; }
+html[data-mode=overdrive] .item-banner .item-more { align-self: center; }
+
+/* Posts: tarjeta al ancho de la sección; el texto conserva una medida de lectura cómoda. */
+html[data-mode=overdrive] .item-article { max-width: none; border-left: 3px solid var(--hg-ac) !important; }
+html[data-mode=overdrive] .item-article .item-sum { max-width: 82ch; }
+
+/* Avances: línea de tiempo con degradado y nodos centrados sobre ella. */
+html[data-mode=overdrive] .tab-grid[data-layout=timeline]::before {
+  left: 8px; width: 1px; opacity: .7;
+  background: linear-gradient(180deg, var(--hg-ac), var(--hangar-secondary, var(--hg-ac2)) 65%, transparent);
+}
+html[data-mode=overdrive] .item-step { padding: 0 0 14px; }
+html[data-mode=overdrive] .item-step-card { padding: var(--hgp-pad) calc(var(--hgp-pad) + 2px); }
+html[data-mode=overdrive] .item-node {
+  left: -28px; top: 20px; box-sizing: border-box; width: 13px; height: 13px;
+  border: 2px solid var(--hg-ac); background: var(--hg-bg);
+  box-shadow: 0 0 0 4px #0a1119, 0 0 calc(12px * var(--glow, 1)) var(--hg-aline);
+  transition: background-color .2s;
+}
+html[data-mode=overdrive] .item-step:is(:hover, :focus-within) .item-node { background: var(--hg-ac); }
+
+/* Links: título y dominio en dos líneas (iban pegados en una) y la flecha sale al pasar. */
+html[data-mode=overdrive] .item-link { grid-template-columns: 40px minmax(0, 1fr) auto; gap: 12px; padding: 12px 14px; }
+html[data-mode=overdrive] .item-link .item-text { display: grid; gap: 2px; min-width: 0; }
+html[data-mode=overdrive] .item-link .item-title { margin: 0; overflow: hidden; font-size: 15px; text-overflow: ellipsis; white-space: nowrap; }
+html[data-mode=overdrive] .item-link .item-meta { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html[data-mode=overdrive] .item-fav {
+  width: 40px; height: 40px; border-color: var(--hg-line2); border-radius: var(--hgp-r); background: var(--hgp-well); font-size: 18px;
+}
+html[data-mode=overdrive] .item-out { color: var(--hg-text3); font-size: 16px; transition: transform var(--hgp-t) var(--hg-ease), color .2s; }
+html[data-mode=overdrive] .item-link:is(:hover, :focus-visible) .item-out { color: var(--hg-ac); transform: translate(2px, -2px); }
+
+/* Shorts: portada a sangre con el texto sobre un velo oscuro. */
+html[data-mode=overdrive] .item-short { padding: 0; }
+html[data-mode=overdrive] .item-short .item-cover { border: 0; border-radius: 0 !important; }
+html[data-mode=overdrive] .item-over { padding: 40px 12px 12px; background: linear-gradient(transparent, rgba(5, 10, 18, .92) 72%); }
+
+/* --------------------------------------------------------------- 8. Ventanas */
+html[data-mode=overdrive] .dialog[open]::backdrop { animation: hgp-fade .25s ease both; }
+
+/* Personalizar: una sola voz para las etiquetas (antes unas iban en mayúsculas de consola y otras no). */
+html[data-mode=overdrive] .cz-body { gap: 28px; }
+html[data-mode=overdrive] .cz-block h3 {
+  display: flex; align-items: center; gap: 10px; color: var(--hg-text2);
+  font: 600 11px/1 var(--hg-font-mono); letter-spacing: .2em;
+}
+html[data-mode=overdrive] .cz-block h3::before { content: ""; flex: none; width: 7px; height: 7px; background: var(--hg-ac); }
+html[data-mode=overdrive] .cz-block h3::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--hg-line2), transparent); }
+html[data-mode=overdrive] .dialog .cz-label {
+  color: var(--hg-text); font: 500 14px/1.35 var(--hg-font-ui); text-transform: none;
+  font-size: 14px !important; letter-spacing: 0 !important;   /* la capa "comfort" fija ambos con !important para todo <label> */
+}
+html[data-mode=overdrive] .dialog .cz-label small { color: var(--hg-text3); font: 400 12px/1.4 var(--hg-font-ui); letter-spacing: 0; text-transform: none; }
+
+/* Deslizadores: zona de arrastre de 32 px (la altura mínima de los campos los inflaba a 44 px). El mando está en
+   hangar-tech-buttons.css. */
+html[data-mode=overdrive] .dialog .cz-range input[type=range] {
+  box-sizing: content-box; height: 4px; min-height: 0 !important; padding: 14px 0; border: 0; border-radius: 0;
+  background-clip: content-box; background-origin: content-box; cursor: pointer;
+}
+html[data-mode=overdrive] .dialog .cz-range input[type=range]::-moz-range-track { background: transparent; }
+html[data-mode=overdrive] .cz-range output { min-width: 52px; color: var(--hg-ac); font: 600 12px var(--hg-font-mono); font-variant-numeric: tabular-nums; }
+
+/* Contenedores de opciones; las teclas, tarjetas e interruptores se definen en hangar-tech-buttons.css. */
+html[data-mode=overdrive] .hangar-settings {
+  padding: 16px; border: 1px solid var(--hg-line2); border-left: 2px solid var(--hg-ac);
+  background: color-mix(in srgb, var(--hg-ac) 4%, transparent);
+}
+html[data-mode=overdrive] .hangar-settings-hint { margin: 0; color: var(--hg-text2); }
+html[data-mode=overdrive] .hangar-presets { margin-bottom: 4px; gap: 10px; }
+
+/* Campos de formulario: misma superficie hundida que el buscador */
+html[data-mode=overdrive] .form-card :is(input:not([type=file]), textarea),
+html[data-mode=overdrive] .pe-form textarea,
+html[data-mode=overdrive] .pe-link-row input,
+html[data-mode=overdrive] .auth-input input {
+  border-color: var(--hg-line2); border-radius: var(--hgp-r); background: var(--hgp-well);
+}
+html[data-mode=overdrive] .form-card :is(input:not([type=file]), textarea):focus,
+html[data-mode=overdrive] .pe-form textarea:focus,
+html[data-mode=overdrive] .pe-link-row input:focus,
+html[data-mode=overdrive] .auth-input input:focus { border-color: var(--hg-ac); background: var(--hgp-well); }
+
+/* ------------------------------------------------------------- 9. Interiores */
+/* El escenario de las páginas interiores vuelve a ser una rejilla con separación (la capa base lo dejaba en
+   bloque y las migas quedaban pegadas al riel de tabs). */
+html[data-mode=overdrive] .page-shell .col-stage { display: grid; gap: 20px; align-content: start; }
+html[data-mode=overdrive] .crumb-trail { text-shadow: 0 1px 12px rgba(3, 7, 12, .9); }
+html[data-mode=overdrive] :is(.pub-badge, .update-item, .pub-cover, .pub-media, .mini-list a) { border-radius: var(--hgp-r); }
+html[data-mode=overdrive] .update-item { border-color: var(--hg-line2); border-left: 2px solid var(--hg-ac); background: var(--hgp-well); }
+html[data-mode=overdrive] .profile-card .profile-avatar { border-radius: var(--hgp-r); }
+html[data-mode=overdrive] .profile-card .profile-stats span { border-radius: var(--hgp-r); background: var(--hgp-well); }
+
+/* Pie */
+html[data-mode=overdrive] .footer {
+  margin-top: 12px; padding: 18px 0 2px; color: var(--hg-text3);
+  font-size: 11px; letter-spacing: .1em; text-shadow: 0 1px 12px rgba(3, 7, 12, .9);
+}
+
+/* ------------------------------------------------------------- 10. Movimiento */
+@keyframes hgp-rise { from { opacity: 0; transform: translateY(14px); } }
+@keyframes hgp-fade { from { opacity: 0; } }
+@keyframes hgp-bar { from { transform: scaleX(0); } }
+
+/* Entrada de las tarjetas al abrir una sección o pedir más: suben en cascada. Sin "forwards", para que al
+   terminar no quede un transform que anule el hover. El !important es necesario: hangar-web.css apaga con
+   !important toda animación de .utility-card. */
+html[data-mode=overdrive]:not([data-motion=off]) .tab-grid > .item {
+  animation: hgp-rise .5s var(--hg-ease) var(--hgp-d, 160ms) backwards !important;
+}
+html[data-mode=overdrive] .tab-grid > .item:nth-child(1) { --hgp-d: 0ms; }
+html[data-mode=overdrive] .tab-grid > .item:nth-child(2) { --hgp-d: 40ms; }
+html[data-mode=overdrive] .tab-grid > .item:nth-child(3) { --hgp-d: 80ms; }
+html[data-mode=overdrive] .tab-grid > .item:nth-child(4) { --hgp-d: 120ms; }
+html[data-mode=overdrive] .tab-grid > .item:nth-child(5) { --hgp-d: 160ms; }
+html[data-mode=overdrive] .tab-grid > .item:nth-child(6) { --hgp-d: 200ms; }
+html[data-mode=overdrive] .tab-grid > .item:nth-child(7) { --hgp-d: 240ms; }
+html[data-mode=overdrive] .tab-grid > .item:nth-child(8) { --hgp-d: 280ms; }
+
+/* Primera carga: los bloques de la portada aparecen de arriba abajo (Backdrop pone .is-ready al terminar). */
+html[data-mode=overdrive]:not([data-motion=off]) body:not(.is-ready) :is(.tabbar, .home-hero, .home-stats, .tab-head, .tab-filters) {
+  animation: hgp-rise .6s var(--hg-ease) backwards !important;
+}
+html[data-mode=overdrive] body:not(.is-ready) :is(.home-hero, .home-stats) { animation-delay: 70ms !important; }
+html[data-mode=overdrive] body:not(.is-ready) :is(.tab-head, .tab-filters) { animation-delay: 140ms !important; }
+
+/* Las barras del Pulso crecen desde cero la primera vez que se pintan. */
+html[data-mode=overdrive]:not([data-motion=off]) .pulse-bar > i u { animation: hgp-bar .9s var(--hg-ease) .15s backwards; }
+
+/* ---------------------------------------------------------------- Responsive */
+@media (max-width: 1000px) {
+  html[data-mode=overdrive] .topbar { padding-inline: 20px; gap: 14px; }
+}
+/* Ventanas medianas: la barra superior y las diez secciones caben en una sola fila con un poco menos de aire. */
+@media (min-width: 761px) and (max-width: 860px) {
+  html[data-mode=overdrive] .mode-btn { padding: 0 11px; }
+  html[data-mode=overdrive] .tabbar { gap: 3px; }
+  html[data-mode=overdrive] .tabbar .tab { padding: 0 10px; letter-spacing: .1em; }
+}
+@media (max-width: 760px) {
+  html[data-mode=overdrive] .topbar { min-height: 0; padding: 12px 16px; gap: 12px; }
+  html[data-mode=overdrive] .dashboard { gap: 16px; padding: 16px 0 36px; }
+  /* El riel se desplaza en horizontal; un degradado en el borde derecho avisa de que continúa. */
+  html[data-mode=overdrive] .dashboard .tabbar {
+    padding: 5px; scrollbar-width: none; scroll-snap-type: x proximity; overscroll-behavior-x: contain;
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent);
+    mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent);
+  }
+  html[data-mode=overdrive] .dashboard .tabbar::-webkit-scrollbar { display: none; }
+  html[data-mode=overdrive] .tabbar .tab { flex: none; scroll-snap-align: center; }
+  html[data-mode=overdrive] .tabbar .tab:last-child { margin-right: 22px; }
+  html[data-mode=overdrive] .home-hero { padding: 62px 20px 88px; }
+  html[data-mode=overdrive] .home-hero .creator-head { gap: 12px; padding: 12px 14px 12px 12px; margin-bottom: 22px; }
+  html[data-mode=overdrive] .home-hero .creator-logo { width: 56px; height: 56px; padding: 3px; }
+  html[data-mode=overdrive] .home-stats.pulse { gap: 14px; padding: 18px; }
+  html[data-mode=overdrive] .tab-head { display: block; }
+  html[data-mode=overdrive] .tab-blurb { text-align: left; }
+  html[data-mode=overdrive] .tab-grid { gap: 12px; }
+  html[data-mode=overdrive] .tab-grid[data-layout=tile] {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(148px * var(--card-scale, 1))), 1fr));
+  }
+  html[data-mode=overdrive] .item-tile { padding: 10px; }
+  html[data-mode=overdrive] .item-tile .item-title { font-size: 14.5px; }
+  html[data-mode=overdrive] .tab-more { width: 100%; }
+  html[data-mode=overdrive] .hangar-settings { padding: 12px; }
+}
+@media (max-width: 640px) {
+  html[data-mode=overdrive] .mode-btn { min-height: 44px; }
+  html[data-mode=overdrive] .tab { min-height: 42px; }
+}
+@media (max-width: 600px) {
+  html[data-mode=overdrive] .item-date { align-self: start; }
+}
+
+/* ------------------------------------------------------------ Menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+  html[data-mode=overdrive] .tab-grid > .item,
+  html[data-mode=overdrive] body:not(.is-ready) :is(.tabbar, .home-hero, .home-stats, .tab-head, .tab-filters),
+  html[data-mode=overdrive] .pulse-bar > i u,
+  html[data-mode=overdrive] .dialog[open]::backdrop { animation: none !important; }
+  html[data-mode=overdrive] :is(a.item, .item-step-card):is(:hover, :focus-visible),
+  html[data-mode=overdrive] .item:hover .item-cover::before,
+  html[data-mode=overdrive] .item:hover .item-cover img,
+  html[data-mode=overdrive] :is(.cz-modes, .cz-fonts, .hangar-presets) button:hover { transform: none; }
+  html[data-mode=overdrive] .item-stage:is(:hover, :focus-visible) .item-play { transform: translate(-50%, -50%); }
+  html[data-mode=overdrive][data-hangar-buttons] :is(.item.utility-card, .item-step-card, .game-card)::before { animation: none; }
+}
