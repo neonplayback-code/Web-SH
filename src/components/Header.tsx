@@ -16,7 +16,7 @@ function useClock() {
 }
 
 export function Header() {
-  const { user, profile } = useCurrentUser()
+  const { user, profile, isOwner } = useCurrentUser()
   const { pathname } = useLocation()
   const time = useClock()
 
@@ -51,6 +51,11 @@ export function Header() {
         </button>
         {!user && isBackendConfigured && pathname !== '/entrar' && (
           <Link className="launcher-pill header-login" to="/entrar">Entrar</Link>
+        )}
+        {isOwner && pathname !== '/nuevo' && (
+          <Link className="launcher-pill header-login" to="/nuevo" aria-label="Publicar" title="Nueva publicación">
+            <Icon name="plus" /><span>Publicar</span>
+          </Link>
         )}
         {user && profile && (
           <Link className="icon-button" to={`/u/${profile.username}`} aria-label="Mi perfil" title={`@${profile.username}`}>
