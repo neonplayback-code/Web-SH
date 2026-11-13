@@ -44,6 +44,8 @@ jobs:
       - name: Compilar sitio público
         env:
           VITE_BASE: ${{ steps.base.outputs.vite_base }}
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
         run: npm run build
 
       - name: Subir artefacto de Pages
