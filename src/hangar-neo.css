@@ -35,7 +35,6 @@ html[data-mode=overdrive][data-hangar-buttons] :is(.tab-grid .item.utility-card,
   border-color: color-mix(in srgb, var(--hg-line2) 75%, transparent) !important;
   border-image: none;
 }
-html[data-mode=overdrive][data-hangar-buttons] :is(.tab-grid .item.utility-card, .utility-card, .item-step-card, .home-hero):is(:hover, :focus-within) { --hgn-spot: 1; --hgn-tab: 72px; }
 html[data-mode=overdrive] :is(a, article).item, html[data-mode=overdrive] .item-step-card, html[data-mode=overdrive] :is(.home-hero, .home-stats.pulse) {
   transition: transform var(--hgp-t) var(--hg-ease), box-shadow var(--hgp-t), border-color .2s, --hgn-spot .4s;
 }
@@ -51,7 +50,6 @@ html[data-mode=overdrive][data-hangar-buttons] :is(.utility-card, .item-step-car
     radial-gradient(280px circle at var(--cx, -600px) var(--cy, -600px), color-mix(in srgb, #fff 25%, var(--hg-ac)), transparent 68%),
     linear-gradient(180deg, color-mix(in srgb, var(--hg-ac) 62%, transparent), transparent 46%);
 }
-html[data-mode=overdrive][data-hangar-buttons] :is(.item.utility-card, .item-step-card):is(:hover, :focus-within, :focus-visible)::before { animation: none; }
 /* Los dos paneles de portada llevan además el secundario en el borde inferior. */
 html[data-mode=overdrive][data-hangar-buttons] :is(.home-hero, .home-stats.pulse, .profile-card)::before {
   background:
@@ -72,20 +70,15 @@ html[data-mode=overdrive] :is(.utility-card, .item-step-card)::after {
 }
 
 /* Portada: al pasar, una línea de escáner la recorre de arriba abajo una vez. */
-@keyframes hgn-scan { from { background-position: 0 -150%, 0 0; } to { background-position: 0 250%, 0 0; } }
 html[data-mode=overdrive] .item-cover::after {
   background:
     linear-gradient(180deg, transparent, color-mix(in srgb, var(--hg-ac) 22%, transparent) 46%, color-mix(in srgb, #fff 50%, var(--hg-ac)) 50%, transparent 52%) 0 -150% / 100% 60% no-repeat,
     repeating-linear-gradient(0deg, transparent 0 5px, #040b1540 5px 6px);
   opacity: .55;
 }
-html[data-mode=overdrive]:not([data-motion=off], [data-fx=minimal]) .item:is(:hover, :focus-visible) .item-cover::after {
-  animation: hgn-scan .95s var(--hg-ease) both;
-}
 
 /* "Botones y tarjetas: Mínimos": sin foco ni filo que siga al cursor. */
 html[data-mode=overdrive][data-fx=minimal] :is(.utility-card, .item-step-card, .home-hero) { --cx: -600px; --cy: -600px; }
-html[data-mode=overdrive][data-hangar-buttons][data-fx=minimal] :is(.tab-grid .item.utility-card, .utility-card, .item-step-card, .home-hero):is(:hover, :focus-within) { --hgn-spot: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   html[data-mode=overdrive] .item .item-cover::after { animation: none !important; }
@@ -124,12 +117,6 @@ html[data-mode=overdrive] .dialog {
 html[data-mode=overdrive] .hangar-settings { border-radius: var(--radius); }
 
 /* ------------------------------------------------------------------ 6. Acceso */
-/* El lateral sigue la esquina redondeada del panel (a la izquierda en escritorio, arriba en móvil). */
-html[data-mode=overdrive] .auth-aside { border-radius: calc(var(--radius) - 1px) 0 0 calc(var(--radius) - 1px); }
-html[data-mode=overdrive] :is(.auth-input input, .auth-info, .auth-input .auth-eye) { border-radius: var(--hgp-r); }
 html[data-mode=overdrive] .auth-back {
   padding: 6px 12px; border-radius: var(--hgp-r); background: rgba(5, 9, 15, .8);
-}
-@media (max-width: 800px) {
-  html[data-mode=overdrive] .auth-aside { border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0; }
 }

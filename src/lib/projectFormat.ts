@@ -167,22 +167,24 @@ export function hostLabel(url: string): string {
   return url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/.*$/, '')
 }
 
+const YOUTUBE_ID = /^[\w-]{1,32}$/
+
 export function parseVideoEmbed(url: string): string | null {
+  const youtube = (id: string | null | undefined) =>
+    id && YOUTUBE_ID.test(id) ? `https://www.youtube-nocookie.com/embed/${id}` : null
   try {
     const u = new URL(url)
     const host = u.hostname.replace(/^www\./, '')
     if (host === 'youtu.be') {
-      const id = u.pathname.slice(1).split('/')[0]
-      return id ? `https://www.youtube-nocookie.com/embed/${id}` : null
+      return youtube(u.pathname.slice(1).split('/')[0])
     }
     if (host === 'youtube.com' || host === 'm.youtube.com') {
       if (u.pathname === '/watch') {
-        const id = u.searchParams.get('v')
-        return id ? `https://www.youtube-nocookie.com/embed/${id}` : null
+        return youtube(u.searchParams.get('v'))
       }
       const parts = u.pathname.split('/').filter(Boolean)
       if ((parts[0] === 'shorts' || parts[0] === 'embed') && parts[1]) {
-        return `https://www.youtube-nocookie.com/embed/${parts[1]}`
+        return youtube(parts[1])
       }
     }
     if (host === 'vimeo.com') {

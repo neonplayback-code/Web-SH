@@ -31,6 +31,12 @@ página de publicación, rejilla), con sus mismos tokens de color.
 - `/p/:id`: la publicación, ♥ y línea de avances del autor.
 - `/u/:username`: publicaciones de cada creador.
 
+## Aplicación Rust (experimental)
+
+Además de la web (React), el repositorio incluye una versión en Rust/Dioxus (`src/main.rs`, `src/backend.rs`, `Cargo.toml`).
+Es una prueba aparte: solo muestra la portada, el acceso, publicar y ♥, y no se publica en GitHub Pages. La web principal es la de React.
+`target/` (la compilación de Rust) no se versiona.
+
 ## Stack
 
 - React 19 + TypeScript + Vite

@@ -30,18 +30,6 @@ html[data-mode=astra][data-fx=soft] {
 @keyframes cz-twinkle { to { --tw: 1; } }
 @keyframes cz-twinkle2 { to { --tw2: .28; } }
 @keyframes btn-orbit { to { --btn-ang: 360deg; } }
-@keyframes cosmos-flow {
-  to {
-    background-position:
-      0 0, 0 0, 0 0,
-      0 0, 0 0, 0 0,
-      0 0, 0 0, 0 0,
-      0 0,
-      100% 100%, 0% 0%, 85% 15%,
-      150px -150px, -210px -210px, 270px 270px;
-  }
-}
-@keyframes sheen { from { background-position: 140% 0; } to { background-position: -40% 0; } }
 @keyframes card-drift { to { background-position: 0 0, 0 0, 0 0, 100% 100%, 0% 0%, 20% 80%; } }
 @keyframes title-flow { to { background-position: 200% 50%; } }
 
@@ -53,7 +41,7 @@ html[data-mode=astra]:not([data-fx=minimal]) .mode-selector {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 8px 24px -10px rgba(0, 0, 0, .75);
 }
 html[data-mode=astra]:not([data-fx=minimal]) .mode-selector .mode-thumb { display: none; }
-html[data-mode=astra]:not([data-fx=minimal]) :is(.save-button, .add-button, .ghost-button, .launcher-pill, .add-tab, .icon-button, .crumb-back, .copy-link, .like-btn, .pe-upload, .pe-reset, .tab-more, .item-more, .creator-edit, .auth-back, .auth-eye, .auth-tab, .auth-forgot, .pill-row button, .sort-btn, .search-clear, .mode-btn, .cz-tab, .cz-seg > button, .cz-modes > button, .cz-fonts > button, .hangar-presets > button, .comment-form button) {
+html[data-mode=astra]:not([data-fx=minimal]) :is(.save-button, .add-button, .ghost-button, .launcher-pill, .icon-button, .crumb-back, .copy-link, .like-btn, .pe-upload, .pe-reset, .tab-more, .item-more, .creator-edit, .auth-back, .sort-btn, .search-clear, .mode-btn, .cz-tab, .cz-seg > button, .cz-modes > button, .cz-fonts > button, .hangar-presets > button) {
   position: relative; isolation: isolate; overflow: hidden;
   --nb-a: color-mix(in srgb, var(--purple) calc(28% * var(--glow, 1)), transparent);
   --nb-b: color-mix(in srgb, var(--cyan) calc(22% * var(--glow, 1)), transparent);
@@ -105,7 +93,7 @@ html[data-mode=astra]:not([data-fx=minimal]) :is(.save-button, .add-button, .gho
   transition: transform .28s var(--ease), box-shadow .3s, color .25s, background-color .25s;
 }
 /* Píldoras compactas y navegación: estrellas 4-puntas en los márgenes sin tocar el texto */
-html[data-mode=astra]:not([data-fx=minimal]) :is(.tabbar .tab, .sort-btn, .mode-btn, .cz-tab, .auth-tab, .auth-forgot, .cz-seg > button) {
+html[data-mode=astra]:not([data-fx=minimal]) :is(.tabbar .tab, .sort-btn, .mode-btn, .cz-tab, .cz-seg > button) {
   background-image:
     radial-gradient(8px 1.1px at 6% 28%, rgba(255, 255, 255, calc(.3 + .65 * var(--tw))) 0%, transparent 100%),
     radial-gradient(1.1px 8px at 6% 28%, rgba(255, 255, 255, calc(.3 + .65 * var(--tw))) 0%, transparent 100%),
@@ -120,7 +108,7 @@ html[data-mode=astra]:not([data-fx=minimal]) :is(.tabbar .tab, .sort-btn, .mode-
   background-repeat: no-repeat;
 }
 /* Borde orbital ÚNICO: variante no seleccionada (sutil y en reposo). */
-html[data-mode=astra]:not([data-fx=minimal]) :is(.save-button, .add-button, .ghost-button, .launcher-pill, .add-tab, .icon-button, .crumb-back, .copy-link, .like-btn, .pe-upload, .pe-reset, .tab-more, .item-more, .creator-edit, .auth-back, .auth-eye, .auth-tab, .auth-forgot, .pill-row button, .sort-btn, .search-clear, .mode-btn, .cz-tab, .cz-seg > button, .cz-modes > button, .cz-fonts > button, .hangar-presets > button, .comment-form button)::before {
+html[data-mode=astra]:not([data-fx=minimal]) :is(.save-button, .add-button, .ghost-button, .launcher-pill, .icon-button, .crumb-back, .copy-link, .like-btn, .pe-upload, .pe-reset, .tab-more, .item-more, .creator-edit, .auth-back, .sort-btn, .search-clear, .mode-btn, .cz-tab, .cz-seg > button, .cz-modes > button, .cz-fonts > button, .hangar-presets > button)::before {
   content: ""; position: absolute; inset: 0; z-index: 2; padding: 1px; border-radius: inherit; pointer-events: none;
   background: conic-gradient(
     from var(--btn-ang),
@@ -139,34 +127,20 @@ html[data-mode=astra]:not([data-fx=minimal]) :is(.save-button, .add-button, .gho
   transition: opacity .28s, filter .28s;
 }
 /* Variante seleccionada / primaria: cometa orbital encendido y núcleo iluminado. */
-html[data-mode=astra]:not([data-fx=minimal]) :is(.save-button, .add-button, .like-btn, .launcher-pill.is-active, .add-tab.is-active, .pill-row button.is-active, .sort-btn.is-active, .mode-btn[aria-checked=true], .cz-tab.is-active, .auth-tab.is-active, .cz-seg > .is-on, .cz-modes > .is-on, .cz-fonts > .is-on, [aria-pressed=true])::before {
+html[data-mode=astra]:not([data-fx=minimal]) :is(.save-button, .add-button, .like-btn, .launcher-pill.is-active, .add-tab.is-active, .pill-row button.is-active, .sort-btn.is-active, .mode-btn[aria-checked=true], .cz-tab.is-active.is-active, .cz-seg > .is-on, .cz-modes > .is-on, .cz-fonts > .is-on, [aria-pressed=true])::before {
   opacity: 1;
 }
 /* El cielo y el borde orbital se animan en los botones principales, seleccionados y al pasar el cursor. */
-html[data-mode=astra]:not([data-fx=minimal], [data-motion=off]) :is(.save-button, .add-button, .like-btn, .launcher-pill.is-active, .add-tab.is-active, .pill-row button.is-active, .cz-modes > .is-on, .cz-fonts > .is-on):not(.tabbar .tab),
-html[data-mode=astra]:not([data-fx=minimal], [data-motion=off]) :is(.save-button, .add-button, .ghost-button, .launcher-pill, .add-tab, .icon-button, .crumb-back, .copy-link, .like-btn, .pe-upload, .pe-reset, .tab-more, .item-more, .creator-edit, .auth-back, .auth-eye, .auth-forgot, .pill-row button, .search-clear, .cz-modes > button, .cz-fonts > button, .hangar-presets > button, .comment-form button):not(.tabbar .tab):is(:hover, :focus-visible) {
+html[data-mode=astra]:not([data-fx=minimal], [data-motion=off]) :is(.save-button, .add-button, .like-btn, .launcher-pill.is-active, .add-tab.is-active, .pill-row button.is-active, .cz-modes > .is-on, .cz-fonts > .is-on):not(.tabbar .tab) {
   animation: var(--fx-anim);
 }
-html[data-mode=astra]:not([data-fx=minimal], [data-motion=off]) :is(.tabbar .tab, .sort-btn, .mode-btn, .cz-tab, .auth-tab, .cz-seg > button):is(.is-active, .is-on, [aria-checked=true], [aria-selected=true], :hover, :focus-visible) {
+html[data-mode=astra]:not([data-fx=minimal], [data-motion=off]) :is(.tabbar .tab, .sort-btn, .mode-btn, .cz-tab, .cz-seg > button):is(.is-active, .is-on, [aria-checked=true], [aria-selected=true]) {
   animation: cz-twinkle calc(2.8s * var(--fx-speed, 1)) ease-in-out infinite alternate, cz-twinkle2 calc(4.1s * var(--fx-speed, 1)) ease-in-out infinite alternate;
 }
-html[data-mode=astra]:not([data-fx=minimal], [data-motion=off]) :is(.save-button, .add-button, .like-btn, .launcher-pill.is-active, .add-tab.is-active, .pill-row button.is-active, .sort-btn.is-active, .mode-btn[aria-checked=true], .cz-tab.is-active, .auth-tab.is-active, .cz-seg > .is-on, .cz-modes > .is-on, .cz-fonts > .is-on, [aria-pressed=true])::before {
+html[data-mode=astra]:not([data-fx=minimal], [data-motion=off]) :is(.save-button, .add-button, .like-btn, .launcher-pill.is-active, .add-tab.is-active, .pill-row button.is-active, .sort-btn.is-active, .mode-btn[aria-checked=true], .cz-tab.is-active.is-active, .cz-seg > .is-on, .cz-modes > .is-on, .cz-fonts > .is-on, [aria-pressed=true])::before {
   animation-play-state: running; animation-duration: 5.2s;
 }
-html[data-mode=astra]:not([data-fx=minimal], [data-motion=off]) :is(.save-button, .add-button, .ghost-button, .launcher-pill, .add-tab, .icon-button, .crumb-back, .copy-link, .like-btn, .pe-upload, .pe-reset, .tab-more, .item-more, .creator-edit, .auth-back, .auth-eye, .auth-tab, .auth-forgot, .pill-row button, .sort-btn, .search-clear, .mode-btn, .cz-tab, .cz-seg > button, .cz-modes > button, .cz-fonts > button, .hangar-presets > button, .comment-form button):is(:hover, :focus-visible)::before {
-  opacity: 1; animation-play-state: running; animation-duration: 2.2s;
-  background: conic-gradient(
-    from var(--btn-ang),
-    color-mix(in srgb, var(--cyan) 42%, rgba(210, 232, 255, .36)) 0deg,
-    color-mix(in srgb, var(--cyan) 42%, rgba(210, 232, 255, .36)) 190deg,
-    var(--cyan) 248deg,
-    #fff 278deg,
-    var(--pink) 312deg,
-    color-mix(in srgb, var(--cyan) 42%, rgba(210, 232, 255, .36)) 352deg,
-    color-mix(in srgb, var(--cyan) 42%, rgba(210, 232, 255, .36)) 360deg
-  );
-}
-html[data-mode=astra]:not([data-fx=minimal]) :is(.save-button, .add-button, .like-btn, .launcher-pill.is-active, .add-tab.is-active, .pill-row button.is-active, .sort-btn.is-active, .mode-btn[aria-checked=true], .cz-tab.is-active, .auth-tab.is-active, .cz-seg > .is-on, .cz-modes > .is-on, .cz-fonts > .is-on, [aria-pressed=true]) {
+html[data-mode=astra]:not([data-fx=minimal]) :is(.save-button, .add-button, .like-btn, .launcher-pill.is-active, .add-tab.is-active, .pill-row button.is-active, .sort-btn.is-active, .mode-btn[aria-checked=true], .cz-tab.is-active.is-active, .cz-seg > .is-on, .cz-modes > .is-on, .cz-fonts > .is-on, [aria-pressed=true]) {
   color: #fff;
   background-color: rgba(10, 16, 44, .92);
   --nb-a: color-mix(in srgb, var(--purple) calc(68% * var(--glow, 1)), transparent);
@@ -179,31 +153,11 @@ html[data-mode=astra]:not([data-fx=minimal]) :is(.save-button, .add-button, .lik
     0 0 calc(26px * var(--glow, 1)) -5px var(--nb-b),
     0 0 calc(44px * var(--glow, 1)) -14px var(--nb-a);
 }
-html[data-mode=astra]:not([data-fx=minimal]) :is(.save-button, .add-button, .ghost-button, .launcher-pill, .add-tab, .icon-button, .crumb-back, .copy-link, .like-btn, .pe-upload, .pe-reset, .tab-more, .item-more, .creator-edit, .auth-back, .auth-tab, .auth-forgot, .pill-row button, .sort-btn, .search-clear, .mode-btn, .cz-tab, .cz-seg > button, .cz-modes > button, .cz-fonts > button, .hangar-presets > button, .comment-form button):is(:hover, :focus-visible) {
-  transform: translateY(-2px);
-  color: #fff;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, .36),
-    0 12px 30px -10px rgba(0, 0, 0, .85),
-    0 0 calc(30px * var(--glow, 1)) -4px var(--nb-b),
-    0 0 calc(50px * var(--glow, 1)) -12px var(--nb-a);
-}
-html[data-mode=astra]:not([data-fx=minimal]) .auth-input .auth-eye { position: absolute; }
-html[data-mode=astra]:not([data-fx=minimal]) .auth-input .auth-eye:is(:hover, :focus-visible) { transform: translateY(-50%) scale(1.06); color: #fff; }
 /* Variante deshabilitada */
-html[data-mode=astra]:not([data-fx=minimal]) :is(.save-button, .add-button, .ghost-button, .launcher-pill, .add-tab, .icon-button, .crumb-back, .copy-link, .like-btn, .pe-upload, .pe-reset, .tab-more, .item-more, .creator-edit, .auth-back, .auth-eye, .auth-tab, .auth-forgot, .pill-row button, .sort-btn, .search-clear, .mode-btn, .cz-tab, .cz-seg > button, .cz-modes > button, .cz-fonts > button, .hangar-presets > button, .comment-form button):is(:disabled, [aria-disabled=true]) {
-  opacity: .44; cursor: not-allowed; filter: saturate(.6); transform: none; animation: none;
-}
-html[data-mode=astra]:not([data-fx=minimal]) :is(.save-button, .add-button, .ghost-button, .launcher-pill, .add-tab, .icon-button, .crumb-back, .copy-link, .like-btn, .pe-upload, .pe-reset, .tab-more, .item-more, .creator-edit, .auth-back, .auth-eye, .auth-tab, .auth-forgot, .pill-row button, .sort-btn, .search-clear, .mode-btn, .cz-tab, .cz-seg > button, .cz-modes > button, .cz-fonts > button, .hangar-presets > button, .comment-form button):is(:disabled, [aria-disabled=true])::before {
-  animation: none; opacity: .28;
-}
 /* Estrella fugaz que cruza el botón al pasar el cursor */
-html[data-mode=astra]:not([data-fx=minimal], [data-fx=soft]) :is(.save-button, .add-button, .ghost-button, .launcher-pill, .add-tab, .icon-button, .crumb-back, .copy-link, .like-btn, .pe-upload, .pe-reset, .tab-more, .item-more, .creator-edit, .auth-back, .auth-eye, .auth-tab, .auth-forgot, .pill-row button, .sort-btn, .search-clear, .mode-btn, .cz-tab, .cz-seg > button, .cz-modes > button, .cz-fonts > button, .hangar-presets > button, .comment-form button)::after {
+html[data-mode=astra]:not([data-fx=minimal], [data-fx=soft]) :is(.save-button, .add-button, .ghost-button, .launcher-pill, .icon-button, .crumb-back, .copy-link, .like-btn, .pe-upload, .pe-reset, .tab-more, .item-more, .creator-edit, .auth-back, .sort-btn, .search-clear, .mode-btn, .cz-tab, .cz-seg > button, .cz-modes > button, .cz-fonts > button, .hangar-presets > button)::after {
   content: ""; position: absolute; inset: 0; z-index: 1; border-radius: inherit; pointer-events: none; opacity: 0;
   background: linear-gradient(108deg, transparent 36%, color-mix(in srgb, var(--cyan) 28%, transparent) 44%, rgba(255, 255, 255, .92) 50%, color-mix(in srgb, var(--pink) 32%, transparent) 55%, transparent 64%) 140% 0 / 260% 100% no-repeat;
-}
-html[data-mode=astra]:not([data-fx=minimal], [data-fx=soft], [data-motion=off]) :is(.save-button, .add-button, .ghost-button, .launcher-pill, .add-tab, .icon-button, .crumb-back, .copy-link, .like-btn, .pe-upload, .pe-reset, .tab-more, .item-more, .creator-edit, .auth-back, .auth-eye, .auth-tab, .auth-forgot, .pill-row button, .sort-btn, .search-clear, .mode-btn, .cz-tab, .cz-seg > button, .cz-modes > button, .cz-fonts > button, .hangar-presets > button, .comment-form button):not(:disabled):is(:hover, :focus-visible)::after {
-  opacity: 1; animation: sheen .95s cubic-bezier(.2, .7, .2, 1) 1;
 }
 /* ♥ dado: el cielo del botón se vuelve rosa y violeta */
 html[data-mode=astra]:not([data-fx=minimal]) .like-btn.is-liked {
@@ -216,7 +170,7 @@ html[data-mode=astra]:not([data-fx=minimal]) .like-btn.is-liked {
 }
 
 /* ---------- Tarjetas y apartados: cielo estrellado y nebulosa ---------- */
-html[data-mode=astra]:not([data-fx=minimal]) :is(.hero-copy, .clock-panel, .utility-card, .game-card, .plugin-widget, .dialog, .search) {
+html[data-mode=astra]:not([data-fx=minimal]) :is(.hero-copy, .clock-panel, .utility-card, .game-card, .dialog, .search) {
   background-color: rgba(3, 5, 15, .82);
   background-image:
     radial-gradient(1.4px 1.4px at 12% 18%, rgba(255, 255, 255, .75) 50%, transparent 62%),
@@ -286,9 +240,4 @@ html[data-mode=astra]:not([data-fx=minimal]) :is(.ghost-button, .launcher-pill:n
   --nb-a: color-mix(in srgb, var(--purple) calc(28% * var(--glow, 1)), transparent);
   --nb-b: color-mix(in srgb, var(--cyan) calc(22% * var(--glow, 1)), transparent);
   --nb-c: color-mix(in srgb, var(--pink) calc(15% * var(--glow, 1)), transparent);
-}
-html[data-mode=astra]:not([data-fx=minimal]) :is(.ghost-button, .launcher-pill, .icon-button, .crumb-back, .copy-link, .pe-upload, .tab-more, .item-more, .creator-edit):is(:hover, :focus-visible) {
-  --nb-a: color-mix(in srgb, var(--purple) calc(56% * var(--glow, 1)), transparent);
-  --nb-b: color-mix(in srgb, var(--cyan) calc(46% * var(--glow, 1)), transparent);
-  --nb-c: color-mix(in srgb, var(--pink) calc(32% * var(--glow, 1)), transparent);
 }

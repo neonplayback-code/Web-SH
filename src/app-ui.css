@@ -22,7 +22,7 @@ html[data-mode=overdrive] .creator-chip { border-radius: 0; }
 .pulse-title svg { width: 16px; height: 16px; fill: none; stroke: var(--cyan); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 6px var(--cyan)); }
 .pulse-live {
   display: inline-flex; align-items: center; gap: 7px; padding: 4px 11px; border: 1px solid color-mix(in srgb, var(--green) 45%, transparent);
-  border-radius: 999px; color: var(--green); font: 700 10px var(--mono); letter-spacing: .16em; text-transform: uppercase;
+  border-radius: 999px; color: var(--green); font: 700 11px var(--mono); letter-spacing: .16em; text-transform: uppercase;
 }
 .pulse-live i { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse-dot 1.8s ease-in-out infinite; }
 @keyframes pulse-dot { 50% { transform: scale(.55); opacity: .5; } }
@@ -35,7 +35,7 @@ html[data-mode=overdrive] .creator-chip { border-radius: 0; }
 .pulse-stat span { color: var(--muted); font-size: 11px; letter-spacing: .08em; }
 .pulse-stat.is-likes b { color: var(--pink); }
 .pulse-bars { display: grid; gap: 9px; }
-.pulse-sub { color: var(--muted); font: 700 10px var(--mono); letter-spacing: .18em; text-transform: uppercase; }
+.pulse-sub { color: var(--muted); font: 700 11px var(--mono); letter-spacing: .18em; text-transform: uppercase; }
 .pulse-bar { display: grid; grid-template-columns: 88px minmax(0, 1fr) 26px; align-items: center; gap: 12px; color: var(--text); font-size: 13px; }
 .pulse-bar i { display: block; height: 8px; overflow: hidden; border-radius: 99px; background: rgba(255, 255, 255, .09); }
 .pulse-bar u {
@@ -88,7 +88,7 @@ html[data-mode=overdrive] :is(.pulse-stat, .pulse-last, .pulse-live) { border-ra
   padding: 3px 8px; border-radius: 999px;
   background: color-mix(in srgb, var(--cyan) 22%, rgba(255, 255, 255, .08));
   border: 1px solid color-mix(in srgb, var(--cyan) 50%, transparent);
-  color: #e8fbff; font: 700 10px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase;
+  color: #e8fbff; font: 700 11px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase;
 }
 .cz-block h3 { margin: 0; color: var(--muted); font: 800 11px var(--mono); letter-spacing: .24em; text-transform: uppercase; }
 .cz-block h3 small { opacity: .7; letter-spacing: .1em; }
@@ -242,14 +242,65 @@ html[data-mode=astra] .home-hero > h1 { margin-top: auto; }
 .creator-featured { display: grid; gap: 10px; margin: 4px 0 22px; }
 .featured-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .featured-item {
-  position: relative; display: grid; align-content: start; min-width: 0; overflow: hidden; border: 1px solid var(--edge);
+  position: relative; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; min-width: 0; overflow: hidden; border: 1px solid var(--edge);
   border-radius: calc(var(--radius) * .75); background: rgba(255, 255, 255, .045); color: var(--text); text-decoration: none;
   transition: transform .3s var(--ease), border-color .3s, box-shadow .3s;
 }
 .featured-item:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--cyan) 55%, transparent); box-shadow: var(--bloom-sm); }
+.featured-info { min-width: 0; }
 .featured-cover { aspect-ratio: 16 / 10; border: 0; border-radius: 0; }
 .featured-cover::before { font-size: clamp(20px, 2.2vw, 28px); }
 .featured-item b { padding: 9px 11px 2px; overflow: hidden; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
 .featured-item small { padding: 0 11px 10px; color: var(--pink); font-size: 12px; font-weight: 700; }
 html:not([data-mode=astra]) .creator-featured { display: none; }
 @media (max-width: 560px) { .featured-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } .featured-item:nth-child(3) { display: none; } }
+
+/* ---------- Ventana modal en pantallas bajas / móviles ---------- */
+/* La ventana cabe en la pantalla y su contenido se desplaza: así "Listo" y "Restablecer" siempre se alcanzan. */
+.dialog.modal { max-height: calc(100dvh - 24px); overflow: hidden; }
+.dialog.modal[open] { display: flex; flex-direction: column; }
+.dialog.modal .modal-inner { display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; }
+.dialog.modal .cz-foot { flex-wrap: wrap; }
+.dialog.modal .cz-foot :is(.ghost-button, .save-button) { white-space: normal; min-width: 0; }
+
+/* ---------- Acciones del autor en una publicación y borradores del perfil ---------- */
+.pub-ownerbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; }
+.pub-ownerbar-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.pub-ownerbar .form-error { flex-basis: 100%; margin: 0; }
+.pub-ownerbar :is(.ghost-button, .save-button) { display: inline-flex; align-items: center; gap: 7px; }
+.pub-ownerbar svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.profile-drafts { display: grid; gap: 14px; margin-top: 22px; }
+
+/* ---------- Zonas táctiles: mínimo cómodo de pulsar (44 px) en pantallas táctiles ---------- */
+@media (pointer: coarse) {
+  :is(.tabbar .tab, .sort-btn, .like-btn, .copy-link, .ghost-button, .save-button, .add-button, .launcher-pill, .crumb-back, .item-more, .cz-tab, .search-clear) { min-height: 44px; }
+  :is(.icon-button, .search-clear) { min-width: 44px; min-height: 44px; }
+  .mode-btn { min-height: 40px; padding-inline: 14px; }
+  .wordmark { min-height: 44px; }
+  .cz-swatch { min-width: 36px; min-height: 36px; }
+}
+@media (max-width: 380px) {
+  .mode-btn { padding-inline: 8px; letter-spacing: .06em; }
+}
+
+/* ASTRA en móvil: las secciones van en una sola fila desplazable (como en HANGAR) y no ocupan media pantalla. */
+@media (max-width: 640px) {
+  html[data-mode=astra] .tabbar { flex-wrap: nowrap; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; padding-bottom: 6px; }
+  html[data-mode=astra] .tabbar::-webkit-scrollbar { display: none; }
+  html[data-mode=astra] .tabbar .tab { flex: none; scroll-snap-align: center; }
+}
+
+/* ASTRA en móvil: la cabecera crece con su contenido (con altura fija, la segunda fila de botones se montaba sobre las secciones). */
+@media (max-width: 760px) {
+  html[data-mode=astra] .topbar { height: auto; min-height: 66px; flex-wrap: wrap; padding-block: 8px; row-gap: 6px; }
+}
+
+/* El campo de búsqueda tiene un ancho propio por defecto (~300 px) que ensanchaba toda la página a 320 px. */
+.tab-filters .search-box { min-width: 0; }
+.tab-filters .search-input { min-width: 0; width: 100%; }
+.tab-body, .col-stage { min-width: 0; }
+
+/* Un título largo en una sola línea no debe ensanchar la rejilla (pasaba con los links a 320 px): la columna se encoge y el texto acaba en "…". */
+.tab-grid > * { min-width: 0; }
+.item-link .item-text { min-width: 0; }
+.item-link :is(.item-title, .item-meta) { display: block; overflow: hidden; text-overflow: ellipsis; }

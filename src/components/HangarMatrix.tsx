@@ -221,6 +221,7 @@ export function HangarMatrix({ onUnsupported }: { onUnsupported: () => void }) {
     const canvas = ref.current
     if (!canvas) return
     const gl = canvas.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'high-performance' })
+    const buffer = gl?.createBuffer() ?? null
     const vs = gl && compile(gl, gl.VERTEX_SHADER, VERT)
     const prog = gl && vs ? link(gl, vs, FRAG) : null
     const tex = gl?.createTexture()
@@ -228,7 +229,7 @@ export function HangarMatrix({ onUnsupported }: { onUnsupported: () => void }) {
       onUnsupported()
       return
     }
-    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer())
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW)
     gl.enableVertexAttribArray(0)
     gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0)
@@ -246,10 +247,12 @@ export function HangarMatrix({ onUnsupported }: { onUnsupported: () => void }) {
 
     const root = document.documentElement
     const reduced = matchMedia('(prefers-reduced-motion: reduce)')
-    const maxScale = Math.min(devicePixelRatio || 1, 1.5)
+    // En móviles y pantallas táctiles se empieza ya con ahorro: sin franja de color y a resolución 1:1 como máximo.
+    const coarse = matchMedia('(pointer: coarse)').matches || Math.min(innerWidth, innerHeight) < 600
+    const maxScale = Math.min(devicePixelRatio || 1, coarse ? 1 : 1.5)
     let scale = maxScale
     // Ahorro si la GPU va justa: 1 = sin franja de color; 2 = además sin capa cercana y con algo menos de resolución.
-    let level = 0, slow = 0
+    let level = coarse ? 1 : 0, slow = 0
     let raf = 0, last = 0, time = 40, dirty = true
     let cur: RGB[] = [[.34, .86, 1], [.72, .5, 1]]
     let target = cur
@@ -370,6 +373,12 @@ export function HangarMatrix({ onUnsupported }: { onUnsupported: () => void }) {
       document.removeEventListener('od-preferences-change', onTheme)
       reduced.removeEventListener('change', onTheme)
       canvas.removeEventListener('webglcontextlost', onLost)
+      // Se liberan los recursos de la GPU: sin esto, cada cambio ASTRA <-> HANGAR deja un contexto más ocupado.
+      gl.deleteTexture(tex)
+      gl.deleteBuffer(buffer)
+      gl.deleteProgram(prog)
+      gl.deleteShader(vs)
+      gl.getExtension('WEBGL_lose_context')?.loseContext()
     }
   }, [onUnsupported])
 

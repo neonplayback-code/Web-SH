@@ -6,9 +6,10 @@ export interface ProjectRow {
   type: ProjectType
   title: string
   summary: string
-  body: string
+  // Las listas no piden el texto completo (hasta 20.000 caracteres por publicación): solo la página de cada una.
+  body?: string
   cover_url: string | null
-  media_urls: string[]
+  media_urls?: string[]
   links: string[]
   tags: string[]
   author_id: string
@@ -21,6 +22,9 @@ export interface ProjectRow {
 }
 
 export const PROJECT_SELECT = '*'
+// Para listas y tarjetas: todo menos el cuerpo y la galería, que pesan mucho y ahí no se ven.
+export const PROJECT_LIST_SELECT =
+  'id,type,title,summary,cover_url,links,tags,author_id,author_username,status,created_at,updated_at,views,likes'
 
 export function toProject(r: ProjectRow): Project {
   return {
@@ -28,7 +32,7 @@ export function toProject(r: ProjectRow): Project {
     type: r.type,
     title: r.title,
     summary: r.summary,
-    body: r.body,
+    body: r.body ?? '',
     coverUrl: r.cover_url,
     mediaUrls: r.media_urls ?? [],
     links: r.links ?? [],

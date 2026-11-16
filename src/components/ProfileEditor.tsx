@@ -1,6 +1,6 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import { TABS } from '../config/tabs'
-import { DEFAULT_PROFILE, saveSiteProfile, useSiteProfile, type SiteProfile } from '../lib/siteProfile'
+import { DEFAULT_PROFILE, safeHref, saveSiteProfile, useSiteProfile, type SiteProfile } from '../lib/siteProfile'
 import { supabase } from '../lib/supabase'
 import { closePanel, useOpenPanel } from '../lib/ui'
 import { useCurrentUser } from '../lib/useCurrentUser'
@@ -56,6 +56,9 @@ export function ProfileEditor() {
 
   const submit = async (e: FormEvent) => {
     e.preventDefault()
+    // Un enlace a medias no se descarta en silencio: se avisa cuál está mal.
+    const bad = form.links.findIndex((l) => (l.label.trim() || l.url.trim()) && (!l.label.trim() || !safeHref(l.url.trim())))
+    if (bad >= 0) return setError(`Revisa el enlace ${bad + 1}: necesita un nombre y una dirección que empiece por http:// o https://`)
     setBusy(true)
     setError('')
     const message = await saveSiteProfile(form)

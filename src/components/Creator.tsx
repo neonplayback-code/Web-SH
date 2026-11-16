@@ -12,16 +12,17 @@ import { HangarConsole } from './HangarScene'
 function timeAgo(ms: number): string {
   const s = Math.max(0, Math.round((Date.now() - ms) / 1000))
   if (s < 60) return 'hace un momento'
-  const m = Math.round(s / 60)
+  const m = Math.floor(s / 60)
   if (m < 60) return `hace ${m} min`
-  const h = Math.round(m / 60)
+  const h = Math.floor(m / 60)
   if (h < 24) return `hace ${h} h`
-  const d = Math.round(h / 24)
+  const d = Math.floor(h / 24)
   return d < 31 ? `hace ${d} d` : new Date(ms).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
 // Bloque del creador (perfil público editable) junto al "pulso" de la web: estadísticas en vivo y el botón Personalizar.
-export function Creator({ projects }: { projects: Project[] }) {
+// `total` es el número real de publicaciones cuando hay más de las que se han cargado.
+export function Creator({ projects, total }: { projects: Project[]; total?: number | null }) {
   const profile = useSiteProfile()
   const { user, isOwner } = useCurrentUser()
 
@@ -96,8 +97,8 @@ export function Creator({ projects }: { projects: Project[] }) {
 
         {(links.length > 0 || isOwner) && (
           <div className="creator-links">
-            {links.map((l) => (
-              <a key={l.href} className="launcher-pill" href={l.href!} target="_blank" rel="noopener noreferrer">
+            {links.map((l, i) => (
+              <a key={`${i}-${l.href}`} className="launcher-pill" href={l.href!} target="_blank" rel="noopener noreferrer">
                 {l.label}<Icon name="external" />
               </a>
             ))}
@@ -117,7 +118,7 @@ export function Creator({ projects }: { projects: Project[] }) {
         </div>
 
         <div className="pulse-stats">
-          <div className="pulse-stat"><b>{projects.length}</b><span>Publicaciones</span></div>
+          <div className="pulse-stat"><b>{total ?? projects.length}</b><span>Publicaciones</span></div>
           <div className="pulse-stat is-likes"><b>{stats.likes}</b><span>Me gusta</span></div>
           <div className="pulse-stat"><b>{stats.updates}</b><span>Avances</span></div>
         </div>

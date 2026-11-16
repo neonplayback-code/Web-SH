@@ -10,6 +10,7 @@ import { PROJECT_TYPES, PROJECT_TYPE_LABELS, type ProjectType } from '../types'
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024
 const MAX_VIDEO_BYTES = 100 * 1024 * 1024
 const MAX_MEDIA = 6
+const MAX_LINKS = 12
 const DRAFT_KEY = 'od_pub_studio_draft'
 
 interface FormatSpec {
@@ -294,6 +295,9 @@ export function NewProjectPage() {
 
   const spec = FORMATS[type]
   const busy = Boolean(statusMsg)
+  // Lo escrito en un formato no debe colarse en otro: si el formato actual no tiene ese campo, se ignora.
+  const activePrimary = spec.primaryLinkLabel ? primaryLink.trim() : ''
+  const activeExtra = spec.extraLabel ? extraMeta.trim() : ''
 
   // Autoguardado local continuo para no perder texto al recargar.
   useEffect(() => {
@@ -335,7 +339,7 @@ export function NewProjectPage() {
     const incoming = Array.from(files)
     const problem = incoming.map((f) => validateFile(f, spec.mediaAccept)).find(Boolean)
     if (problem) return setError(problem)
-    setError('')
+    setError(media.length + incoming.length > MAX_MEDIA ? `Máximo ${MAX_MEDIA} archivos: se añadieron solo los primeros.` : '')
     setMedia((prev) => [...prev, ...incoming].slice(0, MAX_MEDIA))
   }
 
@@ -382,12 +386,13 @@ export function NewProjectPage() {
     const cleanTitle = title.trim()
     if (!cleanTitle) return setError('Ponle un título a tu publicación.')
 
-    const combinedLinks = [primaryLink.trim(), ...(spec.showExtraLinks ? [linksRaw.trim()] : [])]
+    const combinedLinks = [activePrimary, ...(spec.showExtraLinks ? [linksRaw.trim()] : [])]
       .filter(Boolean)
       .join(' ')
     const links = parseLinks(combinedLinks)
     if (!links) return setError('Todos los enlaces deben empezar por http:// o https://')
-    if (spec.primaryLinkRequired && !primaryLink.trim()) {
+    if (links.length > MAX_LINKS) return setError(`Máximo ${MAX_LINKS} enlaces por publicación.`)
+    if (spec.primaryLinkRequired && !activePrimary) {
       return setError('Este formato necesita una URL principal válida.')
     }
     if (cover) {
@@ -398,22 +403,25 @@ export function NewProjectPage() {
     const pendingTag = tagDraft.replace(/^#+/, '').trim().toLowerCase()
     const finalTags = pendingTag && !tags.includes(pendingTag) ? [...tags, pendingTag].slice(0, 8) : tags
 
-    const cleanExtra = extraMeta.trim()
+    const cleanExtra = activeExtra
     const finalSummary = (spec.showSummary ? summary.trim() : '') || cleanExtra
     const metaHeader = cleanExtra && spec.extraLabel ? `${spec.extraLabel}: ${cleanExtra}` : ''
     const rawBody = spec.showBody ? body.trim() : ''
     const finalBody = [metaHeader, rawBody].filter(Boolean).join('\n\n')
 
     setStatusMsg('Preparando publicación…')
+    // Rutas ya subidas: si algo falla después, se borran para no dejar archivos sueltos en Storage.
+    const uploaded: string[] = []
+    const bucket = supabase.storage.from('media')
     try {
       const projectId = crypto.randomUUID()
       const folder = `users/${user.id}/projects/${projectId}`
-      const bucket = supabase.storage.from('media')
 
       const upload = async (file: File, name: string) => {
         const path = `${folder}/${storageName(name)}`
         const { error: upErr } = await bucket.upload(path, file, { contentType: file.type })
         if (upErr) throw new Error(upErr.message)
+        uploaded.push(path)
         return bucket.getPublicUrl(path).data.publicUrl
       }
 
@@ -455,13 +463,14 @@ export function NewProjectPage() {
       try { localStorage.removeItem(DRAFT_KEY) } catch { /* ignore */ }
       navigate(`/p/${projectId}`)
     } catch (err) {
+      if (uploaded.length > 0) await bucket.remove(uploaded).catch(() => undefined)
       setError(err instanceof Error ? err.message : String(err))
     } finally {
       setStatusMsg('')
     }
   }
 
-  const host = formatHost(primaryLink)
+  const host = formatHost(activePrimary)
   const wordCount = body.trim() ? body.trim().split(/\s+/).length : 0
   const readMinutes = Math.max(1, Math.round(wordCount / 180))
   const firstVideoPreview = mediaPreviews.find((m) => m.isVideo)
@@ -688,8 +697,8 @@ export function NewProjectPage() {
                 </div>
               )}
               <span className="pub-preview-badge">{spec.icon} {PROJECT_TYPE_LABELS[type]}</span>
-              {extraMeta.trim() && (
-                <span className="pub-preview-extra">{extraMeta.trim()}</span>
+              {activeExtra && (
+                <span className="pub-preview-extra">{activeExtra}</span>
               )}
               {(type === 'video' || type === 'short') && (
                 <span className="pub-preview-play" aria-hidden="true">▶</span>
@@ -703,9 +712,9 @@ export function NewProjectPage() {
               {type === 'post' && wordCount > 0 && (
                 <span className="pub-preview-meta">📖 ~{readMinutes} min de lectura</span>
               )}
-              {primaryLink.trim() && (
+              {activePrimary && (
                 <span className="pub-preview-link">
-                  <Icon name="external" /> {host || primaryLink.trim()} · {spec.ctaLabel}
+                  <Icon name="external" /> {host || activePrimary} · {spec.ctaLabel}
                 </span>
               )}
               {mediaPreviews.length > 0 && (

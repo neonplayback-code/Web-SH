@@ -31,7 +31,8 @@ const makeCover = (c1: string, c2: string) =>
     `</svg>`
   )}`
 
-const SEEDS: DemoSeed[] = [
+// Solo existen en desarrollo: en la web publicada el compilador elimina estos datos de ejemplo.
+const SEEDS: DemoSeed[] = !import.meta.env.DEV ? [] : [
   {
     id: 'demo-app-1',
     type: 'app',

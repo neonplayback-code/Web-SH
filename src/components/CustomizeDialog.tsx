@@ -89,6 +89,13 @@ function Toggle({ label, checked, onChange }: { label: string; checked: boolean;
   )
 }
 
+// "Restablecer todo" devuelve también el modo y el color de ambiente, no solo los ajustes finos.
+function resetAll() {
+  resetPrefs()
+  setPreset('ice')
+  setMode('astra')
+}
+
 // Ventana de personalización: cada ajuste se aplica al instante y se recuerda en este navegador.
 export function CustomizeDialog() {
   const open = useOpenPanel() === 'customize'
@@ -256,7 +263,7 @@ export function CustomizeDialog() {
       </div>
 
       <footer className="cz-foot">
-        <button type="button" className="ghost-button" onClick={resetPrefs}>
+        <button type="button" className="ghost-button" onClick={resetAll}>
           <Icon name="back" /><span>Restablecer todo</span>
         </button>
         <button type="button" className="save-button" onClick={closePanel}>Listo</button>

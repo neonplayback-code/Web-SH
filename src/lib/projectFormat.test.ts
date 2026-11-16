@@ -42,6 +42,12 @@ describe('parseVideoEmbed & helpers', () => {
     expect(parseVideoEmbed('https://example.com/trailer')).toBeNull()
   })
 
+  it('rejects ids that could escape the embed path', () => {
+    expect(parseVideoEmbed('https://youtube.com/watch?v=../../x')).toBeNull()
+    expect(parseVideoEmbed('https://youtube.com/watch?v=a%2Fb')).toBeNull()
+    expect(parseVideoEmbed('https://youtube.com/watch')).toBeNull()
+  })
+
   it('formats host labels and reading minutes cleanly', () => {
     expect(hostLabel('https://www.thebookofshaders.com/01/')).toBe('thebookofshaders.com')
     expect(estimateReadingMinutes('hola mundo')).toBe(1)

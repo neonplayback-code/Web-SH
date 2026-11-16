@@ -6,7 +6,9 @@ import './a11y.css'
 import './hangar-tech-buttons.css'
 import './hangar-polish.css'
 import './hangar-neo.css'
+import './auth.css'
 import App from './App.tsx'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { initPrefs } from './lib/prefs'
 import { initHangarFx } from './lib/hangarFx'
 
@@ -16,8 +18,10 @@ initHangarFx()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
-      <App />
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
+        <App />
+      </BrowserRouter>
+    </ErrorBoundary>
   </StrictMode>,
 )

@@ -20,7 +20,7 @@ html[data-mode=overdrive] .tab-filters .search-box { flex: 1 1 320px; min-width:
 html[data-mode=overdrive] .tab-filters .search-box::before {
   content: "BUSCAR//"; position: absolute; top: -6px; left: 10px; z-index: 2;
   padding: 0 5px; background: var(--hgp-bar, #0b1420);
-  font: 700 9px/1 var(--hg-font-mono, var(--mono)); letter-spacing: .2em; color: var(--hg-ac);
+  font: 700 11px/1 var(--hg-font-mono, var(--mono)); letter-spacing: .2em; color: var(--hg-ac);
   pointer-events: none;
 }
 /* Atajo de teclado: "/" enfoca el buscador. Se oculta al escribir y en pantallas táctiles. */

@@ -2,7 +2,6 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 import { useCurrentUser } from '../lib/useCurrentUser'
 import { Footer } from './Footer'
-import { RailExtra } from './RailExtra'
 import { TabBar } from './TabBar'
 
 // Marco de las páginas interiores. En HANGAR conserva el riel lateral de la extensión;
@@ -24,7 +23,6 @@ export function PageShell({ children }: { children: ReactNode }) {
             </Link>
           </div>
         </section>
-        <RailExtra />
       </div>
       <div className="col-stage">
         <TabBar />

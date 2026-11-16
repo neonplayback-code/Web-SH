@@ -12,7 +12,7 @@ export function ProjectCard({ project }: { project: Project }) {
         </span>
         <span className="game-info">
           <strong>{project.title}</strong>
-          <small>{PROJECT_TYPE_LABELS[project.type].toUpperCase()} · @{project.authorUsername} · ♥ {project.likes ?? 0}</small>
+          <small>{project.status === 'draft' ? 'BORRADOR · ' : ''}{PROJECT_TYPE_LABELS[project.type].toUpperCase()} · @{project.authorUsername} · ♥ {project.likes ?? 0}</small>
           {project.summary && <span className="pub-summary">{project.summary}</span>}
         </span>
       </Link>

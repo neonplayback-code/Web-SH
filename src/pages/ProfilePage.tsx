@@ -1,39 +1,76 @@
 import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { Link, useParams } from 'react-router'
 import { isBackendConfigured, supabase } from '../lib/supabase'
-import { PROJECT_SELECT, toProject, type ProjectRow } from '../lib/projects'
+import { PROJECT_LIST_SELECT, toProject, type ProjectRow } from '../lib/projects'
 import { hueOf } from '../lib/hue'
+import { useCurrentUser } from '../lib/useCurrentUser'
 import { useDocumentMeta } from '../lib/useDocumentMeta'
 import { ProjectCard } from '../components/ProjectCard'
 import { Notice } from '../components/Notice'
 import type { Project } from '../types'
 
+interface Loaded {
+  username: string
+  found: boolean
+  profileId: string | null
+  since: number | null
+  published: Project[]
+  drafts: Project[]
+  error: string
+}
+
 export function ProfilePage() {
   const { username = '' } = useParams()
-  const [projects, setProjects] = useState<Project[] | null>(null)
-  const [error, setError] = useState('')
+  const { user } = useCurrentUser()
+  const [data, setData] = useState<Loaded | null>(null)
   useDocumentMeta(username ? `@${username}` : null, username ? `Publicaciones de @${username}.` : null)
 
   useEffect(() => {
     if (!isBackendConfigured) return
-    supabase
-      .from('projects')
-      .select(PROJECT_SELECT)
-      .eq('author_username', username)
-      .eq('status', 'published')
-      .order('created_at', { ascending: false })
-      .then(({ data, error: err }) => {
-        if (err) return setError(err.message)
-        setProjects(((data ?? []) as ProjectRow[]).map(toProject))
-      })
-  }, [username])
+    let alive = true
+    const fail = (message: string): Loaded => ({ username, found: false, profileId: null, since: null, published: [], drafts: [], error: message })
 
-  const likes = useMemo(() => (projects ?? []).reduce((sum, p) => sum + (p.likes ?? 0), 0), [projects])
-  const since = useMemo(() => {
-    if (!projects?.length) return ''
-    const oldest = Math.min(...projects.map((p) => p.createdAt))
-    return new Date(oldest).toLocaleDateString('es', { month: 'long', year: 'numeric' })
-  }, [projects])
+    ;(async () => {
+      const profile = await supabase.from('profiles').select('id, created_at').eq('username', username).maybeSingle()
+      if (profile.error) return alive && setData(fail(profile.error.message))
+      if (!profile.data) return alive && setData({ ...fail(''), found: false })
+
+      // Los nombres son únicos, pero se filtra por id: es lo que de verdad identifica a la persona.
+      const rows = await supabase
+        .from('projects')
+        .select(PROJECT_LIST_SELECT)
+        .eq('author_id', profile.data.id)
+        .order('created_at', { ascending: false })
+      if (rows.error) return alive && setData(fail(rows.error.message))
+
+      // Los borradores solo los devuelve el servidor a su autor.
+      const all = ((rows.data ?? []) as ProjectRow[]).map(toProject)
+      if (alive) {
+        setData({
+          username,
+          found: true,
+          profileId: profile.data.id,
+          since: Number(profile.data.created_at),
+          published: all.filter((p) => p.status === 'published'),
+          drafts: all.filter((p) => p.status === 'draft'),
+          error: '',
+        })
+      }
+    })()
+
+    return () => {
+      alive = false
+    }
+  }, [username, user?.id])
+
+  // Mientras llega la respuesta de otro perfil no se enseñan datos del anterior.
+  const current = data?.username === username ? data : null
+  const published = useMemo(() => current?.published ?? [], [current])
+  const drafts = current && user?.id === current.profileId ? current.drafts : []
+  const likes = useMemo(() => published.reduce((sum, p) => sum + (p.likes ?? 0), 0), [published])
+  const since = current?.since
+    ? new Date(current.since).toLocaleDateString('es', { month: 'long', year: 'numeric' })
+    : ''
 
   return (
     <div className="profile-page">
@@ -48,7 +85,7 @@ export function ProfilePage() {
           <span className="section-kicker">PERFIL DE CREADOR</span>
           <h1>@{username}</h1>
           <p className="profile-stats">
-            <span><b>{projects?.length ?? 0}</b> publicaciones</span>
+            <span><b>{published.length}</b> publicaciones</span>
             <span><b>{likes}</b> ♥ recibidos</span>
             {since && <span>desde {since}</span>}
           </p>
@@ -56,15 +93,31 @@ export function ProfilePage() {
       </header>
 
       {!isBackendConfigured && <Notice>Configura Supabase para ver perfiles reales.</Notice>}
-      {error && <Notice>No se pudo cargar el perfil: {error}</Notice>}
-      {projects === null && isBackendConfigured && !error && <Notice>Cargando…</Notice>}
-      {projects && projects.length === 0 && (
+      {current?.error && <Notice>No se pudo cargar el perfil: {current.error}</Notice>}
+      {!current && isBackendConfigured && <Notice>Cargando…</Notice>}
+      {current && !current.error && !current.found && (
+        <div className="utility-card pub-empty"><strong>Este perfil no existe</strong><Link to="/">Volver al inicio</Link></div>
+      )}
+      {current?.found && published.length === 0 && drafts.length === 0 && (
         <div className="utility-card pub-empty"><strong>Todavía no hay publicaciones</strong></div>
       )}
-      {projects && projects.length > 0 && (
+      {published.length > 0 && (
         <div className="pub-grid">
-          {projects.map((p) => <ProjectCard key={p.id} project={p} />)}
+          {published.map((p) => <ProjectCard key={p.id} project={p} />)}
         </div>
+      )}
+      {drafts.length > 0 && (
+        <section className="profile-drafts" aria-labelledby="drafts-heading">
+          <div className="utility-heading">
+            <div>
+              <span className="section-kicker">SOLO TÚ LOS VES</span>
+              <h2 id="drafts-heading">Borradores</h2>
+            </div>
+          </div>
+          <div className="pub-grid">
+            {drafts.map((p) => <ProjectCard key={p.id} project={p} />)}
+          </div>
+        </section>
       )}
     </div>
   )

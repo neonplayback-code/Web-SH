@@ -39,7 +39,7 @@ export function Header() {
         <div className="tele-cell tele-count" aria-hidden="true">
           <span className="tele-label">SESIÓN</span><b>{user ? 'ON' : '—'}</b>
         </div>
-        {(isBackendConfigured || import.meta.env.DEV) && (
+        {import.meta.env.DEV && (
           <div className="online-pill">
             <span className="online-dot" />
             <span>SUPABASE</span>

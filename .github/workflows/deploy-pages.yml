@@ -31,19 +31,28 @@ jobs:
       - name: Instalar dependencias
         run: npm ci
 
+      - name: Revisar código (lint y pruebas)
+        run: |
+          npm run lint
+          npm test
+
       - name: Configurar base de GitHub Pages
         id: base
         run: |
           REPO_NAME="${{ github.event.repository.name }}"
+          OWNER="${{ github.repository_owner }}"
           if [[ "$REPO_NAME" == *.github.io ]]; then
             echo "vite_base=/" >> "$GITHUB_OUTPUT"
+            echo "site_url=https://${REPO_NAME}/" >> "$GITHUB_OUTPUT"
           else
             echo "vite_base=/${REPO_NAME}/" >> "$GITHUB_OUTPUT"
+            echo "site_url=https://${OWNER}.github.io/${REPO_NAME}/" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Compilar sitio público
         env:
           VITE_BASE: ${{ steps.base.outputs.vite_base }}
+          VITE_SITE_URL: ${{ steps.base.outputs.site_url }}
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
         run: npm run build

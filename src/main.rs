@@ -73,9 +73,52 @@ fn clean_username(raw: &str) -> String {
         .next()
         .unwrap_or("")
         .chars()
-        .filter(|character| character.is_alphanumeric() || matches!(character, '.' | '_' | '-'))
+        // Solo alfabeto latino (hasta U+024F, con tildes y ñ): evita letras de otros alfabetos que imitan a las latinas.
+        .filter(|character| {
+            (character.is_alphanumeric() && (*character as u32) <= 0x024F) || matches!(character, '.' | '_' | '-')
+        })
         .take(30)
         .collect()
+}
+
+// La dirección de cada sección (plural) no es el tipo guardado (singular): "videos" -> "video".
+fn kind_for_section(section: &str) -> &str {
+    match section {
+        "proyectos" => "app",
+        "videos" => "video",
+        "anuncios" => "anuncio",
+        "posts" => "post",
+        "betas" => "beta",
+        "demos" => "demo",
+        "avances" => "avance",
+        "links" => "link",
+        "shorts" => "short",
+        other => other,
+    }
+}
+
+// Solo http(s): lo guardado nunca debe poder abrir otros esquemas (javascript:, data:...).
+fn safe_url(url: &str) -> Option<&str> {
+    let lower = url.trim_start().to_ascii_lowercase();
+    (lower.starts_with("https://") || lower.starts_with("http://")).then_some(url)
+}
+
+// Fecha legible (UTC) a partir de milisegundos desde 1970.
+fn format_millis(ms: i64) -> String {
+    let secs = ms.div_euclid(1000);
+    let days = secs.div_euclid(86_400);
+    let rest = secs.rem_euclid(86_400);
+    // Días desde 1970 a año/mes/día (algoritmo civil de Howard Hinnant).
+    let z = days + 719_468;
+    let era = z.div_euclid(146_097);
+    let doe = z.rem_euclid(146_097);
+    let yoe = (doe - doe / 1460 + doe / 36_524 - doe / 146_096) / 365;
+    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    let mp = (5 * doy + 2) / 153;
+    let day = doy - (153 * mp + 2) / 5 + 1;
+    let month = if mp < 10 { mp + 3 } else { mp - 9 };
+    let year = yoe + era * 400 + i64::from(month <= 2);
+    format!("{year:04}-{month:02}-{day:02} {:02}:{:02} UTC", rest / 3600, rest % 3600 / 60)
 }
 
 fn kind_label(kind: &str) -> &str {
@@ -101,7 +144,7 @@ fn filter_publications(
     sort_likes: bool,
 ) -> Vec<Publication> {
     let needle = search.trim().to_lowercase();
-    let selected_type = if section == "proyectos" { "app" } else { section };
+    let selected_type = kind_for_section(section);
 
     let matches = |kind: &str, title: &str, summary: &str| -> bool {
         (section.is_empty() || kind == selected_type)
@@ -190,11 +233,11 @@ fn trigger_toggle_like(
 
     spawn(async move {
         match backend::toggle_like(&project_id, &auth.access_token).await {
-            Ok((_, count)) => {
+            Ok((now_liked, count)) => {
+                // El servidor dice si ahora te gusta: así la lista local nunca se desincroniza.
                 let mut current = liked();
-                if let Some(pos) = current.iter().position(|id| id == &project_id) {
-                    current.remove(pos);
-                } else {
+                current.retain(|id| id != &project_id);
+                if now_liked {
                     current.push(project_id.clone());
                 }
                 liked.set(current);
@@ -447,7 +490,7 @@ fn HomeScreen(
             div { class: "stats-row",
                 div { strong { "{total_projects}" } span { "publicaciones" } }
                 div { strong { "{total_likes}" } span { "me gusta" } }
-                div { strong { "3" } span { "modos visuales" } }
+                div { strong { "2" } span { "modos visuales" } }
             }
         }
         section { class: "tab-body",
@@ -685,14 +728,20 @@ fn NewProjectScreen(
                         .map(str::to_lowercase)
                         .collect(),
                     draft: draft(),
-                    cover: cover.take(),
-                    media: media.take(),
+                    cover: cover(),
+                    media: media(),
                 };
-                match backend::create_project(payload, &auth, &username_for(&auth)).await {
+                let username = match backend::fetch_username(&auth.user.id, &auth.access_token).await {
+                    Some(name) => name,
+                    None => username_for(&auth),
+                };
+                match backend::create_project(payload, &auth, &username).await {
                     Ok(_) => {
                         if let Ok(data) = backend::fetch_projects(Some(&auth.access_token)).await {
                             projects.set(data);
                         }
+                        cover.set(None);
+                        media.set(Vec::new());
                         title.set(String::new());
                         summary.set(String::new());
                         body.set(String::new());
@@ -803,7 +852,17 @@ fn NewProjectScreen(
             }
             div { class: "form-actions",
                 button { r#type: "button", class: "ghost-button", onclick: move |_| screen.set(Screen::Home), "Cancelar" }
-                button { r#type: "submit", class: "ghost-button", disabled: busy(), onclick: move |_| draft.set(true), "Guardar borrador" }
+                // El borrador no es "submit": con Enter, el navegador pulsa el primer botón de envío y eso debe publicar.
+                button {
+                    r#type: "button",
+                    class: "ghost-button",
+                    disabled: busy(),
+                    onclick: move |_| {
+                        draft.set(true);
+                        let _ = document::eval("document.querySelector('form.form-card')?.requestSubmit()");
+                    },
+                    "Guardar borrador"
+                }
                 button { r#type: "submit", class: "save-button", disabled: busy(), onclick: move |_| draft.set(false),
                     if busy() { "Subiendo…" } else { "Publicar" }
                 }
@@ -877,7 +936,7 @@ fn DetailScreen(
                     }
                     if !project.links.is_empty() {
                         div { class: "pub-links",
-                            for url in project.links.iter() {
+                            for url in project.links.iter().filter_map(|url| safe_url(url)) {
                                 a { class: "launcher-pill", href: "{url}", target: "_blank", rel: "noopener noreferrer", "{url}" }
                             }
                         }
@@ -957,7 +1016,7 @@ fn DetailScreen(
                     div { class: "update-list",
                         for update in updates() {
                             div { class: "update-item",
-                                time { "{update.created_at}" }
+                                time { "{format_millis(update.created_at)}" }
                                 p { "{update.text}" }
                             }
                         }
@@ -1034,6 +1093,21 @@ mod tests {
         assert_eq!(clean_username("  alchemy.dev@example.com "), "alchemy.dev");
         assert_eq!(clean_username("user!@#$%_name"), "user");
         assert_eq!(clean_username(&"a".repeat(50)).len(), 30);
+        assert_eq!(clean_username("p\u{430}blo"), "pblo");
+    }
+
+    #[test]
+    fn only_http_links_are_safe() {
+        assert_eq!(safe_url("https://example.com"), Some("https://example.com"));
+        assert_eq!(safe_url("HTTP://example.com"), Some("HTTP://example.com"));
+        assert_eq!(safe_url("javascript:alert(1)"), None);
+        assert_eq!(safe_url("data:text/html,x"), None);
+    }
+
+    #[test]
+    fn formats_epoch_millis() {
+        assert_eq!(format_millis(0), "1970-01-01 00:00 UTC");
+        assert_eq!(format_millis(1_731_434_400_000), "2024-11-12 18:00 UTC");
     }
 
     #[test]
@@ -1051,6 +1125,12 @@ mod tests {
         let projects_only = filter_publications(&[], false, "proyectos", "", false);
         assert_eq!(projects_only.len(), 1);
         assert_eq!(projects_only[0].kind, "app");
+
+        // Cada sección filtra por su tipo, no por su dirección en plural.
+        let videos = filter_publications(&[], false, "videos", "", false);
+        assert_eq!(videos.len(), 1);
+        assert_eq!(videos[0].kind, "video");
+        assert_eq!(kind_for_section("betas"), "beta");
 
         let sorted = filter_publications(&[], false, "", "", true);
         assert!(sorted.windows(2).all(|pair| pair[0].likes >= pair[1].likes));

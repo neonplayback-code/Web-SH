@@ -1,20 +1,25 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useProjects } from '../lib/useProjects'
+import { Navigate } from 'react-router'
+import { loadMoreProjects, useProjects } from '../lib/useProjects'
 import { useDocumentMeta } from '../lib/useDocumentMeta'
+import { useSiteProfile } from '../lib/siteProfile'
 import type { Tab } from '../config/tabs'
 import { Creator } from '../components/Creator'
 import { Footer } from '../components/Footer'
 import { Icon } from '../components/Icon'
 import { Item } from '../components/Items'
 import { Notice } from '../components/Notice'
-import { RailExtra } from '../components/RailExtra'
 import { TabBar } from '../components/TabBar'
 
 type Sort = 'recent' | 'liked'
 
+// Para buscar sin que importen mayúsculas, tildes ni el # de las etiquetas ("accion" encuentra "acción", "#web" encuentra "web").
+const fold = (s: string) => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
+
 // Una sección del sitio: cabecera del creador y, debajo, el cuerpo propio de la sección (su `layout`).
 export function TabPage({ tab }: { tab: Tab }) {
-  const { projects, loading, error } = useProjects()
+  const { projects, loading, error, hasMore, loadingMore, total } = useProjects()
+  const { hiddenTabs } = useSiteProfile()
   const [text, setText] = useState('')
   const [sort, setSort] = useState<Sort>('recent')
   const [shown, setShown] = useState(tab.pageSize)
@@ -34,19 +39,20 @@ export function TabPage({ tab }: { tab: Tab }) {
     return () => document.removeEventListener('keydown', onKey)
   }, [])
 
-  const totalLikes = useMemo(() => projects.reduce((sum, p) => sum + (p.likes ?? 0), 0), [projects])
-  const avanceCount = useMemo(() => projects.filter((p) => p.type === 'avance').length, [projects])
   const ofTab = useMemo(() => (tab.type ? projects.filter((p) => p.type === tab.type) : projects), [projects, tab.type])
 
   const filtered = useMemo(() => {
-    const needle = text.trim().toLowerCase()
+    const needle = fold(text.trim().replace(/^#+/, ''))
     const list = needle
-      ? ofTab.filter((p) => [p.title, p.summary, p.authorUsername, ...(p.tags ?? [])].some((s) => s?.toLowerCase().includes(needle)))
+      ? ofTab.filter((p) => [p.title, p.summary, p.authorUsername, ...(p.tags ?? [])].some((s) => s && fold(s).includes(needle)))
       : ofTab
     return sort === 'liked' ? [...list].sort((a, b) => (b.likes ?? 0) - (a.likes ?? 0)) : list
   }, [ofTab, text, sort])
 
   const visible = filtered.slice(0, shown)
+
+  // Una sección que el dueño ocultó tampoco se abre escribiendo su dirección.
+  if (tab.slug && hiddenTabs.includes(tab.slug)) return <Navigate to="/" replace />
 
   let body
   if (error) {
@@ -69,14 +75,7 @@ export function TabPage({ tab }: { tab: Tab }) {
     <main className="dashboard" id="contenido">
       {/* Riel lateral en HANGAR; en ASTRA la rejilla reparte: tabs, creador + resumen, cuerpo */}
       <div className="col-rail">
-        <Creator projects={projects} />
-        <RailExtra
-          stats={[
-            { label: 'Publicaciones', value: projects.length },
-            { label: 'Me gusta', value: totalLikes },
-            { label: 'Avances', value: avanceCount },
-          ]}
-        />
+        <Creator projects={projects} total={total} />
       </div>
 
       <div className="col-stage">
@@ -85,7 +84,7 @@ export function TabPage({ tab }: { tab: Tab }) {
         <section className="tab-body" aria-labelledby="tab-heading">
           <header className="section-heading tab-head">
             <div className="section-title">
-              <span className="section-kicker">{filtered.length} ELEMENTOS</span>
+              <span className="section-kicker">{filtered.length} {filtered.length === 1 ? 'ELEMENTO' : 'ELEMENTOS'}</span>
               <h2 id="tab-heading">{tab.title}<span className="heading-period">.</span></h2>
             </div>
             <p className="tab-blurb">{tab.blurb}</p>
@@ -143,9 +142,18 @@ export function TabPage({ tab }: { tab: Tab }) {
 
           {body}
 
-          {filtered.length > shown && (
-            <button type="button" className="ghost-button tab-more" onClick={() => setShown((n) => n + tab.pageSize)}>
-              {tab.more}
+          {(filtered.length > shown || hasMore) && (
+            <button
+              type="button"
+              className="ghost-button tab-more"
+              disabled={loadingMore}
+              onClick={() => {
+                // Primero se muestra lo que ya está cargado; cuando se acaba, se piden más al servidor.
+                if (filtered.length > shown) setShown((n) => n + tab.pageSize)
+                else void loadMoreProjects()
+              }}
+            >
+              {loadingMore ? 'Cargando…' : tab.more}
             </button>
           )}
         </section>

@@ -6,6 +6,12 @@ describe('cleanUsername', () => {
     expect(cleanUsername('Ana_María.99-x')).toBe('Ana_María.99-x')
   })
 
+  it('quita letras de otros alfabetos que imitan a las latinas', () => {
+    // La "а" es cirílica: se ve igual que la "a" latina pero es otro carácter.
+    expect(cleanUsername('p\u0430blo')).toBe('pblo')
+    expect(cleanUsername('Niño.Ñandú')).toBe('Niño.Ñandú')
+  })
+
   it('quita espacios y símbolos', () => {
     expect(cleanUsername('ana the  #1!')).toBe('anathe1')
   })

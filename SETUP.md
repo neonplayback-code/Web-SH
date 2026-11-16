@@ -39,6 +39,10 @@ La configuración base son dos archivos, cada uno en **su propia consulta** (as�
    Sin este paso la web funciona igual con los valores de `src/config/site.ts`, pero no podrás guardar cambios de perfil.
    (`3-arreglo-usuario.sql` solo hace falta si alguna cuenta quedó con el correo como nombre de usuario.)
 
+6. Otra consulta nueva: [supabase/5-endurecer.sql](supabase/5-endurecer.sql). **Ejecútala siempre, también si ya tenías la web funcionando**:
+   cierra un hueco por el que cualquier cuenta podía hacerse dueña cambiando la fecha de su perfil, hace únicos los nombres de usuario,
+   limita los enlaces a http(s) y crea el contador de visitas.
+
 Todos se pueden ejecutar más de una vez sin romper nada. Si alguno da un error en rojo, cópialo completo.
 
 Qué crea:
@@ -61,7 +65,7 @@ inmediato, como antes. Si lo dejas activo, cada cuenta nueva tiene que confirmar
 ## 5. Probar que funciona
 
 1. `npm install` y `npm run dev`.
-2. En la cabecera, la píldora **SUPABASE** debe decir **OK** (si dice OFF, falta `.env` o no se reinició el servidor).
+2. En desarrollo (`npm run dev`), la cabecera muestra una píldora **SUPABASE** que debe decir **OK** (si dice OFF, falta `.env` o no se reinició el servidor). En la web publicada no se muestra.
 3. Pulsa **Entrar** en la cabecera, ve a **Crear cuenta** y regístrate con correo y contraseña. **Hazlo tú primero**:
    la primera cuenta es la del dueño. Luego abre **`/nuevo`** (no hay enlace público; escribe la ruta a mano) para publicar.
    Los visitantes solo ven y dan ♥ después de iniciar sesión.
@@ -77,6 +81,11 @@ Si algo falla, el error aparece en rojo en el formulario o en un aviso. Los más
 ## 6. Dominios permitidos (cuando publiques la web)
 
 **Authentication → URL Configuration**: añade el dominio final de la web en **Site URL** y en **Redirect URLs**.
+Si la web vive en una subcarpeta (GitHub Pages: `https://usuario.github.io/nombre-del-repo/`), añade también esa dirección completa
+(con la subcarpeta y `/entrar`): los enlaces del correo de "Olvidé mi contraseña" y de "Enlace mágico" vuelven a ella.
+
+Nota: el plan gratuito de Supabase limita cada archivo subido a 50 MB aunque el bucket permita 100 MB. Para videos más grandes
+hace falta un plan de pago o subirlos a YouTube/Vimeo y pegar el enlace.
 
 ## 7. Publicar la web (más adelante)
 

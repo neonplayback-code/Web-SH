@@ -4,7 +4,6 @@
 
 @property --ang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
 @keyframes astra-orbit { to { --ang: 360deg; } }
-@keyframes astra-aurora { from { background-position: 0% 50%; } to { background-position: 200% 50%; } }
 
 /* Cápsula de búsqueda: nebulosa dentro y un borde de color que da vueltas despacio */
 html[data-mode=astra] .tab-filters {

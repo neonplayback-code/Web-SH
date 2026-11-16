@@ -1,0 +1,240 @@
+/* ==========================================================================================================
+   Acceso (entrar, crear cuenta, enlace al correo, recuperar contraseña).
+   Usa los mismos tokens que el resto de la web (--text, --muted, --edge, --radius, --cyan, --purple, --display…),
+   así que en ASTRA se ve de cristal y redondeado y en HANGAR sale de panel recto, sin tocar nada más.
+   ========================================================================================================== */
+
+.ax-shell {
+  --ax-ok: var(--hg-ok, #5eead4);
+  --ax-bad: #ff8fa0;
+  --ax-warn: #ffd479;
+  --ax-r: calc(var(--radius, 18px) * .8);
+  --ax-accent: linear-gradient(100deg, var(--cyan), var(--purple));
+  position: relative; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  width: min(1000px, 100%); min-height: 640px; overflow: hidden;
+  border: 1px solid var(--edge); border-radius: calc(var(--radius, 18px) * 1.4);
+  background: linear-gradient(160deg, rgba(14, 20, 44, .72), rgba(6, 9, 22, .78));
+  -webkit-backdrop-filter: blur(24px) saturate(160%); backdrop-filter: blur(24px) saturate(160%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 40px 90px -40px rgba(0, 0, 0, .9);
+  color: var(--text);
+}
+html[data-mode=overdrive] .ax-shell {
+  --ax-accent: var(--hg-ac, var(--cyan));
+  border-top: 2px solid var(--hg-ac, var(--cyan));
+  background: linear-gradient(180deg, rgba(14, 19, 23, .9), rgba(7, 9, 11, .94));
+}
+
+/* ------------------------------------------------------------------------------------------ ficha (izquierda) */
+.ax-stage {
+  position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: 28px;
+  padding: 30px 32px 34px; overflow: hidden; border-right: 1px solid var(--edge);
+  background:
+    radial-gradient(90% 60% at 0% 0%, color-mix(in srgb, var(--cyan) 20%, transparent), transparent 70%),
+    radial-gradient(80% 60% at 100% 100%, color-mix(in srgb, var(--purple) 24%, transparent), transparent 72%);
+}
+.ax-brand { position: relative; z-index: 2; display: flex; align-items: center; gap: 12px; font: 700 17px/1 var(--display); letter-spacing: .02em; }
+.ax-brand img { width: 40px; height: 40px; border-radius: 50%; object-fit: contain; box-shadow: 0 0 0 2px color-mix(in srgb, var(--cyan) 50%, transparent); }
+
+/* Un solo adorno: anillos que giran muy despacio detrás de la ficha. */
+.ax-rings { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; }
+.ax-rings i { position: absolute; left: 0; top: 0; border: 1px solid color-mix(in srgb, var(--cyan) 32%, transparent); border-radius: 50%; translate: -50% -50%; animation: ax-spin 90s linear infinite; }
+.ax-rings i:nth-child(1) { width: 300px; height: 300px; }
+.ax-rings i:nth-child(2) { width: 460px; height: 460px; border-style: dashed; border-color: color-mix(in srgb, var(--purple) 30%, transparent); animation-duration: 140s; animation-direction: reverse; }
+.ax-rings i:nth-child(3) { width: 640px; height: 640px; border-color: color-mix(in srgb, var(--cyan) 16%, transparent); animation-duration: 220s; }
+.ax-rings i::after { content: ""; position: absolute; left: 50%; top: -3px; width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 12px var(--cyan); }
+html[data-mode=overdrive] .ax-rings i { border-radius: 0; }
+html[data-mode=overdrive] .ax-rings i::after { border-radius: 0; }
+@keyframes ax-spin { to { rotate: 360deg; } }
+
+.ax-badge {
+  --h: 220;
+  position: relative; z-index: 2; width: min(100%, 372px); margin: auto; padding: 26px 26px 22px;
+  display: grid; gap: 18px;
+  border: 1px solid hsl(var(--h) 75% 65% / .38); border-radius: calc(var(--radius, 18px) * 1.1);
+  background: linear-gradient(165deg, hsl(var(--h) 60% 40% / .26), rgba(8, 12, 26, .82) 62%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1), 0 24px 50px -24px rgba(0, 0, 0, .85);
+  transition: border-color .4s, background .4s;
+}
+.ax-badge[data-ready=true] { border-color: color-mix(in srgb, var(--ax-ok) 55%, transparent); }
+.ax-badge-top { display: flex; align-items: center; gap: 14px; padding-right: 36px; min-width: 0; }
+.ax-avatar {
+  flex: none; display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%;
+  background: linear-gradient(140deg, hsl(var(--h) 85% 60%), hsl(calc(var(--h) + 55) 80% 42%));
+  font: 800 24px/1 var(--display); color: #fff; text-shadow: 0 1px 8px rgba(0, 0, 0, .35);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, .08), 0 10px 22px -10px hsl(var(--h) 90% 55% / .8);
+  transition: background .4s;
+}
+html[data-mode=overdrive] .ax-avatar { border-radius: 0; }
+.ax-badge-id { display: grid; gap: 3px; min-width: 0; }
+.ax-badge-id strong { overflow: hidden; font: 700 19px/1.2 var(--display); text-overflow: ellipsis; white-space: nowrap; }
+.ax-badge-id small { color: var(--muted); font: 13px/1.3 var(--body); }
+.ax-checks { display: grid; gap: 10px; margin: 0; padding: 14px 0 0; list-style: none; border-top: 1px solid var(--edge); }
+.ax-check { display: flex; align-items: center; gap: 10px; color: var(--muted); font: 14px/1.3 var(--body); transition: color .25s; }
+.ax-check.is-ok { color: var(--text); }
+.ax-check-dot { flex: none; display: grid; place-items: center; width: 18px; height: 18px; border: 1.5px solid var(--edge); border-radius: 50%; transition: background .25s, border-color .25s; }
+html[data-mode=overdrive] .ax-check-dot { border-radius: 0; }
+.ax-check.is-ok .ax-check-dot { border-color: var(--ax-ok); background: color-mix(in srgb, var(--ax-ok) 22%, transparent); color: var(--ax-ok); animation: ax-pop .35s var(--ease, ease-out); }
+.ax-check.is-pending .ax-check-dot { border-style: dashed; }
+.ax-check-dot svg { width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.ax-badge-seal {
+  position: absolute; top: 16px; right: 16px; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid var(--edge); color: var(--muted); transition: color .3s, border-color .3s, background .3s;
+}
+html[data-mode=overdrive] .ax-badge-seal { border-radius: 0; }
+.ax-badge-seal svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ax-badge[data-ready=true] .ax-badge-seal { color: #04120d; border-color: var(--ax-ok); background: var(--ax-ok); animation: ax-pop .4s var(--ease, ease-out); }
+.ax-promise { position: relative; z-index: 2; max-width: 32ch; margin: 0; color: var(--muted); font: 15px/1.55 var(--body); }
+@keyframes ax-pop { 0% { transform: scale(.6); } 60% { transform: scale(1.18); } 100% { transform: scale(1); } }
+
+/* ------------------------------------------------------------------------------------------ formulario (derecha) */
+.ax-panel { display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 40px 48px; }
+.ax-form { display: grid; gap: 18px; min-width: 0; }
+.ax-shell button { font: inherit; letter-spacing: normal; text-transform: none; }
+
+.ax-tabs {
+  position: relative; display: grid; grid-template-columns: 1fr 1fr; padding: 4px; border: 1px solid var(--edge);
+  border-radius: calc(var(--radius, 18px) * 2); background: rgba(255, 255, 255, .035);
+}
+.ax-tabs button {
+  position: relative; z-index: 1; min-height: 44px; padding: 0 12px; border: 0; border-radius: inherit; background: transparent;
+  color: var(--muted); font: 600 15px/1 var(--body); cursor: pointer; transition: color .25s;
+}
+.ax-tabs button:hover { color: var(--text); }
+.ax-tabs button[aria-selected=true] { color: #050912; }
+.ax-tabs i {
+  position: absolute; left: 4px; top: 4px; bottom: 4px; width: calc(50% - 4px); border-radius: calc(var(--radius, 18px) * 2 - 4px);
+  background: var(--ax-accent); box-shadow: 0 8px 22px -10px var(--cyan); transition: transform .35s cubic-bezier(.3, .8, .3, 1);
+}
+.ax-tabs[data-active=signup] i { transform: translateX(100%); }
+
+.ax-back { display: inline-flex; align-items: center; gap: 8px; width: fit-content; min-height: 44px; padding: 0 4px; border: 0; background: none; color: var(--muted); font: 600 14px/1 var(--body); cursor: pointer; }
+.ax-back:hover { color: var(--text); }
+.ax-back svg, .ax-link svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+
+.ax-head { display: grid; gap: 8px; animation: ax-in .35s var(--ease, ease-out) both; }
+.ax-head h1, .ax-sent h1 { margin: 0; font: 800 clamp(27px, 3.2vw, 35px)/1.08 var(--display); letter-spacing: -.01em; text-wrap: balance; }
+.ax-lead { max-width: 46ch; margin: 0; color: var(--muted); font: 15px/1.55 var(--body); }
+@keyframes ax-in { from { opacity: 0; translate: 0 6px; } }
+
+.ax-field { display: grid; gap: 8px; min-width: 0; }
+.ax-field-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.ax-field-head label { color: var(--text); font: 600 14px/1.2 var(--body); }
+
+.ax-shell .ax-input {
+  position: relative; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 6px 0 14px;
+  border: 1px solid var(--edge); border-radius: var(--ax-r); background: rgba(255, 255, 255, .045);
+  transition: border-color .2s, box-shadow .2s, background .2s;
+}
+.ax-shell .ax-input:hover { border-color: color-mix(in srgb, var(--cyan) 32%, var(--edge)); }
+.ax-shell .ax-input:focus-within { border-color: var(--cyan); background: rgba(255, 255, 255, .07); box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 18%, transparent); }
+.ax-field.has-error .ax-input { border-color: var(--ax-bad); box-shadow: 0 0 0 4px rgba(255, 143, 160, .12); }
+.ax-input > svg { flex: none; width: 18px; height: 18px; fill: none; stroke: var(--muted); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.ax-input:focus-within > svg { stroke: var(--cyan); }
+.ax-at { flex: none; color: var(--muted); font: 600 17px/1 var(--body); }
+html .ax-shell .ax-input input {
+  flex: 1; min-width: 0; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; border-radius: 0; outline: 0; box-shadow: none;
+  background: transparent; color: var(--text); font: 16px/1.2 var(--body); letter-spacing: normal; text-transform: none; appearance: none; -webkit-appearance: none;
+}
+/* El anillo de foco lo pone el contenedor (:focus-within); el global de cada modo dibujaría un segundo recuadro dentro. */
+html .ax-shell .ax-input input:focus, html .ax-shell .ax-input input:focus-visible { outline: 0 !important; box-shadow: none !important; }
+.ax-shell .ax-input input::placeholder { color: color-mix(in srgb, var(--muted) 70%, transparent); opacity: 1; }
+.ax-shell .ax-input input:-webkit-autofill { -webkit-text-fill-color: var(--text); -webkit-box-shadow: 0 0 0 100px rgba(14, 20, 44, .95) inset; caret-color: var(--text); }
+.ax-eye { flex: none; display: grid; place-items: center; width: 42px; height: 42px; border: 0; border-radius: calc(var(--ax-r) - 2px); background: transparent; color: var(--muted); cursor: pointer; }
+.ax-eye:hover { color: var(--text); background: rgba(255, 255, 255, .06); }
+.ax-eye svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.ax-ok { flex: none; display: grid; place-items: center; width: 28px; height: 28px; margin-right: 6px; color: var(--ax-ok); }
+.ax-ok svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+
+.ax-msg { display: flex; align-items: flex-start; gap: 7px; margin: 0; color: var(--muted); font: 13px/1.45 var(--body); }
+.ax-msg svg { flex: none; width: 15px; height: 15px; margin-top: 1px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ax-msg.is-error { color: var(--ax-bad); }
+.ax-msg.is-warn { color: var(--ax-warn); }
+.ax-msg.is-hint { color: var(--text); }
+.is-ok-text { color: var(--ax-ok); }
+.is-warn-text { color: var(--ax-warn); }
+
+.ax-inline { padding: 0; border: 0; background: none; color: var(--cyan); font: 600 13px/1.4 var(--body); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.ax-inline:hover { color: var(--text); }
+
+.ax-meter { display: grid; gap: 7px; }
+.ax-meter-bars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+.ax-meter-bars i { height: 5px; border-radius: 99px; background: var(--edge); transition: background .3s; }
+html[data-mode=overdrive] .ax-meter-bars i { border-radius: 0; }
+.ax-meter p { margin: 0; color: var(--muted); font: 13px/1.45 var(--body); }
+.ax-meter p b { color: var(--text); font-weight: 700; }
+.ax-meter[data-score="0"] .ax-meter-bars i.on { background: var(--ax-bad); }
+.ax-meter[data-score="1"] .ax-meter-bars i.on { background: #ff9f6b; }
+.ax-meter[data-score="2"] .ax-meter-bars i.on { background: var(--ax-warn); }
+.ax-meter[data-score="3"] .ax-meter-bars i.on { background: #7be0c6; }
+.ax-meter[data-score="4"] .ax-meter-bars i.on { background: var(--ax-ok); }
+
+.ax-alert {
+  display: flex; align-items: flex-start; gap: 10px; margin: 0; padding: 12px 14px; border: 1px solid rgba(255, 143, 160, .45); border-radius: var(--ax-r);
+  background: rgba(255, 143, 160, .1); color: #ffd0d8; font: 14px/1.45 var(--body); animation: ax-shake .4s;
+}
+.ax-alert svg { flex: none; width: 18px; height: 18px; margin-top: 1px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+@keyframes ax-shake { 20% { translate: -6px 0; } 40% { translate: 5px 0; } 60% { translate: -3px 0; } 80% { translate: 2px 0; } }
+
+.ax-submit, .ax-ghost {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 54px; padding: 0 20px;
+  border: 1px solid transparent; border-radius: var(--ax-r); cursor: pointer; text-decoration: none; font: 700 16px/1 var(--display);
+  transition: transform .2s, box-shadow .2s, opacity .2s, border-color .2s, background .2s;
+}
+.ax-submit { background: var(--ax-accent); color: #050912; box-shadow: 0 14px 30px -14px var(--cyan); }
+.ax-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 18px 34px -14px var(--cyan); }
+.ax-submit:active:not(:disabled) { transform: translateY(0); }
+.ax-ghost { border-color: var(--edge); background: rgba(255, 255, 255, .04); color: var(--text); }
+.ax-ghost:hover:not(:disabled) { border-color: var(--cyan); }
+.ax-submit:disabled, .ax-ghost:disabled { opacity: .62; cursor: not-allowed; }
+.ax-spinner { flex: none; width: 18px; height: 18px; border: 2.5px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: ax-turn .7s linear infinite; }
+.ax-spinner.is-small { width: 16px; height: 16px; margin-right: 10px; border-width: 2px; color: var(--muted); }
+@keyframes ax-turn { to { rotate: 360deg; } }
+
+.ax-link { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 44px; border: 0; background: none; color: var(--muted); font: 600 14px/1 var(--body); cursor: pointer; }
+.ax-link:hover { color: var(--text); }
+.ax-note { margin: 0; color: var(--muted); font: 13px/1.5 var(--body); text-align: center; }
+
+/* ------------------------------------------------------------------------------------------ paso "revisa tu correo" */
+.ax-sent { display: grid; gap: 16px; justify-items: start; animation: ax-in .4s var(--ease, ease-out) both; }
+.ax-sent-icon {
+  position: relative; display: grid; place-items: center; width: 76px; height: 76px; margin-bottom: 4px; border: 1px solid color-mix(in srgb, var(--cyan) 45%, transparent);
+  border-radius: 50%; background: color-mix(in srgb, var(--cyan) 12%, transparent); color: var(--cyan);
+}
+html[data-mode=overdrive] .ax-sent-icon { border-radius: 0; }
+.ax-sent-icon > svg { width: 34px; height: 34px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.ax-sent-icon i { position: absolute; right: -4px; bottom: -4px; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--ax-ok); color: #04120d; animation: ax-pop .5s .25s var(--ease, ease-out) both; }
+html[data-mode=overdrive] .ax-sent-icon i { border-radius: 0; }
+.ax-sent-icon i svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.ax-sent-to { margin: 0; padding: 10px 14px; border: 1px dashed var(--edge); border-radius: var(--ax-r); color: var(--muted); font: 14px/1.4 var(--body); overflow-wrap: anywhere; }
+.ax-sent-to b { color: var(--text); }
+.ax-sent-actions { display: grid; gap: 10px; width: 100%; margin-top: 6px; }
+.ax-sent .ax-note { text-align: left; }
+
+/* ------------------------------------------------------------------------------------------ pantalla pequeña */
+@media (max-width: 860px) {
+  .ax-shell { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+  .ax-stage { flex-direction: row; align-items: center; gap: 14px; padding: 14px 18px; border-right: 0; border-bottom: 1px solid var(--edge); }
+  .ax-rings, .ax-promise, .ax-checks, .ax-badge-seal, .ax-badge-id small { display: none; }
+  .ax-brand img { width: 34px; height: 34px; }
+  .ax-badge { width: auto; max-width: 52%; margin: 0 0 0 auto; padding: 0; gap: 0; border: 0; background: none; box-shadow: none; }
+  .ax-badge-top { padding-right: 0; gap: 10px; }
+  .ax-avatar { width: 38px; height: 38px; font-size: 17px; }
+  .ax-badge-id strong { font-size: 15px; }
+  .ax-panel { padding: 24px 20px 28px; }
+}
+@media (max-width: 380px) {
+  .ax-brand span { display: none; }
+  .ax-badge { max-width: none; }
+}
+
+/* Movimiento: solo el que responde a lo que haces; se apaga con "Animaciones: Quietas" y con prefers-reduced-motion. */
+html[data-motion=off] :is(.ax-rings i, .ax-head, .ax-sent, .ax-alert, .ax-spinner),
+html[data-motion=calm] .ax-rings i { animation: none; }
+html[data-motion=off] .ax-shell * { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+@media (prefers-reduced-motion: reduce) {
+  .ax-shell *, .ax-shell *::before, .ax-shell *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+  .ax-spinner { animation-duration: 1.4s !important; animation-iteration-count: infinite !important; }
+}
+
+/* HANGAR pone los títulos en mayúsculas y con un color apagado: en este panel el título se lee mejor en frase y a todo contraste. */
+html[data-mode=overdrive] .ax-shell :is(.ax-head h1, .ax-sent h1) { background: none; -webkit-text-fill-color: currentColor; color: var(--text); text-transform: none; letter-spacing: -.01em; text-shadow: none; }

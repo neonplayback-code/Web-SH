@@ -16,7 +16,7 @@ html[data-mode=astra] {
   --dim: #8590ab;
 }
 html[data-mode=astra] body { color: var(--text); font-weight: 400; letter-spacing: .005em; }
-html[data-mode=astra] :is(h1, h2, h3, .wordmark, .utility-heading h2, .hero-title) { font-family: var(--display); color: #ffffff; text-shadow: 0 0 18px rgba(170, 200, 255, .22); }
+html[data-mode=astra] :is(h1, h2, h3, .wordmark, .utility-heading h2) { font-family: var(--display); color: #ffffff; text-shadow: 0 0 18px rgba(170, 200, 255, .22); }
 html[data-mode=astra] .shortcut-name { color: #ffffff; }
 html[data-mode=astra] .shortcut-domain, html[data-mode=astra] .hero-subtitle { color: var(--muted); }
 html[data-mode=astra] .search input::placeholder { color: #9ea8c2; }
@@ -37,9 +37,9 @@ html[data-mode=overdrive] .shortcut-domain, html[data-mode=overdrive] .tele-labe
 
 /* HANGAR type roles: each kind of text gets its own voice instead of one face for everything.
    display (Orbitron) for titles and names, UI (Exo 2 light) for running text, mono (Cascadia) for labels and buttons, numerals in Orbitron. */
-html[data-mode=overdrive] :is(.hero-subtitle, .mode-desc, .plugin-desc, .shortcut-domain, .sg-item) { font-family: var(--hg-font-ui); font-weight: 300; color: var(--hg-text2); }
+html[data-mode=overdrive] :is(.hero-subtitle) { font-family: var(--hg-font-ui); font-weight: 300; color: var(--hg-text2); }
 html[data-mode=overdrive] .shortcut-name { font-weight: 700; font-size: 13px; }
-html[data-mode=overdrive] :is(.eyebrow, .section-kicker, .plugin-chip, .mode-btn, .theme-row > span, .search kbd, .clock-label, .clock-live) { font-family: var(--hg-font-mono); text-transform: uppercase; letter-spacing: .14em; font-weight: 500; }
+html[data-mode=overdrive] :is(.eyebrow, .section-kicker, .mode-btn) { font-family: var(--hg-font-mono); text-transform: uppercase; letter-spacing: .14em; font-weight: 500; }
 html[data-mode=overdrive] :is(time, .clock-panel time, .tele-cell b) { font-family: var(--hg-font-display); font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: .04em; }
 
 /* Animated RGB gradient on the big text: titles, wordmark and numerals. Static when reduced motion is on. */

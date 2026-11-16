@@ -1,5 +1,5 @@
 import { useEffect, useState, type CSSProperties, type FormEvent } from 'react'
-import { useParams, Link } from 'react-router'
+import { useParams, Link, useNavigate } from 'react-router'
 import { isBackendConfigured, supabase } from '../lib/supabase'
 import { PROJECT_SELECT, toProject, toUpdate, type ProjectRow } from '../lib/projects'
 import { findBetaCatalogProject } from '../lib/betaCatalog'
@@ -8,6 +8,7 @@ import { useCurrentUser } from '../lib/useCurrentUser'
 import { hasLiked, toggleLike } from '../lib/likes'
 import { hueOf } from '../lib/hue'
 import { useDocumentMeta } from '../lib/useDocumentMeta'
+import { safeHref } from '../lib/siteProfile'
 import { TABS } from '../config/tabs'
 import { LikeButton } from '../components/LikeButton'
 import { Notice } from '../components/Notice'
@@ -22,10 +23,24 @@ import {
 import { PROJECT_TYPE_LABELS, type Project, type ProjectUpdate } from '../types'
 
 const isVideo = (url: string) => /\.(mp4|webm|mov)(\?|$)/i.test(url)
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+// Borra los archivos de una publicación (portada y galería viven en su carpeta). Si falla, la fila se borra igual.
+async function removeProjectFiles(authorId: string, projectId: string) {
+  try {
+    const bucket = supabase.storage.from('media')
+    const folder = `users/${authorId}/projects/${projectId}`
+    const { data } = await bucket.list(folder, { limit: 100 })
+    if (data && data.length > 0) await bucket.remove(data.map((f) => `${folder}/${f.name}`))
+  } catch {
+    /* los archivos sueltos no impiden borrar la publicación */
+  }
+}
 
 export function ProjectPage() {
   const { id = '' } = useParams()
   const { user } = useCurrentUser()
+  const navigate = useNavigate()
   const [project, setProject] = useState<Project | null>(null)
   const [state, setState] = useState<'loading' | 'ready' | 'missing' | 'error'>('loading')
   const [updates, setUpdates] = useState<ProjectUpdate[]>([])
@@ -36,12 +51,20 @@ export function ProjectPage() {
   const [likeError, setLikeError] = useState('')
   const [copied, setCopied] = useState(false)
   const [playingEmbed, setPlayingEmbed] = useState(false)
+  const [views, setViews] = useState<number | null>(null)
+  const [ownerBusy, setOwnerBusy] = useState(false)
+  const [ownerError, setOwnerError] = useState('')
   useDocumentMeta(project?.title ?? null, project?.summary ?? null)
 
   const isDemo = Boolean(findDemoProject(id) ?? findBetaCatalogProject(id))
+  // El catálogo de presentación no son publicaciones reales: no admite ♥.
+  const isCatalog = !findDemoProject(id) && Boolean(findBetaCatalogProject(id))
 
   useEffect(() => {
     setPlayingEmbed(false)
+    setViews(null)
+    setUpdates([])
+    setOwnerError('')
     const demoItem = findDemoProject(id) ?? findBetaCatalogProject(id)
     if (demoItem) {
       setProject(demoItem)
@@ -50,40 +73,93 @@ export function ProjectPage() {
       setState('ready')
       return
     }
-    if (!isBackendConfigured) {
+    // Sin sesión de datos o con una dirección que no es un UUID, no hay nada que buscar.
+    if (!isBackendConfigured || !UUID.test(id)) {
+      setProject(null)
       setState('missing')
       return
     }
+    let alive = true
+    setState('loading')
     supabase
       .from('projects')
       .select(PROJECT_SELECT)
       .eq('id', id)
       .maybeSingle()
       .then(({ data, error: err }) => {
+        if (!alive) return
         if (err) return setState('error')
-        if (!data) return setState('missing')
+        if (!data) {
+          setProject(null)
+          return setState('missing')
+        }
         setProject(toProject(data as ProjectRow))
         setState('ready')
       })
+    return () => {
+      alive = false
+    }
   }, [id])
 
+  const loadedId = project?.id
+  const loadedStatus = project?.status
+
   useEffect(() => {
-    if (isDemo || !isBackendConfigured || !project) return
+    if (isDemo || !isBackendConfigured || !loadedId) return
+    let alive = true
     supabase
       .from('project_updates')
       .select('id, text, created_at')
-      .eq('project_id', id)
+      .eq('project_id', loadedId)
       .order('created_at', { ascending: false })
-      .then(({ data }) => setUpdates((data ?? []).map(toUpdate)))
-  }, [id, isDemo, project])
+      .then(({ data }) => alive && setUpdates((data ?? []).map(toUpdate)))
+    return () => {
+      alive = false
+    }
+  }, [isDemo, loadedId])
 
+  // Cuenta la visita una vez por sesión del navegador; las siguientes veces solo lee el total.
   useEffect(() => {
-    if (isDemo || !isBackendConfigured || !user) {
+    if (isDemo || !isBackendConfigured || !loadedId || loadedStatus !== 'published') return
+    let alive = true
+    ;(async () => {
+      const key = `od_seen_${loadedId}`
+      let seen = false
+      try { seen = sessionStorage.getItem(key) === '1' } catch { /* sin almacenamiento */ }
+      let total: number | null = null
+      // Se marca antes de pedir: así un doble montaje o una recarga rápida no cuenta dos visitas.
+      if (!seen) {
+        try { sessionStorage.setItem(key, '1') } catch { /* sin almacenamiento */ }
+      }
+      if (seen) {
+        const { data } = await supabase.from('project_views').select('views').eq('project_id', loadedId).maybeSingle()
+        total = data ? Number(data.views) : null
+      } else {
+        const { data, error: err } = await supabase.rpc('bump_view', { p_project_id: loadedId })
+        if (!err) total = Number(data)
+        else {
+          try { sessionStorage.removeItem(key) } catch { /* sin almacenamiento */ }
+        }
+      }
+      if (alive && total !== null && Number.isFinite(total)) setViews(total)
+    })()
+    return () => {
+      alive = false
+    }
+  }, [isDemo, loadedId, loadedStatus])
+
+  const userId = user?.id
+  useEffect(() => {
+    if (isDemo || !isBackendConfigured || !userId) {
       setLiked(false)
       return
     }
-    hasLiked(id, user.id).then(setLiked).catch(() => setLiked(false))
-  }, [id, isDemo, user])
+    let alive = true
+    hasLiked(id, userId).then((v) => alive && setLiked(v)).catch(() => alive && setLiked(false))
+    return () => {
+      alive = false
+    }
+  }, [id, isDemo, userId])
 
   if (state === 'loading') return <Notice>Cargando…</Notice>
   if (state === 'error') return <Notice>No se pudo cargar la publicación.</Notice>
@@ -98,7 +174,8 @@ export function ProjectPage() {
   const section = TABS.find((t) => t.type === project.type)
   const backTo = section ? `/${section.slug}` : '/'
   const gallery = project.mediaUrls ?? []
-  const links = project.links ?? []
+  // Solo http(s): lo guardado nunca debe poder abrir otros esquemas (javascript:, data:...).
+  const links = (project.links ?? []).filter((l) => safeHref(l) !== null)
   const primaryUrl = links[0]
   const extraLinks = links.slice(1)
   const videoFile = gallery.find((url) => isVideo(url))
@@ -133,6 +210,7 @@ export function ProjectPage() {
   }
 
   const onLike = async () => {
+    if (isCatalog) return
     if (isDemo) {
       const nextLiked = !liked
       setLiked(nextLiked)
@@ -153,6 +231,33 @@ export function ProjectPage() {
     }
   }
 
+  const changeStatus = async (status: 'draft' | 'published') => {
+    setOwnerBusy(true)
+    setOwnerError('')
+    const { data, error: err } = await supabase
+      .from('projects')
+      .update({ status, updated_at: Date.now() })
+      .eq('id', id)
+      .select('id')
+    setOwnerBusy(false)
+    if (err) return setOwnerError(err.message)
+    if (!data || data.length === 0) return setOwnerError('No se pudo cambiar el estado: no tienes permiso.')
+    setProject((p) => (p ? { ...p, status } : p))
+  }
+
+  const removeProject = async () => {
+    if (!window.confirm('¿Eliminar esta publicación para siempre? No se puede deshacer.')) return
+    setOwnerBusy(true)
+    setOwnerError('')
+    const { data, error: err } = await supabase.from('projects').delete().eq('id', id).select('id')
+    if (err || !data || data.length === 0) {
+      setOwnerBusy(false)
+      return setOwnerError(err?.message ?? 'No se pudo eliminar: no tienes permiso.')
+    }
+    await removeProjectFiles(project.authorUid, id)
+    navigate(backTo, { replace: true })
+  }
+
   const copyLink = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href)
@@ -165,9 +270,10 @@ export function ProjectPage() {
 
   const bylineEl = (
     <p className="pub-byline">
-      Por <Link to={`/u/${project.authorUsername}`}>@{project.authorUsername}</Link>
+      Por <Link to={`/u/${encodeURIComponent(project.authorUsername)}`}>@{project.authorUsername}</Link>
       <i aria-hidden="true">·</i>
       <time dateTime={new Date(project.createdAt).toISOString()}>{date}</time>
+      {views !== null && (<><i aria-hidden="true">·</i><span>{views} {views === 1 ? 'visita' : 'visitas'}</span></>)}
     </p>
   )
 
@@ -206,7 +312,7 @@ export function ProjectPage() {
         <LikeButton
           liked={liked}
           count={project.likes ?? 0}
-          busy={likeBusy}
+          busy={likeBusy || isCatalog || project.status === 'draft'}
           onClick={onLike}
           to={isDemo || user ? undefined : `/entrar?next=/p/${id}`}
         />
@@ -214,6 +320,7 @@ export function ProjectPage() {
           <Icon name="link" /><span>{copied ? 'Enlace copiado' : 'Copiar enlace'}</span>
         </button>
       </div>
+      {isCatalog && <p className="pub-hint">Esta ficha es de presentación: los ♥ se activan cuando se publique.</p>}
       {!isDemo && !user && <p className="pub-hint"><Link to={`/entrar?next=/p/${id}`}>Inicia sesión</Link> para dar ♥.</p>}
       {likeError && <p className="form-error">{likeError}</p>}
     </>
@@ -290,7 +397,7 @@ export function ProjectPage() {
           <article className="project-hero utility-card pub-hero-video is-type-video">
             <div className="pub-theater" style={coverHue}>
               {videoFile ? (
-                <video src={videoFile} controls poster={project.coverUrl ?? undefined} className="pub-theater-media" />
+                <video src={videoFile} controls preload="metadata" poster={project.coverUrl ?? undefined} className="pub-theater-media" />
               ) : embedUrl && playingEmbed ? (
                 <iframe
                   src={`${embedUrl}?autoplay=1`}
@@ -342,7 +449,7 @@ export function ProjectPage() {
           <article className="project-hero utility-card pub-hero-short is-type-short">
             <div className="pub-reel-frame" style={coverHue}>
               {videoFile ? (
-                <video src={videoFile} controls loop playsInline poster={project.coverUrl ?? undefined} className="pub-reel-media" />
+                <video src={videoFile} controls preload="metadata" loop playsInline poster={project.coverUrl ?? undefined} className="pub-reel-media" />
               ) : embedUrl && playingEmbed ? (
                 <iframe
                   src={`${embedUrl}?autoplay=1`}
@@ -490,6 +597,25 @@ export function ProjectPage() {
         </span>
       </nav>
 
+      {isOwner && !isDemo && (
+        <div className="utility-card pub-ownerbar" role="group" aria-label="Acciones del autor">
+          <span className={`pub-status-dot${project.status === 'draft' ? ' is-upcoming' : ''}`}>
+            {project.status === 'draft' ? 'BORRADOR · SOLO TÚ LO VES' : 'PUBLICADO'}
+          </span>
+          <span className="pub-ownerbar-actions">
+            {project.status === 'draft' ? (
+              <button type="button" className="save-button" disabled={ownerBusy} onClick={() => changeStatus('published')}>Publicar ahora</button>
+            ) : (
+              <button type="button" className="ghost-button" disabled={ownerBusy} onClick={() => changeStatus('draft')}>Pasar a borrador</button>
+            )}
+            <button type="button" className="ghost-button" disabled={ownerBusy} onClick={removeProject}>
+              <Icon name="trash" /><span>Eliminar</span>
+            </button>
+          </span>
+          {ownerError && <p className="form-error" role="alert">{ownerError}</p>}
+        </div>
+      )}
+
       {renderHero()}
 
       {showSeparateBody && (
@@ -512,7 +638,7 @@ export function ProjectPage() {
           <div className="pub-gallery">
             {extraGallery.map((url) =>
               isVideo(url)
-                ? <video key={url} src={url} controls className="pub-media" />
+                ? <video key={url} src={url} controls preload="metadata" className="pub-media" />
                 : <img key={url} src={url} alt="" loading="lazy" className="pub-media" />
             )}
           </div>
@@ -543,7 +669,7 @@ export function ProjectPage() {
             <div className="update-list">
               {updates.map((u) => (
                 <div key={u.id} className="update-item">
-                  <time>{new Date(u.createdAt).toLocaleString()}</time>
+                  <time>{new Date(u.createdAt).toLocaleString('es')}</time>
                   <p>{u.text}</p>
                 </div>
               ))}

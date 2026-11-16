@@ -23,7 +23,7 @@ html[data-mode=overdrive] :is(.hero-copy, .clock-panel, .utility-card, .game-car
 html[data-mode=overdrive] .home-hero { padding-top: 66px; padding-bottom: 90px; isolation: isolate; }
 html[data-mode=overdrive] .home-hero > :not(.hg-console-art) { position: relative; z-index: 1; }
 .hg-console-art { position: absolute; inset: 0; pointer-events: none; overflow: hidden; border-radius: inherit; }
-.hg-bay-label { display: flex; justify-content: space-between; gap: 8px; padding: 14px 26px; color: var(--hg-ac); font: 10px/1.4 var(--hg-font-mono); letter-spacing: .18em; border-bottom: 1px solid var(--hg-line); background: linear-gradient(90deg, var(--hg-soft), transparent); }
+.hg-bay-label { display: flex; justify-content: space-between; gap: 8px; padding: 14px 26px; color: var(--hg-ac); font: 11px/1.4 var(--hg-font-mono); letter-spacing: .18em; border-bottom: 1px solid var(--hg-line); background: linear-gradient(90deg, var(--hg-soft), transparent); }
 .hg-bay-label span:last-child { color: var(--hg-text3); }
 
 .hg-terminal { position: absolute; bottom: 0; left: 0; right: 0; padding: 14px 26px; display: grid; gap: 7px; border-top: 1px solid var(--hg-line); background: #020912aa; color: #91a9c2; font: 11px/1.5 var(--hg-font-mono); }
@@ -57,8 +57,8 @@ html[data-mode=overdrive][data-motion=off] .hg-console-art * { animation: none !
 html[data-mode=overdrive][data-fx=minimal] :is(.item, button, a) { box-shadow: none !important; }
 @media (max-width:760px) {
 
-  .hg-bay-label { padding-inline: 20px; font-size: 9px; letter-spacing: .1em; }
-  .hg-terminal { padding-inline: 20px; font-size: 10px; }
+  .hg-bay-label { padding-inline: 20px; font-size: 11px; letter-spacing: .1em; }
+  .hg-terminal { padding-inline: 20px; font-size: 11px; }
   html[data-mode=overdrive] .home-hero { padding-top: 64px; padding-bottom: 90px; }
   .hangar-presets { grid-template-columns: 1fr; }
 }
@@ -156,7 +156,6 @@ html[data-mode=overdrive] .profile-card .profile-stats span {
 html[data-mode=overdrive] :is(.home-hero, .home-stats.pulse) {
   background: linear-gradient(135deg, #0a1421f7, #101e2ef5 66%, #090f1bf7);
 }
-@keyframes hg-gradient-button { from { background-position: 0 50%; } to { background-position: 100% 50%; } }
 
 /* Mask the center so the gradient stays on all four edges and follows the corners. */
 @property --hg-edge-angle {
@@ -204,10 +203,6 @@ html[data-mode=overdrive] :is(.home-hero, .home-stats.pulse, .profile-card) {
 html[data-mode=overdrive] .home-stats.pulse,
 html[data-mode=overdrive] :is(.item, .game-card):nth-child(even) { --hg-edge-delay: -5s; }
 html[data-mode=overdrive] :is(.item, .game-card):nth-child(3n) { --hg-edge-delay: -9s; }
-html[data-mode=overdrive] :is(.item, .game-card):is(:hover, :focus-within) {
-  --hg-edge-opacity: 1;
-}
-@keyframes hg-edge-orbit { to { --hg-edge-angle: 360deg; } }
 @media (prefers-reduced-motion: reduce) {
   html[data-mode=overdrive] { --hg-edge-animation: none; }
 }

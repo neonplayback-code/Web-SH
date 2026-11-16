@@ -6,7 +6,6 @@ interface BetaSeed {
   summary: string
   body: string
   tags: string[]
-  likes: number
   daysAgo: number
   accent: [string, string]
 }
@@ -36,7 +35,6 @@ const BETA_SEEDS: BetaSeed[] = [
       'Estado: En desarrollo activo. Todavía no cuenta con lanzamiento público.'
     ].join('\n\n'),
     tags: ['en-beta', 'desktop', 'python', 'windows'],
-    likes: 18,
     daysAgo: 1,
     accent: ['#f97316', '#38bdf8'],
   },
@@ -51,7 +49,6 @@ const BETA_SEEDS: BetaSeed[] = [
       'Estado: En fase beta privada. Todavía no ha sido lanzado al público.'
     ].join('\n\n'),
     tags: ['en-beta', 'tauri', 'rust', 'python'],
-    likes: 16,
     daysAgo: 2,
     accent: ['#22d3ee', '#6366f1'],
   },
@@ -66,7 +63,6 @@ const BETA_SEEDS: BetaSeed[] = [
       'Estado: En fase de pruebas locales. Aún no está publicada en Chrome Web Store.'
     ].join('\n\n'),
     tags: ['en-beta', 'chrome', 'ia', 'nodejs'],
-    likes: 14,
     daysAgo: 3,
     accent: ['#a855f7', '#06b6d4'],
   },
@@ -81,7 +77,6 @@ const BETA_SEEDS: BetaSeed[] = [
       'Estado: En construcción temprana. Todavía no lanzado al público.'
     ].join('\n\n'),
     tags: ['en-beta', 'almacen-ia', 'desktop', 'seguridad'],
-    likes: 19,
     daysAgo: 4,
     accent: ['#ef4444', '#f59e0b'],
   },
@@ -96,7 +91,6 @@ const BETA_SEEDS: BetaSeed[] = [
       'Estado: En fase beta de diseño y revisión antes del lanzamiento.'
     ].join('\n\n'),
     tags: ['en-beta', 'web', 'portafolio', 'ui'],
-    likes: 15,
     daysAgo: 5,
     accent: ['#10b981', '#3b82f6'],
   },
@@ -123,8 +117,9 @@ export function betaCatalogProjects(): Project[] {
       status: 'published',
       createdAt,
       updatedAt: createdAt,
-      views: seed.likes * 3 + 10,
-      likes: seed.likes,
+      // Es un catálogo de presentación, no publicaciones reales: sin contadores inventados.
+      views: 0,
+      likes: 0,
     }
   })
 }

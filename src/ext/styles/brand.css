@@ -10,4 +10,3 @@ html[data-mode=overdrive] .brand-mark { width: 48px; height: 40px; border: 1px s
 html[data-mode=overdrive] .brand-mark::before { content: none; }
 html[data-mode=overdrive] .brand-mark .od-logo { width: 74%; --logo-a: var(--hg-ac); --logo-b: var(--hg-ac2); --logo-c: var(--hg-ac3); filter: drop-shadow(0 0 5px color-mix(in srgb, var(--hg-ac) 60%, transparent)); }
 /* Side panel follows its own palette tokens. */
-.brand .od-logo { width: 38px; --logo-a: var(--c1); --logo-b: var(--c2); --logo-c: var(--c3); }

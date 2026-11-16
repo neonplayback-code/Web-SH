@@ -8,13 +8,17 @@ export function useDocumentMeta(title?: string | null, description?: string | nu
   useEffect(() => {
     document.title = title ? `${title} · ${BASE_TITLE}` : BASE_TITLE
 
-    const meta = document.querySelector<HTMLMetaElement>('meta[name="description"]')
-    const text = description?.trim().slice(0, 160) || BASE_DESCRIPTION
-    if (meta) meta.content = text
+    // La descripción y el título también van en las etiquetas para compartir (og:), por si el lector ejecuta JavaScript.
+    const pairs: [HTMLMetaElement | null, string, string][] = [
+      [document.querySelector('meta[name="description"]'), description?.trim().slice(0, 160) || BASE_DESCRIPTION, BASE_DESCRIPTION],
+      [document.querySelector('meta[property="og:description"]'), description?.trim().slice(0, 160) || BASE_DESCRIPTION, BASE_DESCRIPTION],
+      [document.querySelector('meta[property="og:title"]'), title ? `${title} · ${BASE_TITLE}` : BASE_TITLE, BASE_TITLE],
+    ]
+    for (const [meta, text] of pairs) if (meta) meta.content = text
 
     return () => {
       document.title = BASE_TITLE
-      if (meta) meta.content = BASE_DESCRIPTION
+      for (const [meta, , base] of pairs) if (meta) meta.content = base
     }
   }, [title, description])
 }

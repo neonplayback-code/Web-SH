@@ -21,6 +21,7 @@ uniform float u_stars;
 uniform float u_nebula;
 uniform float u_twinkle;
 uniform float u_meteor;
+uniform float u_detail; // octavas de ruido: 6 en pantallas potentes, menos en móviles
 
 // ------------------------------------------------------------------ Hash & Noise
 float h21(vec2 p) {
@@ -52,6 +53,7 @@ float fbm6(vec2 p) {
   float amp = 0.5;
   mat2 rot = mat2(0.80, -0.60, 0.60, 0.80) * 2.03;
   for (int i = 0; i < 6; i++) {
+    if (float(i) >= u_detail) break;
     sum += amp * vnoise(p);
     p = rot * p + vec2(13.7, 7.9);
     amp *= 0.5;
@@ -66,6 +68,7 @@ float ridged5(vec2 p) {
   float weight = 1.0;
   mat2 rot = mat2(0.78, 0.62, -0.62, 0.78) * 2.08;
   for (int i = 0; i < 5; i++) {
+    if (float(i) >= u_detail - 1.0) break;
     float n = 1.0 - abs(vnoise(p) * 2.0 - 1.0);
     n = n * n * weight;
     weight = clamp(n * 1.45, 0.0, 1.0);
@@ -346,6 +349,7 @@ export function AstraSky({ onUnsupported }: { onUnsupported: () => void }) {
       u_nebula: gl.getUniformLocation(prog, 'u_nebula'),
       u_twinkle: gl.getUniformLocation(prog, 'u_twinkle'),
       u_meteor: gl.getUniformLocation(prog, 'u_meteor'),
+      u_detail: gl.getUniformLocation(prog, 'u_detail'),
     }
 
     const root = document.documentElement
@@ -353,7 +357,16 @@ export function AstraSky({ onUnsupported }: { onUnsupported: () => void }) {
     const active = () => !root.dataset.mode || root.dataset.mode === 'astra'
     const still = () => reduced.matches || root.dataset.motion === 'off'
 
-    let dpr = Math.min(window.devicePixelRatio || 1, 2)
+    // En móviles y pantallas táctiles el shader es lo que más batería gasta: se dibuja a menor resolución
+    // (el canvas se estira por CSS), con menos octavas de ruido y a 30 cuadros por segundo.
+    const coarse = matchMedia('(pointer: coarse)').matches || Math.min(window.innerWidth, window.innerHeight) < 600
+    const MIN_SCALE = 0.4
+    let scale = coarse ? 0.6 : 1
+    let detail = coarse ? 4 : 6
+    let slow = 0
+    let cssW = 0 // 0 = aún no se ha dimensionado el canvas
+    let cssH = 0
+    let dpr = Math.min(window.devicePixelRatio || 1, coarse ? 1 : 2) * scale
     let cur: [RGB, RGB, RGB] = [FALLBACK_C1, FALLBACK_C2, FALLBACK_C3]
     let target: [RGB, RGB, RGB] = cur
     let stars = 1
@@ -382,9 +395,16 @@ export function AstraSky({ onUnsupported }: { onUnsupported: () => void }) {
     }
 
     const resize = () => {
-      dpr = Math.min(window.devicePixelRatio || 1, 2)
-      const w = Math.max(1, Math.round(window.innerWidth * dpr))
-      const h = Math.max(1, Math.round(window.innerHeight * dpr))
+      // En móvil la barra del navegador cambia la altura al desplazar: esos saltos pequeños no reasignan el canvas.
+      const w0 = window.innerWidth
+      const h0 = window.innerHeight
+      const heightOnly = w0 === cssW && Math.abs(h0 - cssH) < cssH * 0.25
+      if (heightOnly && canvas.width > 1) return
+      cssW = w0
+      cssH = h0
+      dpr = Math.min(window.devicePixelRatio || 1, coarse ? 1 : 2) * scale
+      const w = Math.max(1, Math.round(cssW * dpr))
+      const h = Math.max(1, Math.round(cssH * dpr))
       if (canvas.width !== w || canvas.height !== h) {
         canvas.width = w
         canvas.height = h
@@ -405,12 +425,18 @@ export function AstraSky({ onUnsupported }: { onUnsupported: () => void }) {
       gl.uniform1f(u.u_nebula, nebula)
       gl.uniform1f(u.u_twinkle, twinkle)
       gl.uniform1f(u.u_meteor, meteor)
+      gl.uniform1f(u.u_detail, detail)
       gl.drawArrays(gl.TRIANGLES, 0, 3)
     }
 
     const frame = (now: number) => {
       raf = 0
       if (!active()) return
+      // Tope de 30 cuadros por segundo en pantallas táctiles.
+      if (coarse && last && now - last < 30) {
+        raf = requestAnimationFrame(frame)
+        return
+      }
       const dt = Math.min(0.1, (now - (last || now)) / 1000)
       last = now
       const speed = still() ? 0 : root.dataset.motion === 'calm' ? 0.35 : 1
@@ -429,6 +455,15 @@ export function AstraSky({ onUnsupported }: { onUnsupported: () => void }) {
       if (speed > 0 || moving || dirty) {
         draw()
         dirty = false
+        // Si aun así va justo (más de ~25 ms por cuadro de forma sostenida), baja la resolución un poco más.
+        slow = dt > (coarse ? 0.045 : 0.03) && speed > 0 ? slow + 1 : Math.max(0, slow - 2)
+        if (slow > 90 && scale > MIN_SCALE) {
+          scale = Math.max(MIN_SCALE, scale * 0.8)
+          detail = Math.min(detail, 4)
+          slow = 0
+          cssW = 0 // fuerza a reasignar el canvas con la escala nueva
+          resize()
+        }
       }
       if (speed > 0 || moving) raf = requestAnimationFrame(frame)
     }

@@ -22,13 +22,6 @@ html[data-mode=overdrive] .shortcut-card.is-new-group { animation-name: group-bi
 }
 
 /* Collapsible side blocks: a toggle in each heading folds the block to that heading line. */
-.collapse-toggle {
-  flex: none; margin-left: auto; width: 22px; height: 22px; display: grid; place-items: center;
-  border: 1px solid var(--edge, rgba(255, 255, 255, .14)); border-radius: 7px;
-  background: rgba(255, 255, 255, .05); color: var(--muted, #aab4cc); font: 600 14px/1 var(--mono, monospace); cursor: pointer;
-  transition: color .2s, border-color .2s, background .2s;
-}
-.collapse-toggle:hover, .collapse-toggle:focus-visible { color: var(--text, #fff); border-color: var(--cyan, #53efff); outline: none; }
 .is-collapsed > :not(.collapse-head) { display: none !important; }
 html[data-mode=overdrive] .collapse-toggle { border-radius: 0; border-color: var(--hg-line2); background: var(--hg-bg2); color: var(--hg-text2); }
 html[data-mode=overdrive] .collapse-toggle:hover, html[data-mode=overdrive] .collapse-toggle:focus-visible { border-color: var(--hg-ac); color: var(--hg-ac); }

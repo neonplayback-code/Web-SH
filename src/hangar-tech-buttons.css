@@ -610,10 +610,6 @@ html[data-mode=overdrive][data-fx=minimal] :is(
   html[data-mode=overdrive] :is(
     .tab, .ghost-button, .add-button, .save-button, .launcher-pill, .icon-button, .sort-btn, .pulse-customize,
     .crumb-back, .like-btn, .cz-seg > *, .hangar-presets > *, .cz-modes > *, .cz-fonts > *, .pe-check
-  ):is(:hover, :active) { transform: none; }
-  html[data-mode=overdrive] :is(
-    .tab, .ghost-button, .add-button, .save-button, .launcher-pill, .icon-button, .sort-btn, .pulse-customize,
-    .crumb-back, .like-btn, .cz-seg > *, .hangar-presets > *, .cz-modes > *, .cz-fonts > *, .pe-check
   )::after { transition: none; animation: none !important; }
   html[data-mode=overdrive] :is(.ghost-button, .launcher-pill, .save-button, .add-button, .pulse-customize, .crumb-back, .sort-btn):hover svg { transform: none; }
   html[data-mode=overdrive] .cz-switch, html[data-mode=overdrive] .cz-switch::after { transition: none; }

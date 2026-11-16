@@ -124,18 +124,18 @@ html[data-mode=overdrive] .tele-cell {
   animation: hg-rise .55s var(--hg-ease) both;
 }
 html[data-mode=overdrive] .tele-count { animation-delay: .05s; }
-html[data-mode=overdrive] .tele-label { font: 9px var(--hg-font-mono); letter-spacing: .22em; text-transform: uppercase; color: var(--hg-text3); }
+html[data-mode=overdrive] .tele-label { font: 11px var(--hg-font-mono); letter-spacing: .22em; text-transform: uppercase; color: var(--hg-text3); }
 html[data-mode=overdrive] .tele-cell :is(time, b) { font: 600 24px/1 var(--hg-font-display); font-variant-numeric: tabular-nums; color: var(--hg-text); }
 html[data-mode=overdrive] .tele-cell b.pop { animation: hg-pop .45s var(--hg-ease); }
 html[data-mode=overdrive] .online-pill {
   margin: 0; padding: 0 22px; gap: 10px; border: 0; border-left: 1px solid var(--hg-line); border-radius: 0; background: none; backdrop-filter: none;
-  font: 10px var(--hg-font-mono); letter-spacing: .16em; color: var(--hg-text2); text-transform: uppercase;
+  font: 11px var(--hg-font-mono); letter-spacing: .16em; color: var(--hg-text2); text-transform: uppercase;
 }
 html[data-mode=overdrive] .online-pill strong { color: var(--hg-text); font-weight: 600; }
 html[data-mode=overdrive] .online-dot, html[data-mode=overdrive] .clock-live i, html[data-mode=overdrive] .footer-center i, html[data-mode=overdrive] .hero-session i {
   width: 8px; height: 8px; border-radius: 0; background: var(--hg-ok); box-shadow: none; animation: hg-led 2.4s ease-in-out infinite;
 }
-html[data-mode=overdrive] .palette-button kbd { font: 10px var(--hg-font-mono); letter-spacing: .18em; text-transform: uppercase; color: var(--hg-text3); }
+html[data-mode=overdrive] .palette-button kbd { font: 11px var(--hg-font-mono); letter-spacing: .18em; text-transform: uppercase; color: var(--hg-text3); }
 
 /* ===================================================================== layout */
 html[data-mode=overdrive] .dashboard {
@@ -148,16 +148,15 @@ html[data-mode=overdrive] .col-rail {
   background: radial-gradient(560px 280px at 0% 0%, var(--hg-soft), transparent 70%), linear-gradient(180deg, var(--hg-bg2), var(--hg-bg));
 }
 html[data-mode=overdrive] .col-stage { padding: 0 30px 34px; }
-html[data-mode=overdrive] body:not(.is-ready) :is(.col-rail > *, .stage-head, .search, .theme-row, .section-heading, .utility-card, .footer) { animation: hg-rise .6s var(--hg-ease) both; }
+html[data-mode=overdrive] body:not(.is-ready) :is(.col-rail > *, .search, .section-heading, .utility-card, .footer) { animation: hg-rise .6s var(--hg-ease) both; }
 
 /* Stage header */
-.stage-head, .rail-extra { display: none; }
 html[data-mode=overdrive] .stage-head {
   display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin: 0 -30px 22px; padding: 22px 30px 20px;
   border-bottom: 1px solid var(--hg-line); background: linear-gradient(90deg, var(--hg-soft), transparent 42%);
 }
 html[data-mode=overdrive] .eyebrow, html[data-mode=overdrive] .stage-head .eyebrow {
-  display: flex; align-items: center; gap: 9px; margin: 0; font: 10px var(--hg-font-mono); letter-spacing: .26em; text-transform: uppercase; color: var(--hg-text3);
+  display: flex; align-items: center; gap: 9px; margin: 0; font: 11px var(--hg-font-mono); letter-spacing: .26em; text-transform: uppercase; color: var(--hg-text3);
 }
 html[data-mode=overdrive] .stage-head .eyebrow::before { content: ""; width: 7px; height: 7px; background: var(--hg-ac); }
 html[data-mode=overdrive] .stage-title { display: flex; align-items: center; gap: 16px; margin: 10px 0 0; font: 600 38px/1.1 var(--hg-font-display); letter-spacing: .03em; text-transform: uppercase; }
@@ -173,11 +172,11 @@ html[data-mode=overdrive] .hero-copy {
   flex: none; padding: 22px 24px 18px; overflow: visible; border: 0; border-bottom: 1px solid var(--hg-line); border-radius: 0; background: none; backdrop-filter: none; box-shadow: none;
 }
 html[data-mode=overdrive] .hero-copy::before, html[data-mode=overdrive] .hero-copy::after { display: none; }
-html[data-mode=overdrive] .hero-topline { margin-bottom: 14px; font: 10px var(--hg-font-mono); letter-spacing: .26em; text-transform: uppercase; }
+html[data-mode=overdrive] .hero-topline { margin-bottom: 14px; font: 11px var(--hg-font-mono); letter-spacing: .26em; text-transform: uppercase; }
 html[data-mode=overdrive] .hero-id { color: var(--hg-text3); }
 html[data-mode=overdrive] .hero-id .od-icon { color: var(--hg-ac); }
-html[data-mode=overdrive] .hero-session { color: var(--hg-text3); font-size: 9px; }
-html[data-mode=overdrive] .hero-greeting { margin: 0 0 8px; color: var(--hg-ac); font: 10px var(--hg-font-mono); letter-spacing: .2em; }
+html[data-mode=overdrive] .hero-session { color: var(--hg-text3); font-size: 11px; }
+html[data-mode=overdrive] .hero-greeting { margin: 0 0 8px; color: var(--hg-ac); font: 11px var(--hg-font-mono); letter-spacing: .2em; }
 html[data-mode=overdrive] .hero #greeting {
   font: 600 30px/1.18 var(--hg-font-display); letter-spacing: .03em; text-transform: uppercase; text-shadow: none; padding-top: .08em;
   background: linear-gradient(180deg, var(--hg-text) 20%, var(--hg-text2) 130%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
@@ -200,11 +199,11 @@ html[data-mode=overdrive] .clock-panel {
 html[data-mode=overdrive] .clock-panel::before { display: none; }
 html[data-mode=overdrive] .hero .clock-panel { width: auto; }
 html[data-mode=overdrive] .clock-panel::after { content: ""; display: block; position: absolute; inset: auto; top: 0; right: 0; width: 11px; height: 11px; padding: 0; z-index: auto; border-top: 2px solid var(--hg-line2); border-right: 2px solid var(--hg-line2); background: none; mask: none; opacity: 1; }
-html[data-mode=overdrive] .clock-label, html[data-mode=overdrive] .clock-live { font: 9px var(--hg-font-mono); letter-spacing: .22em; color: var(--hg-text3); }
+html[data-mode=overdrive] .clock-label, html[data-mode=overdrive] .clock-live { font: 11px var(--hg-font-mono); letter-spacing: .22em; color: var(--hg-text3); }
 html[data-mode=overdrive] .clock-panel time {
   margin: 8px 0 6px; font: 600 clamp(40px, 4vw, 52px)/1 var(--hg-font-display); letter-spacing: 0; text-shadow: none; color: var(--hg-text); background: none; -webkit-text-fill-color: currentColor;
 }
-html[data-mode=overdrive] .clock-bottom span:last-child, html[data-mode=overdrive] .date-button { font: 10.5px var(--hg-font-mono); letter-spacing: .1em; color: var(--hg-text2); text-transform: uppercase; }
+html[data-mode=overdrive] .clock-bottom span:last-child, html[data-mode=overdrive] .date-button { font: 11px var(--hg-font-mono); letter-spacing: .1em; color: var(--hg-text2); text-transform: uppercase; }
 html[data-mode=overdrive] .clock-cross { color: var(--hg-ac); text-shadow: none; animation: none; }
 html[data-mode=overdrive] .date-button:hover { color: var(--hg-ac); border-bottom-color: var(--hg-aline); }
 html[data-mode=overdrive] .weather-chip { margin-top: 12px; padding: 9px 12px; border: 1px solid var(--hg-line); border-bottom: 2px solid var(--hg-line2); border-radius: 0; background: var(--hg-bg2); color: var(--hg-text2); box-shadow: none; }
@@ -215,7 +214,7 @@ html[data-mode=overdrive] .weather-text b { color: var(--hg-text); font: 600 18p
 /* Rail extras: numbered fields */
 html[data-mode=overdrive] .rail-extra { display: flex; flex-direction: column; gap: 24px; padding: 22px 24px; }
 html[data-mode=overdrive] .field-label, html[data-mode=overdrive] .rail-extra .field-label {
-  display: flex; align-items: center; gap: 10px; margin: 0 0 10px; font: 10px var(--hg-font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--hg-text3);
+  display: flex; align-items: center; gap: 10px; margin: 0 0 10px; font: 11px var(--hg-font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--hg-text3);
 }
 html[data-mode=overdrive] .field-label .idx { color: var(--hg-ac); }
 html[data-mode=overdrive] .field-label::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--hg-line2), transparent); }
@@ -226,14 +225,14 @@ html[data-mode=overdrive] .mode-switch button.is-active { background: var(--hg-g
 html[data-mode=overdrive] .key-list { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
 html[data-mode=overdrive] .key-list li { display: flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 10px; border: 1px solid var(--hg-line); border-left: 3px solid var(--hg-line2); background: var(--hg-panel); color: var(--hg-text2); font-size: 12.5px; font-weight: 600; }
 html[data-mode=overdrive] .key-list li span { margin-left: auto; }
-html[data-mode=overdrive] .key-list kbd { padding: 1px 6px; border: 1px solid var(--hg-line2); background: var(--hg-bg2); color: var(--hg-text); font: 10px var(--hg-font-mono); letter-spacing: .06em; }
+html[data-mode=overdrive] .key-list kbd { padding: 1px 6px; border: 1px solid var(--hg-line2); background: var(--hg-bg2); color: var(--hg-text); font: 11px var(--hg-font-mono); letter-spacing: .06em; }
 
 /* ======================================================================= stage */
-html[data-mode=overdrive] :is(.clock-panel, .search, .shortcut-card, .utility-card, .dialog, .search-engine-menu, .catalog-card, .custom-preview, .calendar-pop, .game-card) {
+html[data-mode=overdrive] :is(.clock-panel, .search, .utility-card, .dialog, .game-card) {
   border-radius: 0; backdrop-filter: none; -webkit-backdrop-filter: none;
 }
-html[data-mode=overdrive] :is(.search, .shortcut-card, .utility-card, .search-engine-menu, .catalog-card, .custom-preview, .game-card)::before { display: none; }
-html[data-mode=overdrive] :is(.search, .shortcut-card, .utility-card)::after { display: none; }
+html[data-mode=overdrive] :is(.search, .utility-card, .game-card)::before { display: none; }
+html[data-mode=overdrive] :is(.search, .utility-card)::after { display: none; }
 
 html[data-mode=overdrive] .search {
   height: 54px; margin: 0 0 14px; padding: 0 16px 0 8px; gap: 12px;
@@ -242,7 +241,7 @@ html[data-mode=overdrive] .search {
 html[data-mode=overdrive] .search:focus-within { background: var(--hg-panel2); border-color: var(--hg-aline); border-bottom-color: var(--hg-ac); box-shadow: none; transform: none; }
 html[data-mode=overdrive] .search input { font: 600 14px var(--hg-font-ui); }
 html[data-mode=overdrive] .search input::placeholder { color: var(--hg-text3); font-weight: 500; }
-html[data-mode=overdrive] .search kbd { font: 10px var(--hg-font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--hg-text3); }
+html[data-mode=overdrive] .search kbd { font: 11px var(--hg-font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--hg-text3); }
 html[data-mode=overdrive] .search-engine-trigger > img { filter: none; }
 html[data-mode=overdrive] .search-engine-menu { border: 1px solid var(--hg-line2); background: var(--hg-panel); box-shadow: 0 18px 40px rgba(0, 0, 0, .5); animation: hg-rise .2s var(--hg-ease) both; }
 html[data-mode=overdrive] .search-engine-option { border-radius: 0; border: 0; border-left: 3px solid transparent; color: var(--hg-text2); font-weight: 600; }
@@ -251,7 +250,7 @@ html[data-mode=overdrive] .search-engine-option.is-selected { background: var(--
 html[data-mode=overdrive] .search-engine-option.is-selected::after { color: var(--hg-ac); text-shadow: none; }
 
 html[data-mode=overdrive] .theme-row { margin: 0 0 22px; justify-content: flex-end; gap: 8px; }
-html[data-mode=overdrive] .theme-row > span { margin-right: 6px; font: 10px var(--hg-font-mono); letter-spacing: .26em; color: var(--hg-text3); }
+html[data-mode=overdrive] .theme-row > span { margin-right: 6px; font: 11px var(--hg-font-mono); letter-spacing: .26em; color: var(--hg-text3); }
 html[data-mode=overdrive] .theme-swatch, html[data-mode=overdrive] .theme-swatch.od-button {
   width: 22px; height: 22px; border: 1px solid var(--hg-line2); border-radius: 0; opacity: 1; background: var(--swatch) !important; box-shadow: none; transform: none;
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%); transition: border-color .15s, outline-color .15s;
@@ -263,7 +262,7 @@ html[data-mode=overdrive] .theme-swatch.is-selected { box-shadow: inset 0 0 0 2p
 /* Section headings */
 html[data-mode=overdrive] .section-heading { align-items: flex-end; margin: 0 0 16px; padding-bottom: 12px; border-bottom: 1px solid var(--hg-line); }
 html[data-mode=overdrive] .section-kicker {
-  display: flex; align-items: center; gap: 9px; margin: 0 0 8px; font: 10px var(--hg-font-mono); letter-spacing: .26em; text-transform: uppercase; color: var(--hg-text3); text-shadow: none;
+  display: flex; align-items: center; gap: 9px; margin: 0 0 8px; font: 11px var(--hg-font-mono); letter-spacing: .26em; text-transform: uppercase; color: var(--hg-text3); text-shadow: none;
 }
 html[data-mode=overdrive] .section-kicker::before { content: ""; width: 7px; height: 7px; margin: 0; background: var(--hg-ac); animation: none; font-size: 0; }
 html[data-mode=overdrive] .section-title::after { display: none; }
@@ -319,7 +318,7 @@ html[data-mode=overdrive] .game-art { background: linear-gradient(135deg, var(--
 html[data-mode=overdrive] .game-art::before { text-shadow: none; font: 600 34px var(--hg-font-display); letter-spacing: .04em; }
 html[data-mode=overdrive] .game-card:hover .game-art img { transform: scale(1.03); filter: none; }
 html[data-mode=overdrive] .game-info strong { font: 600 18px/1.2 var(--hg-font-display); letter-spacing: .02em; }
-html[data-mode=overdrive] .game-info small { font: 10px var(--hg-font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--hg-text3); }
+html[data-mode=overdrive] .game-info small { font: 11px var(--hg-font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--hg-text3); }
 html[data-mode=overdrive] .game-play {
   right: 0; top: 0; padding: 7px 14px; border-radius: 0; background: var(--hg-grad); color: var(--hg-ink); box-shadow: none; font: 12px var(--hg-font-display); letter-spacing: .14em;
   clip-path: polygon(0 0, 100% 0, 100% 100%, 8px 100%, 0 calc(100% - 8px));
@@ -335,17 +334,14 @@ html[data-mode=overdrive] .game-add:only-child .game-info strong { font: 600 30p
 html[data-mode=overdrive] .utility-grid { gap: 10px; }
 html[data-mode=overdrive] .utility-card { padding: 18px 20px; background: var(--hg-panel); border: 1px solid var(--hg-line); border-left: 3px solid var(--hg-ac); box-shadow: none; }
 html[data-mode=overdrive] .utility-heading h2 { font: 600 22px var(--hg-font-display); letter-spacing: .04em; text-transform: uppercase; color: var(--hg-text); }
-html[data-mode=overdrive] :is(.progress-label, .notes-status) {
-  padding: 4px 8px; border: 1px solid var(--hg-aline); border-radius: 0; background: var(--hg-soft); color: var(--hg-ac); font: 600 9.5px var(--hg-font-mono); letter-spacing: .16em;
-}
 html[data-mode=overdrive] .progress-track { height: 6px; border-radius: 0; background: var(--hg-bg2); box-shadow: inset 0 0 0 1px var(--hg-line); }
 html[data-mode=overdrive] .progress-track span { border-radius: 0; background: var(--hg-grad); background-size: 200% 100%; box-shadow: none; animation: hg-grad-flow 9s ease-in-out infinite; }
 html[data-mode=overdrive] .progress-track span::after { display: none; }
 @keyframes hg-grad-flow { 50% { background-position: 100% 0; } }
-html[data-mode=overdrive] :is(.task-entry input, .notes-card textarea, .dialog label:not(.catalog-search) input, .catalog-search, .weather-form input) {
+html[data-mode=overdrive] :is(.task-entry input, .dialog label:not(.catalog-search) input) {
   border: 1px solid var(--hg-line); border-bottom: 2px solid var(--hg-line2); border-radius: 0; background: var(--hg-panel); box-shadow: none; color: var(--hg-text); font-weight: 600; transition: border-color .15s, background .15s;
 }
-html[data-mode=overdrive] :is(.task-entry input, .notes-card textarea, .dialog label:not(.catalog-search) input, .weather-form input):focus {
+html[data-mode=overdrive] :is(.task-entry input, .dialog label:not(.catalog-search) input):focus {
   background: var(--hg-panel2); border-color: var(--hg-aline); border-bottom-color: var(--hg-ac); box-shadow: none;
 }
 html[data-mode=overdrive] .dialog .catalog-search:focus-within { border-color: var(--hg-aline); border-bottom-color: var(--hg-ac); box-shadow: none; }
@@ -365,17 +361,16 @@ html[data-mode=overdrive] .footer-center b, html[data-mode=overdrive] .footer-ri
 
 /* ===================================================================== buttons */
 html[data-mode=overdrive] .add-symbol { color: var(--hg-ac); }
-html[data-mode=overdrive] :is(.ghost-button, .back-link, .calendar-nav, .calendar-today) {
+html[data-mode=overdrive] :is(.ghost-button) {
   border: 1px solid var(--hg-line2); border-radius: 0; background: transparent; box-shadow: none; color: var(--hg-text2); font-weight: 600;
 }
-html[data-mode=overdrive] :is(.ghost-button, .back-link, .calendar-nav, .calendar-today):hover:not(:disabled) { border-color: var(--hg-ac); color: var(--hg-text); background: var(--hg-soft); box-shadow: none; }
+html[data-mode=overdrive] :is(.ghost-button):hover:not(:disabled) { border-color: var(--hg-ac); color: var(--hg-text); background: var(--hg-soft); box-shadow: none; }
 html[data-mode=overdrive] .dialog-close{ width: 42px; height: 42px; border: 1px solid var(--hg-line2); border-radius: 0; background: transparent; backdrop-filter: none; color: var(--hg-text2); box-shadow: none; }
 html[data-mode=overdrive] .od-button { transition: background .15s, border-color .15s, color .15s !important; }
 html[data-mode=overdrive].od-launchpad .od-button[data-od-effect] { animation-name: none; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
-html[data-mode=overdrive].od-launchpad .shortcut-card.od-button[data-od-effect], html[data-mode=overdrive].od-launchpad .shortcut-card.od-button[data-od-effect]:is(:hover, :focus-within) {
+html[data-mode=overdrive].od-launchpad .shortcut-card.od-button[data-od-effect] {
   background: var(--hg-panel) !important; border-color: var(--hg-line) !important; box-shadow: none !important; transform: none !important;
 }
-html[data-mode=overdrive].od-launchpad .shortcut-card.od-button[data-od-effect]:is(:hover, :focus-within) { background: var(--hg-panel2) !important; border-color: var(--hg-line2) !important; }
 html[data-mode=overdrive].od-launchpad .od-button[data-od-effect=halo] { background: transparent !important; border-radius: 0; }
 html[data-mode=overdrive].od-launchpad .od-button[data-od-effect=ripple] { background-color: transparent !important; box-shadow: none !important; }
 html[data-mode=overdrive].od-launchpad .od-button[data-od-effect=chroma] { background: var(--swatch, transparent) !important; animation: none; }
@@ -397,9 +392,9 @@ html[data-mode=overdrive] .dialog[open] { animation: hg-rise .2s var(--hg-ease) 
 html[data-mode=overdrive] .dialog::before, html[data-mode=overdrive] .dialog::after { display: none; }
 html[data-mode=overdrive] .dialog::backdrop { background: rgba(4, 4, 5, .84); backdrop-filter: none; }
 html[data-mode=overdrive] .dialog h2 { font: 600 26px var(--hg-font-display); letter-spacing: .04em; text-transform: uppercase; }
-html[data-mode=overdrive] .dialog-head .eyebrow { color: var(--hg-text3); font-size: 10px; margin-bottom: 8px; }
+html[data-mode=overdrive] .dialog-head .eyebrow { color: var(--hg-text3); font-size: 11px; margin-bottom: 8px; }
 html[data-mode=overdrive] .eyebrow-index { color: var(--hg-ac); margin-left: 6px; }
-html[data-mode=overdrive] .dialog label { color: var(--hg-text3); font: 10px var(--hg-font-mono); letter-spacing: .2em; text-transform: uppercase; }
+html[data-mode=overdrive] .dialog label { color: var(--hg-text3); font: 11px var(--hg-font-mono); letter-spacing: .2em; text-transform: uppercase; }
 html[data-mode=overdrive] .dialog label input { text-transform: none; letter-spacing: 0; font: 600 13px var(--hg-font-ui); }
 html[data-mode=overdrive] .dialog-actions { position: sticky; bottom: -28px; margin: 18px -28px -28px; padding: 14px 28px 20px; background: var(--hg-panel); border-top: 1px solid var(--hg-line); }
 html[data-mode=overdrive] .settings-dialog .dialog-head { background: linear-gradient(180deg, var(--hg-panel) 80%, transparent); }

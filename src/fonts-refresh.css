@@ -18,4 +18,4 @@ html[data-font=classic][data-mode=overdrive] .hero #greeting { letter-spacing: -
 html[data-font=classic][data-mode=overdrive] :is(.item-title, .creator-name, .pulse-last strong) { font-weight: 600; }
 html[data-font=classic][data-mode=astra] .item-title { font-size: 18px; font-weight: 700; letter-spacing: 0; }
 html[data-font=classic][data-mode=astra] .item-tile .item-title { font-size: 17px; }
-html[data-font=classic][data-mode=astra] .item-meta { font-family: var(--body); font-size: 10.5px; letter-spacing: .08em; }
+html[data-font=classic][data-mode=astra] .item-meta { font-family: var(--body); font-size: 11px; letter-spacing: .08em; }

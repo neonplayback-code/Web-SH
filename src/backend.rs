@@ -102,6 +102,11 @@ struct AuthResponse {
 }
 
 #[derive(Deserialize)]
+struct UsernameRow {
+    username: String,
+}
+
+#[derive(Deserialize)]
 struct LikedRow {
     project_id: String,
 }
@@ -253,26 +258,33 @@ pub async fn is_owner(token: &str) -> Result<bool, String> {
 }
 
 pub async fn fetch_liked_ids(user_id: &str, token: &str) -> Result<Vec<String>, String> {
-    let req = api_request(
-        reqwest::Method::GET,
-        &format!("/rest/v1/project_likes?select=project_id&user_id=eq.{user_id}"),
-        Some(token),
-    )?;
+    // Los valores van como parámetros de consulta (codificados), nunca pegados a la URL.
+    let req = api_request(reqwest::Method::GET, "/rest/v1/project_likes", Some(token))?.query(&[
+        ("select", "project_id".to_owned()),
+        ("user_id", format!("eq.{user_id}")),
+    ]);
     let rows: Vec<LikedRow> = send_json(req).await?;
     Ok(rows.into_iter().map(|row| row.project_id).collect())
+}
+
+// El nombre público real es el de la tabla profiles (único y ya limpio): las publicaciones deben llevar ese.
+pub async fn fetch_username(user_id: &str, token: &str) -> Option<String> {
+    let req = api_request(reqwest::Method::GET, "/rest/v1/profiles", Some(token))
+        .ok()?
+        .query(&[("select", "username".to_owned()), ("id", format!("eq.{user_id}"))]);
+    let rows: Vec<UsernameRow> = send_json(req).await.ok()?;
+    rows.into_iter().next().map(|row| row.username)
 }
 
 pub async fn fetch_updates(
     project_id: &str,
     token: Option<&str>,
 ) -> Result<Vec<ProjectUpdate>, String> {
-    let req = api_request(
-        reqwest::Method::GET,
-        &format!(
-            "/rest/v1/project_updates?select=id,text,created_at&project_id=eq.{project_id}&order=created_at.desc"
-        ),
-        token,
-    )?;
+    let req = api_request(reqwest::Method::GET, "/rest/v1/project_updates", token)?.query(&[
+        ("select", "id,text,created_at".to_owned()),
+        ("project_id", format!("eq.{project_id}")),
+        ("order", "created_at.desc".to_owned()),
+    ]);
     send_json(req).await
 }
 

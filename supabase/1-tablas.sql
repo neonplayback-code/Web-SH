@@ -181,6 +181,10 @@ drop policy if exists "edito mi perfil" on public.profiles;
 create policy "edito mi perfil" on public.profiles for update
   using (id = (select auth.uid())) with check (id = (select auth.uid()));
 
+-- Del perfil solo se puede editar el nombre: la fecha decide quién es el dueño y no debe tocarse.
+revoke update on public.profiles from authenticated, anon;
+grant update (username) on public.profiles to authenticated;
+
 -- Publicaciones: lo publicado lo ve todo el mundo; los borradores solo su autor.
 drop policy if exists "publicadas o propias" on public.projects;
 create policy "publicadas o propias" on public.projects for select

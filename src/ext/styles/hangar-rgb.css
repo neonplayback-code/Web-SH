@@ -41,29 +41,21 @@ html[data-mode=overdrive] body::after {
 }
 @keyframes hg-scanband { to { background-position: 0 130%, 0 0; } }
 /* Circuit flow + cursor spotlight (created by scripts/hangar-fx.js) */
-#hg-circuits, #hg-spot { position: fixed; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; display: none; }
 html[data-mode=overdrive] #hg-circuits, html[data-mode=overdrive] #hg-spot { display: block; }
-#hg-spot { background: radial-gradient(380px circle at var(--mx, 50%) var(--my, 30%), color-mix(in srgb, var(--hg-ac) 13%, transparent), transparent 62%); mix-blend-mode: screen; }
-.hg-trace { fill: none; stroke: color-mix(in srgb, var(--hg-ac) 26%, transparent); stroke-width: 1; stroke-linejoin: round; }
-.hg-packet { fill: none; stroke: var(--hg-ac); stroke-width: 1.8; stroke-linecap: round; stroke-dasharray: 22 900; filter: drop-shadow(0 0 4px var(--hg-ac)); animation: hg-flow 7s linear infinite; }
-.hg-packet:nth-of-type(3n) { stroke: var(--hg-ac3); filter: drop-shadow(0 0 4px var(--hg-ac3)); }
-.hg-packet:nth-of-type(3n+1) { stroke: var(--hg-ac2); filter: drop-shadow(0 0 4px var(--hg-ac2)); }
-.hg-node { fill: var(--hg-ac); opacity: .65; }
-@keyframes hg-flow { from { stroke-dashoffset: 922; } to { stroke-dashoffset: 0; } }
 html[data-mode=overdrive] .backdrop-media { opacity: .55; }
 
 /* ----------------------------------------------------------------- RGB edge flow */
-html[data-mode=overdrive] :is(.clock-panel, .utility-card, .plugin-widget) {
+html[data-mode=overdrive] :is(.clock-panel, .utility-card) {
   border: 1px solid transparent; border-image: conic-gradient(from var(--ring), var(--hg-ac), var(--hg-ac2), var(--hg-ac3), var(--hg-ac2), var(--hg-ac)) 1; animation: ring 10s linear infinite;
 }
 html[data-mode=overdrive] .utility-card:nth-of-type(2) { animation-duration: 14s; animation-direction: reverse; }
-html[data-mode=overdrive] :is(.shortcut-card, .game-card, .plugin-row, .catalog-card):hover { border-image: conic-gradient(from var(--ring), var(--hg-ac), var(--hg-ac2), var(--hg-ac3), var(--hg-ac2), var(--hg-ac)) 1; animation: ring 3.4s linear infinite; }
+html[data-mode=overdrive] :is( .game-card):hover { border-image: conic-gradient(from var(--ring), var(--hg-ac), var(--hg-ac2), var(--hg-ac3), var(--hg-ac2), var(--hg-ac)) 1; animation: ring 3.4s linear infinite; }
 html[data-mode=overdrive] .search:focus-within { border: 1px solid transparent; border-bottom-width: 2px; border-image: conic-gradient(from var(--ring), var(--hg-ac), var(--hg-ac2), var(--hg-ac3), var(--hg-ac2), var(--hg-ac)) 1; animation: ring 3.4s linear infinite; background: color-mix(in srgb, var(--hg-panel2) 70%, transparent); }
 html[data-mode=overdrive] .utility-card::before, html[data-mode=overdrive] .clock-panel::before {
   display: block; content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .7; padding: 0; background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .03) 0 1px, transparent 1px 3px); mask: none; -webkit-mask: none;
 }
 /* Circuit corners: tech accents on two opposite corners */
-html[data-mode=overdrive] :is(.utility-card, .plugin-widget)::after {
+html[data-mode=overdrive] :is(.utility-card)::after {
   display: block; content: ""; position: absolute; inset: -1px; z-index: 2; pointer-events: none; padding: 0; mask: none; -webkit-mask: none; opacity: .9; border: 0; width: auto; height: auto;
   background:
     linear-gradient(var(--hg-ac), var(--hg-ac)) 100% 0 / 16px 2px no-repeat, linear-gradient(var(--hg-ac), var(--hg-ac)) 100% 0 / 2px 16px no-repeat,
@@ -84,34 +76,21 @@ html[data-mode=overdrive] .mode-selector { border-image: conic-gradient(from var
 html[data-mode=overdrive] .theme-swatch.is-selected { box-shadow: inset 0 0 0 2px var(--hg-bg), inset 0 0 0 3px var(--hg-text), 0 0 12px var(--swatch); }
 
 /* ------------------------------------------------ ripple, magnetic hover, glitch */
-.hg-ripple { position: fixed; z-index: 9990; width: 14px; height: 14px; margin: -7px 0 0 -7px; pointer-events: none; border: 2px solid var(--hg-ac); box-shadow: 0 0 14px var(--hg-ac), inset 0 0 8px var(--hg-ac); transform: rotate(45deg) scale(0); opacity: .95; animation: hg-ripple .7s cubic-bezier(.2, .8, .2, 1) forwards; }
 .hg-ripple.is-b { border-color: var(--hg-ac3); box-shadow: 0 0 14px var(--hg-ac3); animation-delay: .08s; }
-@keyframes hg-ripple { to { transform: rotate(45deg) scale(7); opacity: 0; } }
-.hg-glitch { animation: hg-glitch .3s steps(2, end); }
-@keyframes hg-glitch {
-  0% { text-shadow: 3px 0 var(--hg-ac3), -3px 0 var(--hg-ac); transform: translateX(-1px); }
-  25% { text-shadow: -3px 0 var(--hg-ac3), 3px 0 var(--hg-ac); clip-path: inset(10% 0 52% 0); }
-  50% { text-shadow: 2px 0 var(--hg-ac), -2px 0 var(--hg-ac3); clip-path: inset(58% 0 6% 0); transform: translateX(2px); }
-  75% { text-shadow: -2px 0 var(--hg-ac3); clip-path: inset(0 0 0 0); transform: none; }
-  100% { text-shadow: none; clip-path: none; transform: none; }
-}
 
 /* --------------------------------------------------- navigation, boot, telemetry */
 html[data-mode=overdrive] .search-engine-option { animation: hg-slide .3s var(--hg-ease) both; }
 html[data-mode=overdrive] .search-engine-option:nth-child(2) { animation-delay: .04s; } html[data-mode=overdrive] .search-engine-option:nth-child(3) { animation-delay: .08s; } html[data-mode=overdrive] .search-engine-option:nth-child(4) { animation-delay: .12s; }
 @keyframes hg-slide { from { opacity: 0; transform: translateX(-12px); } }
-#hg-boot { position: fixed; inset: 0; z-index: 9998; display: grid; align-content: center; justify-content: center; gap: 14px; background: rgba(5, 7, 12, .93); pointer-events: none; transition: opacity .4s; }
-#hg-boot pre { margin: 0; color: var(--hg-ac); font: 13px/1.7 var(--hg-font-mono); text-shadow: 0 0 10px color-mix(in srgb, var(--hg-ac) 70%, transparent); }
-#hg-boot i { display: block; width: 0; height: 2px; background: var(--hg-grad); box-shadow: 0 0 12px var(--hg-ac); transition: width .12s linear; }
 #hg-boot.is-done { opacity: 0; }
 
 html[data-mode=overdrive] .hg-meter { position: relative; border: 1px solid var(--hg-line); border-left: 3px solid var(--hg-ac); background: color-mix(in srgb, var(--hg-bg2) 70%, transparent); padding: 6px 8px 4px; }
 html[data-mode=overdrive] .hg-meter canvas { display: block; width: 100%; height: 56px; }
-html[data-mode=overdrive] .hg-meter-read { position: absolute; top: 6px; right: 10px; display: flex; align-items: baseline; gap: 6px; font: 9px var(--hg-font-mono); letter-spacing: .2em; color: var(--hg-text3); }
+html[data-mode=overdrive] .hg-meter-read { position: absolute; top: 6px; right: 10px; display: flex; align-items: baseline; gap: 6px; font: 11px var(--hg-font-mono); letter-spacing: .2em; color: var(--hg-text3); }
 html[data-mode=overdrive] .hg-meter-read b { font: 600 20px/1 var(--hg-font-display); letter-spacing: 0; color: var(--hg-ac); text-shadow: 0 0 12px color-mix(in srgb, var(--hg-ac) 60%, transparent); }
 html[data-mode=overdrive] .hg-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 10px 0 0; }
 html[data-mode=overdrive] .hg-stats div { padding: 8px 10px; border: 1px solid var(--hg-line); border-left: 3px solid var(--hg-line2); background: color-mix(in srgb, var(--hg-panel) 60%, transparent); }
-html[data-mode=overdrive] .hg-stats dt { font: 9px var(--hg-font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--hg-text3); }
+html[data-mode=overdrive] .hg-stats dt { font: 11px var(--hg-font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--hg-text3); }
 html[data-mode=overdrive] .hg-stats dd { margin: 2px 0 0; font: 600 22px/1.1 var(--hg-font-display); font-variant-numeric: tabular-nums; }
 html[data-mode=overdrive] .hg-status { display: grid; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; font: 11px var(--hg-font-mono); letter-spacing: .1em; color: var(--hg-text2); text-transform: uppercase; }
 html[data-mode=overdrive] .hg-status li { display: flex; align-items: center; gap: 8px; }
@@ -135,17 +114,16 @@ html[data-mode=overdrive] .search-suggest { border: 1px solid var(--hg-line2); b
 html[data-mode=overdrive] .sg-item { border-left: 3px solid transparent; font: 600 14px var(--hg-font-ui); }
 html[data-mode=overdrive] .sg-item .sg-icon svg { color: var(--hg-ac); }
 html[data-mode=overdrive] .sg-item:hover, html[data-mode=overdrive] .sg-item.is-active { background: var(--hg-soft); border-left-color: var(--hg-ac); }
-html[data-mode=overdrive] .sg-clear { font: 10px var(--hg-font-mono); letter-spacing: .18em; text-transform: uppercase; color: var(--hg-text3); }
+html[data-mode=overdrive] .sg-clear { font: 11px var(--hg-font-mono); letter-spacing: .18em; text-transform: uppercase; color: var(--hg-text3); }
 html[data-mode=overdrive] .search-clear { border-radius: 0; color: var(--hg-text2); }
 html[data-mode=overdrive] .search-clear:hover { color: var(--hg-ac); background: var(--hg-soft); }
 
 /* ----------------------------------------------------------- graphics levels */
 html.perf-lite[data-mode=overdrive] body::after, html.perf-lite[data-mode=overdrive] #hg-circuits, html.perf-lite[data-mode=overdrive] #hg-spot, html.perf-lite[data-mode=overdrive] .aurora { display: none; }
-html.perf-lite[data-mode=overdrive] :is(.clock-panel, .utility-card, .plugin-widget, .search:focus-within, .mode-selector) { animation: none; border-image: none; border: 1px solid var(--hg-line2); }
+html.perf-lite[data-mode=overdrive] :is(.clock-panel, .utility-card, .search:focus-within, .mode-selector) { animation: none; border-image: none; border: 1px solid var(--hg-line2); }
 html.perf-lite[data-mode=overdrive] .grid-glow { animation: none; opacity: .3; }
 html.perf-lite[data-mode=overdrive] .hg-packet { animation: none; }
 @media (prefers-reduced-motion: reduce) {
   html[data-mode=overdrive] body::after { animation: none; }
-  .hg-packet, .hg-ripple, .hg-glitch, html[data-mode=overdrive] :is(.clock-panel, .utility-card, .plugin-widget, .mode-selector) { animation: none !important; }
-  #hg-boot { display: none; }
+   html[data-mode=overdrive] :is(.clock-panel, .utility-card, .mode-selector) { animation: none !important; }
 }

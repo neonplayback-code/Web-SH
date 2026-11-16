@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
-import { Routes, Route, Link } from 'react-router'
+import { Routes, Route, Link, useLocation } from 'react-router'
 import { Backdrop } from './components/Backdrop'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { CustomizeDialog } from './components/CustomizeDialog'
 import { ProfileEditor } from './components/ProfileEditor'
 import { Header } from './components/Header'
@@ -15,11 +16,14 @@ const ProfilePage = lazy(() => import('./pages/ProfilePage').then((m) => ({ defa
 const LoginPage = lazy(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage })))
 
 function App() {
+  const { pathname } = useLocation()
   return (
     <>
       <a className="skip-link" href="#contenido">Saltar al contenido</a>
       <Backdrop />
       <Header />
+      {/* Con la ruta como key, un error en una página se borra al ir a otra. */}
+      <ErrorBoundary key={pathname}>
       <Suspense fallback={null}>
         <Routes>
           {TABS.map((t) => (
@@ -39,6 +43,7 @@ function App() {
           } />
         </Routes>
       </Suspense>
+      </ErrorBoundary>
       <CustomizeDialog />
       <ProfileEditor />
     </>

@@ -113,7 +113,7 @@ export async function saveSiteProfile(next: SiteProfile): Promise<string | null>
     .filter((l) => l.label && safeHref(l.url))
     .slice(0, 8)
 
-  const { error } = await supabase.from('site_profile').upsert({
+  const row = {
     id: 'main',
     display_name: next.displayName.trim().slice(0, 60) || DEFAULT_PROFILE.displayName,
     role: next.role.trim().slice(0, 40),
@@ -129,13 +129,15 @@ export async function saveSiteProfile(next: SiteProfile): Promise<string | null>
     links,
     hidden_tabs: next.hiddenTabs,
     updated_at: Date.now()
-  })
+  }
+  const { error } = await supabase.from('site_profile').upsert(row)
   if (error) {
     return error.message.toLowerCase().includes('site_profile')
       ? 'Falta ejecutar el SQL del perfil (supabase/4-perfil.sql) en Supabase.'
       : error.message
   }
-  state = { ...next, links }
+  // Lo que se muestra es lo que quedó guardado (recortado y limpio), no lo que se escribió.
+  state = fromRow(row as Row)
   emit()
   return null
 }
